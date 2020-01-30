@@ -9,6 +9,40 @@ lineBreak
 spacing
 	= space / lineBreak
 
+// title
+
+titleA_char
+	= !(lineBreak / "】") c:. { return c; }
+
+titleA_content
+	= t:$(titleA_char+) { return t; }
+
+titleA
+	= "【" titleA_content "】"
+
+titleB_char
+	= !(lineBreak / "]") c:. { return c; }
+
+titleB_content
+	= t:$(titleB_char+) { return t; }
+
+titleB
+	= "[" titleB_content "]"
+
+title
+	= titleA / titleB
+
+// blockCode
+
+blockCode_char
+	= !(lineBreak / "```") c:. { return c; }
+
+blockCode_line
+	= t:$(blockCode_char*) lineBreak { return t; }
+
+blockCode
+	= "```" lineBreak blockCode_line* "```"
+
 // parts
 
 plain
