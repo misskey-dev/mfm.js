@@ -9,22 +9,31 @@ lineBreak
 spacing
 	= space / lineBreak
 
-// title
+// titile
+
+title_nestContent
+	= inline
 
 titleA_char
-	= !(lineBreak / "】") c:. { return c; }
+	= !(title_nestContent / lineBreak / "】") c:. { return c; }
+
+titleA_text
+	= t:$(titleA_char+) { return t; }
 
 titleA_content
-	= t:$(titleA_char+) { return t; }
+	= (title_nestContent / titleA_text)+
 
 titleA
 	= "【" titleA_content "】"
 
 titleB_char
-	= !(lineBreak / "]") c:. { return c; }
+	= !(title_nestContent / lineBreak / "]") c:. { return c; }
+
+titleB_text
+	= t:$(titleB_char+) { return t; }
 
 titleB_content
-	= t:$(titleB_char+) { return t; }
+	=  (title_nestContent / titleB_text)+
 
 titleB
 	= "[" titleB_content "]"
