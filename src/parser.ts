@@ -1,1 +1,1 @@
-import coreParser from './coreParser';
+const coreParser = require('./coreParser.js');
