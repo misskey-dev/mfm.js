@@ -54,35 +54,45 @@ blockCode
 
 // parts
 
-plain
-	= emoji
-	/ text
+// plain
+// 	= emoji
+// 	/ text
+
+// block
+// 	= title
+// 	/ quote
+// 	/ search
+// 	/ blockCode
+// 	/ mathBlock
+// 	/ center
+
+// inline
+// 	= big
+// 	/ bold
+// 	/ small
+// 	/ italic
+// 	/ strike
+// 	/ motion
+// 	/ spin
+// 	/ jump
+// 	/ flip
+// 	/ inlineCode
+// 	/ mathInline
+// 	/ mention
+// 	/ hashtag
+// 	/ url
+// 	/ link
+// 	/ plain
+
+// root
+// 	= block
+// 	/ inline
 
 block
 	= title
-	/ quote
-	/ search
 	/ blockCode
-	/ mathBlock
-	/ center
 
-inline
-	= big
-	/ bold
-	/ small
-	/ italic
-	/ strike
-	/ motion
-	/ spin
-	/ jump
-	/ flip
-	/ inlineCode
-	/ mathInline
-	/ mention
-	/ hashtag
-	/ url
-	/ link
-	/ plain
+inline = "inline"
 
 root
 	= block

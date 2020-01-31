@@ -2,24 +2,29 @@
   "private": true,
   "name": "mfm-parser-pegjs",
   "version": "0.1.0",
+  "main": "./built/index.js",
   "scripts": {
-    "build": "npm run peg && npm run tsc",
-    "build-debug": "npm run peg-debug && npm run tsc",
-    "peg": "mkdirp ./built && pegjs -o built/coreParser.js src/coreParser.pegjs",
-    "peg-debug": "mkdirp ./built && pegjs -o built/coreParser.js --trace src/coreParser.pegjs",
-    "tsc": "tsc"
+    "build": "npm run peg && npm run tsc && npm run webpack",
+    "build-dev": "npm run peg-dev && npm run tsc && npm run webpack-dev",
+    "peg": "mkdirp ./built/parser && pegjs -o built/parser/coreParser.js src/parser/coreParser.pegjs",
+    "peg-dev": "mkdirp ./built/parser && pegjs -o built/parser/coreParser.js --trace src/parser/coreParser.pegjs",
+    "tsc": "tsc",
+    "webpack": "webpack --mode=production",
+    "webpack-dev": "webpack --mode=development",
+    "start": "node ."
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/marihachi/mfm-parser-pegjs.git"
   },
   "author": "Marihachi",
-  "dependencies": {
-  },
   "devDependencies": {
     "@types/node": "^12.0.4",
     "mkdirp": "^0.5.1",
     "pegjs": "^0.10.0",
-    "typescript": "3.7.x"
+    "ts-loader": "6.2.x",
+    "typescript": "3.7.x",
+    "webpack": "4.40.x",
+    "webpack-cli": "3.3.x"
   }
 }
