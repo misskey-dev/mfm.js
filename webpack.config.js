@@ -1,5 +1,5 @@
 module.exports = {
-	entry: './src/client/mainEntry.ts',
+	entry: './src/client/main-entry.ts',
 	output: {
 		path: `${__dirname}/built/client`,
 		publicPath: '/', // base path of URL
