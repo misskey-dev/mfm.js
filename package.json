@@ -20,15 +20,13 @@
   "author": "Marihachi",
   "devDependencies": {
     "@types/node": "^12.0.4",
+    "@types/parsimmon": "^1.10.1",
     "mkdirp": "^0.5.1",
+    "parsimmon": "^1.13.0",
     "pegjs": "^0.10.0",
     "ts-loader": "6.2.x",
     "typescript": "3.7.x",
     "webpack": "4.40.x",
     "webpack-cli": "3.3.x"
-  },
-  "dependencies": {
-    "@types/parsimmon": "^1.10.1",
-    "parsimmon": "^1.13.0"
   }
 }
