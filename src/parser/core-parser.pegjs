@@ -107,8 +107,8 @@ search
 	});
 }
 
-search_query =
-	head:CHAR tail:(!([ 　\t] search_keyToken ENDLINE) c:CHAR { return c; })*
+search_query
+	= head:CHAR tail:(!([ 　\t] search_keyToken ENDLINE) c:CHAR { return c; })*
 {
 	return head + tail.join('');
 }
