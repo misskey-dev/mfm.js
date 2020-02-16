@@ -95,7 +95,7 @@ blockCode_line
 big
 	= "***" content:(!"***" i:inline { return i; })+ "***"
 {
-	return createTree('big', { }, content);
+	return createTree('big', { }, mergeText(content));
 }
 
 
@@ -106,13 +106,13 @@ bold = bold_A / bold_B
 bold_A
 	= "**" content:(!"**" i:inline { return i; })+ "**"
 {
-	return createTree('bold', { }, content);
+	return createTree('bold', { }, mergeText(content));
 }
 
 bold_B
 	= "__" content:(!"__" i:inline { return i; })+ "__"
 {
-	return createTree('bold', { }, content);
+	return createTree('bold', { }, mergeText(content));
 }
 
 
