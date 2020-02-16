@@ -4,23 +4,17 @@
 		mergeText
 	} = require('./parser-utils');
 
-	function applyParser(input, rule) {
+	function applyParser(input, startRule) {
 		let parseFunc = peg$parse;
-		return parseFunc(input, rule ? { startRule : rule } : { });
+		return parseFunc(input, startRule ? { startRule } : { });
 	}
 }
 
 root
-	= ts:all*
-{
-	return mergeText(ts);
-}
+	= ts:(block / inline)* { return mergeText(ts); }
 
-all
-	= block / inline
-
-// plain
-// 	=
+plain
+	= ts:(text /*/ emoji*/)* { return mergeText(ts); }
 
 block
 	= title
@@ -30,8 +24,10 @@ block
 
 inline
 	= big
-	/ c:. { return createTree('text', { text: c }); }
+	/ text
 
+text
+	= c:. { return createTree('text', { text: c }); }
 
 // block: title
 

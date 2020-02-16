@@ -7,8 +7,8 @@
   "scripts": {
     "build": "npm run tsc && npm run peg && npm run webpack",
     "build-dev": "npm run tsc && npm run peg-dev && npm run webpack-dev",
-    "peg": "node ./built/build",
-    "peg-dev": "node ./built/build trace",
+    "peg": "mkdirp ./built/parser && pegjs -o built/parser/core-parser.js --allowed-start-rules root,plain src/parser/core-parser.pegjs",
+    "peg-dev": "mkdirp ./built/parser && pegjs -o built/parser/core-parser.js --allowed-start-rules root,plain --trace src/parser/core-parser.pegjs",
     "tsc": "tsc",
     "webpack": "webpack --mode=production",
     "webpack-dev": "webpack --mode=development",
