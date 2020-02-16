@@ -35,15 +35,15 @@ title
 	= titleA / titleB
 
 titleA
-	= "【" content:(!("】" ENDLINE) i:inline { return i; })+ "】" ENDLINE
+	= BEGINLINE "【" content:(!("】" ENDLINE) i:inline { return i; })+ "】" ENDLINE
 {
-	return createTree('title', { }, content);
+	return createTree('title', { }, mergeText(content));
 }
 
 titleB
-	= "[" content:(!("]" ENDLINE) i:inline { return i; })+ "]" ENDLINE
+	= BEGINLINE "[" content:(!("]" ENDLINE) i:inline { return i; })+ "]" ENDLINE
 {
-	return createTree('title', { }, content);
+	return createTree('title', { }, mergeText(content));
 }
 
 
@@ -57,13 +57,13 @@ quote
 }
 
 quote_line
-	= ">" _? content:$(CHAR+) ENDLINE { return content; }
+	= BEGINLINE ">" _? content:$(CHAR+) ENDLINE { return content; }
 
 
 // block: search
 
 search
-	= q:search_query sp:[ 　\t] key:search_keyToken ENDLINE
+	= BEGINLINE q:search_query sp:[ 　\t] key:search_keyToken ENDLINE
 {
 	return createTree('search', {
 		query: q,
@@ -84,7 +84,7 @@ search_keyToken
 // block: blockCode
 
 blockCode
-	= "```" NEWLINE lines: (!("```" ENDLINE) line:blockCode_line NEWLINE { return line; } )* "```" ENDLINE { return lines; }
+	= BEGINLINE "```" NEWLINE lines: (!("```" ENDLINE) line:blockCode_line NEWLINE { return line; } )* "```" ENDLINE { return lines; }
 
 blockCode_line
 	= (!"```" (block / inline))+
@@ -126,6 +126,9 @@ ENDLINE
 
 NEWLINE
 	= "\r\n" / [\r\n]
+
+BEGINLINE
+	= &{ return location().start.column == 1; }
 
 EOF
 	= !.
