@@ -1,23 +1,23 @@
 {
-	function buildList(head, others) {
-		return [ head, ...others ];
-	}
+	const {
+		createTree,
+		mergeText
+	} = require('./parser-utils');
 
-	function createTree(type, props, children) {
-		props = props || { };
-		children = children || [ ];
-		children = !Array.isArray(children) ? [children] : children;
-
-		return {
-			node: { type, props },
-			children: children
-		};
+	function applyParser(input, rule) {
+		let parseFunc = peg$parse;
+		return parseFunc(input, rule ? { startRule : rule } : { });
 	}
 }
 
 root
-	= block
-	/ inline
+	= ts:all*
+{
+	return mergeText(ts);
+}
+
+all
+	= block / inline
 
 // plain
 // 	=
@@ -30,6 +30,7 @@ block
 
 inline
 	= big
+	/ c:. { return createTree('text', { text: c }); }
 
 
 // block: title
@@ -38,68 +39,35 @@ title
 	= titleA / titleB
 
 titleA
-	= "【" content:titleA_content "】"
+	= "【" content:(!("】" ENDLINE) i:inline { return i; })+ "】" ENDLINE
 {
 	return createTree('title', { }, content);
 }
-
-titleA_content
-	= (inline / titleA_text)+
-
-titleA_text
-	= s:$(titleA_char+)
-{
-	return createTree('text', { text: s });
-}
-
-titleA_char
-	= !(inline / "】") c:CHAR { return c; }
 
 titleB
-	= "[" content: titleB_content "]"
+	= "[" content:(!("]" ENDLINE) i:inline { return i; })+ "]" ENDLINE
 {
 	return createTree('title', { }, content);
 }
-
-titleB_content
-	= (inline / titleB_text)+
-
-titleB_text
-	= s:$(titleB_char+)
-{
-	return createTree('text', { text: s });
-}
-
-titleB_char
-	= !(inline / "]") c:CHAR { return c; }
 
 
 // block: quote
-// (handle the line as quote block if got a char ">" of the line head.)
 
 quote
-	= head:quote_line tail:(NEWLINE tree:quote_line { return tree; })*
+	= lines:quote_line+
 {
-	const trees = [head, ...tail];
-	console.log(trees.map(tree => tree.children));//.flat();
-	return [head, ...tail].join('\n');
+	const children = applyParser(lines.join('\n'), 'root');
+	return createTree('quote', { }, children);
 }
 
 quote_line
-	= ">" content:quote_content &ENDLINE { return createTree('quote', { }, content); }
-
-// TODO: allow nesting
-quote_content
-	= quote_text
-
-quote_text
-	= s:$(CHAR+) { return createTree('text', { text: s }); }
+	= ">" _? content:$(CHAR+) ENDLINE { return content; }
 
 
 // block: search
 
 search
-	= q:search_query sp:[ 　\t] key:search_keyToken &ENDLINE
+	= q:search_query sp:[ 　\t] key:search_keyToken ENDLINE
 {
 	return createTree('search', {
 		query: q,
@@ -120,29 +88,36 @@ search_keyToken
 // block: blockCode
 
 blockCode
-	= "```" NEWLINE lines: (!("```" ENDLINE) line:blockCode_line NEWLINE { return line; } )* "```" &ENDLINE { return lines; }
+	= "```" NEWLINE lines: (!("```" ENDLINE) line:blockCode_line NEWLINE { return line; } )* "```" ENDLINE { return lines; }
 
-// TODO: allow nesting
 blockCode_line
-	= t:$(CHAR*) { return t; }
+	= (!"```" (block / inline))+
 
 
 // inline: big
 
 big
-	= "***" content:big_content "***"
+	= "***" content:(!"***" i:inline { return i; })+ "***"
 {
 	return createTree('big', { }, content);
 }
 
-big_content
-	= (big_text / inline)*
 
-big_text
-	= s:$(big_char+) { return createTree('text', { text: s }); }
+// inline: bold
 
-big_char
-	= !("***") c:CHAR { return c; }
+bold = bold_A / bold_B
+
+bold_A
+	= "**" content:(!"**" i:inline { return i; })+ "**"
+{
+	return createTree('bold', { }, content);
+}
+
+bold_B
+	= "__" content:(!"__" i:inline { return i; })+ "__"
+{
+	return createTree('bold', { }, content);
+}
 
 
 // Core rules
@@ -159,8 +134,5 @@ NEWLINE
 EOF
 	= !.
 
-// __ "whitespaces"
-// 	= _+
-
-// _ "whitespace"
-// 	= [ \t]
+_ "whitespace"
+	= [ \t]

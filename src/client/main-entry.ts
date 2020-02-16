@@ -1,13 +1,10 @@
-import { PegParser } from '../parser/peg-parser';
+import { parse } from '../../built/index';
 
 async function entryPoint() {
-	const coreParser: PegParser = require('../../built/parser/core-parser.js');
-
-	const input = '[hoge]';
-	console.log('parsing input:', input);
-	const result = coreParser.parse(input);
-	console.log('parsing result:');
+	const result = parse('abc');
 	console.log(JSON.stringify(result));
 }
 entryPoint()
-.catch(err => console.log(err));
+.catch(err => {
+	console.log(err);
+});

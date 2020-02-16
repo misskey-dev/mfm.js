@@ -5,7 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "outDir": "./built/client/",              /* Redirect output structure to the directory. */
-    "rootDir": "./src/client/",               /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
+    "rootDir": "./src/",                      /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
     "removeComments": false,
 
     /* Strict Type-Checking Options */
@@ -21,7 +21,7 @@
     "experimentalDecorators": true,
   },
   "include": [
-    "src/client/**/*",
+    "src/**/*",
   ],
   "exclude": [
       "node_modules",

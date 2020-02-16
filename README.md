@@ -1,13 +1,27 @@
 # mfm-parser-pegjs
 ## Description
-A trial of creating a MFM parser with peg.js  
+A MFM parser made with PEG.js (In developing)  
 
 ## Installation
 ```
-npm i
+npm i mfm-parser-pegjs
 ```
 
-## Build
+## Usage
+```ts
+import { parse } from 'mfm-parser-pegjs';
+
+// parse a MFM code
+const result = parse('this is a ***MFM text***');
+```
+
+## Usage (Repository)
+### 1. Clone
+```
+git clone https://github.com/marihachi/mfm-parser-pegjs.git
+```
+
+### 2. Build
 For production:  
 ```
 npm run build
@@ -18,7 +32,10 @@ For development:
 npm run build-dev
 ```
 
-## Start
+### Use Interactive interface
 ```
-npm start
+npm parse
 ```
+
+## License
+MIT
