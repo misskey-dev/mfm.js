@@ -34,7 +34,7 @@ npm run build-dev
 
 ### Use Interactive interface
 ```
-npm parse
+npm run parse
 ```
 
 ## License
