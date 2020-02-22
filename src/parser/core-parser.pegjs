@@ -10,11 +10,14 @@
 	}
 }
 
-root
+rootParser
 	= ts:(block / inline)* { return mergeText(ts); }
 
-plain
+plainParser
 	= ts:(text /*/ emoji*/)* { return mergeText(ts); }
+
+inlineParser
+	= ts:(inline)* { return mergeText(ts); }
 
 block
 	= title
@@ -24,10 +27,12 @@ block
 
 inline
 	= big
+	/ bold
 	/ text
 
 text
 	= c:. { return createTree('text', { text: c }); }
+
 
 // block: title
 
@@ -52,7 +57,7 @@ titleB
 quote
 	= lines:quote_line+
 {
-	const children = applyParser(lines.join('\n'), 'root');
+	const children = applyParser(lines.join('\n'), 'rootParser');
 	return createTree('quote', { }, children);
 }
 
@@ -84,10 +89,17 @@ search_keyToken
 // block: blockCode
 
 blockCode
-	= BEGINLINE "```" NEWLINE lines: (!("```" ENDLINE) line:blockCode_line NEWLINE { return line; } )* "```" ENDLINE { return lines; }
+	= BEGINLINE "```" lang:CHAR* NEWLINE lines:blockCode_line* "```" ENDLINE
+{
+	lang = lang.join('');
+	return createTree('blockCode', {
+		code: lines.join('\n'),
+		lang: lang.length > 0 ? lang : null,
+	});
+}
 
 blockCode_line
-	= (!"```" (block / inline))+
+	= !("```" ENDLINE) line:$(CHAR+) NEWLINE { return line; }
 
 
 // inline: big
@@ -110,9 +122,10 @@ bold_A
 }
 
 bold_B
-	= "__" content:(!"__" i:inline { return i; })+ "__"
+	= "__" content:(!"__" i:[a-zA-Z0-9 \t] { return i; })+ "__"
 {
-	return createTree('bold', { }, mergeText(content));
+	const parsedContent = applyParser(content.join(''), 'inlineParser');
+	return createTree('bold', { }, parsedContent);
 }
 
 
