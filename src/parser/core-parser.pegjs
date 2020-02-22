@@ -62,25 +62,22 @@ quote
 }
 
 quote_line
-	= BEGINLINE ">" _? content:$(CHAR+) ENDLINE { return content; }
+	= BEGINLINE (!"><" ">" / !"＞＜" "＞") _? content:$(CHAR+) ENDLINE { return content; }
 
 
 // block: search
 
 search
-	= BEGINLINE q:search_query sp:[ 　\t] key:search_keyToken ENDLINE
+	= BEGINLINE q:search_query _ search_keyToken ENDLINE
 {
 	return createTree('search', {
 		query: q,
-		content: [ q, sp, key ].join('')
+		content: text()
 	});
 }
 
 search_query
-	= head:CHAR tail:(!([ 　\t] search_keyToken ENDLINE) c:CHAR { return c; })*
-{
-	return head + tail.join('');
-}
+	= $(!(_ search_keyToken ENDLINE) c:CHAR { return c; })+
 
 search_keyToken
 	= "検索" / "search"i
@@ -89,9 +86,8 @@ search_keyToken
 // block: blockCode
 
 blockCode
-	= BEGINLINE "```" lang:CHAR* NEWLINE lines:blockCode_line* "```" ENDLINE
+	= BEGINLINE "```" lang:$(CHAR*) NEWLINE lines:blockCode_line* "```" ENDLINE
 {
-	lang = lang.join('');
 	return createTree('blockCode', {
 		code: lines.join('\n'),
 		lang: lang.length > 0 ? lang : null,
@@ -122,9 +118,9 @@ bold_A
 }
 
 bold_B
-	= "__" content:(!"__" i:[a-zA-Z0-9 \t] { return i; })+ "__"
+	= "__" content:$(!"__" c:[a-zA-Z0-9 \t] { return c; })+ "__"
 {
-	const parsedContent = applyParser(content.join(''), 'inlineParser');
+	const parsedContent = applyParser(content, 'inlineParser');
 	return createTree('bold', { }, parsedContent);
 }
 
@@ -147,4 +143,4 @@ EOF
 	= !.
 
 _ "whitespace"
-	= [ \t]
+	= [ 　\t]
