@@ -24,6 +24,8 @@ block
 	/ quote
 	/ search
 	/ blockCode
+	// / mathBlock
+	/ center
 
 inline
 	= big
@@ -32,6 +34,16 @@ inline
 	/ italic
 	/ strike
 	/ motion
+	// / spin
+	/ jump
+	/ flip
+	// / inlineCode
+	// / mathInline
+	// / mention
+	// / hashtag
+	// / url
+	// / link
+	// / emoji
 	/ text
 
 text
@@ -100,6 +112,15 @@ blockCode
 
 blockCode_line
 	= !("```" ENDLINE) line:$(CHAR+) NEWLINE { return line; }
+
+
+// block: center
+
+center
+	= BEGINLINE "<center>" content:(!"</center>" i:inline { return i; })+ "</center>"
+{
+	return createTree('center', { }, mergeText(content));
+}
 
 
 // inline: big
@@ -189,6 +210,24 @@ motionB
 	= "(((" content:(!")))" i:inline { return i; })+ ")))"
 {
 	return createTree('motion', { }, mergeText(content));
+}
+
+
+// inline: jump
+
+jump
+	= "<jump>" content:(!"</jump>" i:inline { return i; })+ "</jump>"
+{
+	return createTree('jump', { }, mergeText(content));
+}
+
+
+// inline: flip
+
+flip
+	= "<flip>" content:(!"</flip>" i:inline { return i; })+ "</flip>"
+{
+	return createTree('flip', { }, mergeText(content));
 }
 
 
