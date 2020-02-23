@@ -28,6 +28,10 @@ block
 inline
 	= big
 	/ bold
+	/ small
+	/ italic
+	/ strike
+	/ motion
 	/ text
 
 text
@@ -109,19 +113,82 @@ big
 
 // inline: bold
 
-bold = bold_A / bold_B
+bold
+	= boldA / boldB
 
-bold_A
+boldA
 	= "**" content:(!"**" i:inline { return i; })+ "**"
 {
 	return createTree('bold', { }, mergeText(content));
 }
 
-bold_B
+boldB
 	= "__" content:$(!"__" c:[a-zA-Z0-9 \t] { return c; })+ "__"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return createTree('bold', { }, parsedContent);
+}
+
+
+// inline: small
+
+small
+	= "<small>" content:(!"</small>" i:inline { return i; })+ "</small>"
+{
+	return createTree('small', { }, mergeText(content));
+}
+
+
+// inline: italic
+
+italic
+	= italicA / italicB / italicC
+
+italicA
+	= "<i>" content:(!"</i>" i:inline { return i; })+ "</i>"
+{
+	return createTree('italic', { }, mergeText(content));
+}
+
+italicB
+	= "*" content:$(!"*" c:[a-zA-Z0-9 \t] { return c; })+ "*"
+{
+	const parsedContent = applyParser(content, 'inlineParser');
+	return createTree('italic', { }, parsedContent);
+}
+
+italicC
+	= "_" content:$(!"_" c:[a-zA-Z0-9 \t] { return c; })+ "_"
+{
+	const parsedContent = applyParser(content, 'inlineParser');
+	return createTree('italic', { }, parsedContent);
+}
+
+
+// inline: strike
+
+strike
+	= "~~" content:(!"~~" i:inline { return i; })+ "~~"
+{
+	return createTree('strike', { }, mergeText(content));
+}
+
+
+// inline: motion
+
+motion
+	= motionA / motionB
+
+motionA
+	= "<motion>" content:(!"</motion>" i:inline { return i; })+ "</motion>"
+{
+	return createTree('motion', { }, mergeText(content));
+}
+
+motionB
+	= "(((" content:(!")))" i:inline { return i; })+ ")))"
+{
+	return createTree('motion', { }, mergeText(content));
 }
 
 
