@@ -1,7 +1,6 @@
 {
-  "private": true,
   "name": "mfm-parser-pegjs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A MFM parser made with PEG.js",
   "main": "./built/index.js",
   "scripts": {
@@ -32,8 +31,8 @@
     "webpack-cli": "3.3.x"
   },
   "files": [
-    "./built/index.js",
-    "./built/index.d.ts",
-    "./built/parser"
+    "built/index.js",
+    "built/index.d.ts",
+    "built/parser"
   ]
 }
