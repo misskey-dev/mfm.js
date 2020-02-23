@@ -38,4 +38,7 @@ npm run parse
 ```
 
 ## License
-MIT
+This software is released under the [MIT License](LICENSE).
+
+This software includes codes of other softwares:
+- PEG.js: https://raw.githubusercontent.com/pegjs/pegjs/master/LICENSE
