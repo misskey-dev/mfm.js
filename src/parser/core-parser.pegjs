@@ -56,13 +56,13 @@ title
 	= titleA / titleB
 
 titleA
-	= BEGINLINE "【" content:(!("】" ENDLINE) i:inline { return i; })+ "】" ENDLINE
+	= BEGINLINE "【" content:(!(NEWLINE / "】" ENDLINE) i:inline { return i; })+ "】" ENDLINE
 {
 	return createTree('title', { }, mergeText(content));
 }
 
 titleB
-	= BEGINLINE "[" content:(!("]" ENDLINE) i:inline { return i; })+ "]" ENDLINE
+	= BEGINLINE "[" content:(!(NEWLINE / "]" ENDLINE) i:inline { return i; })+ "]" ENDLINE
 {
 	return createTree('title', { }, mergeText(content));
 }
