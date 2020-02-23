@@ -34,7 +34,7 @@ inline
 	/ italic
 	/ strike
 	/ motion
-	// / spin
+	/ spin
 	/ jump
 	/ flip
 	// / inlineCode
@@ -211,6 +211,18 @@ motionB
 {
 	return createTree('motion', { }, mergeText(content));
 }
+
+
+// inline: spin
+
+spin
+	= "<spin" attr:spin_attr? ">" content:(!"</spin>" i:inline { return i; })+ "</spin>"
+{
+	return createTree('spin', { attr: attr }, mergeText(content));
+}
+
+spin_attr
+	= _ str:$(!">" CHAR)* { return str; }
 
 
 // inline: jump
