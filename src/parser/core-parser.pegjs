@@ -37,7 +37,7 @@ inline
 	/ spin
 	/ jump
 	/ flip
-	// / inlineCode
+	/ inlineCode
 	// / mathInline
 	// / mention
 	// / hashtag
@@ -251,6 +251,17 @@ flip
 	= "<flip>" content:(!"</flip>" i:inline { return i; })+ "</flip>"
 {
 	return createTree('flip', { }, mergeText(content));
+}
+
+
+// inline: inlineCode
+
+inlineCode
+	= "`" content:$(!"`" c:CHAR { return c; })+ "`"
+{
+	return createTree('inlineCode', {
+		code: content
+	});
 }
 
 
