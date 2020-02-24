@@ -38,7 +38,7 @@ inline
 	/ jump
 	/ flip
 	/ inlineCode
-	// / mathInline
+	/ mathInline
 	// / mention
 	// / hashtag
 	// / url
@@ -261,6 +261,17 @@ inlineCode
 {
 	return createTree('inlineCode', {
 		code: content
+	});
+}
+
+
+// inline: mathInline
+
+mathInline
+	= "\\(" content:$(!"\\)" c:CHAR { return c; })+ "\\)"
+{
+	return createTree('mathInline', {
+		formula: content
 	});
 }
 
