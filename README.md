@@ -9,10 +9,13 @@ npm i mfm-parser-pegjs
 
 ## Usage
 ```ts
-import { parse } from 'mfm-parser-pegjs';
+import * as mfm from 'mfm-parser-pegjs';
 
-// parse a MFM code
-const result = parse('this is a ***MFM text***');
+// parse a MFM text
+const result = mfm.parse('good morning ***everyone!***');
+
+// parse a MFM plain text
+const plainResult = mfm.parsePlain('I like the hot soup :soup:​');
 ```
 
 ## Usage (Repository)
@@ -39,6 +42,3 @@ npm run parse
 
 ## License
 This software is released under the [MIT License](LICENSE).
-
-This software includes codes of other softwares:
-- PEG.js: https://raw.githubusercontent.com/pegjs/pegjs/master/LICENSE

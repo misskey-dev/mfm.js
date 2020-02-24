@@ -12,3 +12,9 @@ export function parse(input: string) {
 	trees = coreParser.parse(input);
 	return trees;
 }
+
+export function parsePlain(input: string) {
+	let trees: Tree[];
+	trees = coreParser.parse(input, { startRule: 'plainParser' });
+	return trees;
+}
