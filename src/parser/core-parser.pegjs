@@ -24,7 +24,7 @@ block
 	/ quote
 	/ search
 	/ blockCode
-	// / mathBlock
+	/ mathBlock
 	/ center
 
 inline
@@ -112,6 +112,17 @@ blockCode
 
 blockCode_line
 	= !("```" ENDLINE) line:$(CHAR+) NEWLINE { return line; }
+
+
+// block: mathBlock
+
+mathBlock
+	= BEGINLINE "\\[" content:$(!"\\]" c:. { return c; })+ "\\]" ENDLINE
+{
+	return createTree('mathBlock', {
+		formula: content.trim()
+	});
+}
 
 
 // block: center
