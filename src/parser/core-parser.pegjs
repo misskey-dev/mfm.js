@@ -48,19 +48,15 @@ inline
 	/ customEmoji
 	/ textOrEmoji
 
+
 // block: title
 
 title
-	= titleA / titleB
-
-titleA
 	= BEGINLINE "【" content:(!(NEWLINE / "】" ENDLINE) i:inline { return i; })+ "】" ENDLINE
 {
 	return createTree('title', { }, mergeText(content));
 }
-
-titleB
-	= BEGINLINE "[" content:(!(NEWLINE / "]" ENDLINE) i:inline { return i; })+ "]" ENDLINE
+	/ BEGINLINE "[" content:(!(NEWLINE / "]" ENDLINE) i:inline { return i; })+ "]" ENDLINE
 {
 	return createTree('title', { }, mergeText(content));
 }
@@ -144,16 +140,11 @@ big
 // inline: bold
 
 bold
-	= boldA / boldB
-
-boldA
 	= "**" content:(!"**" i:inline { return i; })+ "**"
 {
 	return createTree('bold', { }, mergeText(content));
 }
-
-boldB
-	= "__" content:$(!"__" c:[a-zA-Z0-9 \t] { return c; })+ "__"
+	/ "__" content:$(!"__" c:[a-zA-Z0-9 \t] { return c; })+ "__"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return createTree('bold', { }, parsedContent);
@@ -172,23 +163,16 @@ small
 // inline: italic
 
 italic
-	= italicA / italicB / italicC
-
-italicA
 	= "<i>" content:(!"</i>" i:inline { return i; })+ "</i>"
 {
 	return createTree('italic', { }, mergeText(content));
 }
-
-italicB
-	= "*" content:$(!"*" c:[a-zA-Z0-9 \t] { return c; })+ "*"
+	/ "*" content:$(!"*" c:[a-zA-Z0-9 \t] { return c; })+ "*"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return createTree('italic', { }, parsedContent);
 }
-
-italicC
-	= "_" content:$(!"_" c:[a-zA-Z0-9 \t] { return c; })+ "_"
+	/ "_" content:$(!"_" c:[a-zA-Z0-9 \t] { return c; })+ "_"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return createTree('italic', { }, parsedContent);
@@ -207,16 +191,11 @@ strike
 // inline: motion
 
 motion
-	= motionA / motionB
-
-motionA
 	= "<motion>" content:(!"</motion>" i:inline { return i; })+ "</motion>"
 {
 	return createTree('motion', { }, mergeText(content));
 }
-
-motionB
-	= "(((" content:(!")))" i:inline { return i; })+ ")))"
+	/ "(((" content:(!")))" i:inline { return i; })+ ")))"
 {
 	return createTree('motion', { }, mergeText(content));
 }
