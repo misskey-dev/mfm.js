@@ -43,7 +43,7 @@ npm run parse
 ## License
 This software is released under the [MIT License](LICENSE) unless otherwise noted.  
 
-This software includes code of therd paty softwares below:  
+This software includes code of therd party softwares below:  
 - twemoji-parser  
   Copyright (c) 2018 Twitter, Inc.  
   MIT Licence: https://github.com/twitter/twemoji-parser/blob/master/LICENSE.md  
