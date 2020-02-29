@@ -4,6 +4,8 @@
 		mergeText
 	} = require('./parser-utils');
 
+	const emojiRegex = require('./twemoji').default;
+
 	function applyParser(input, startRule) {
 		let parseFunc = peg$parse;
 		return parseFunc(input, startRule ? { startRule } : { });
@@ -14,7 +16,7 @@ rootParser
 	= ts:(block / inline)* { return mergeText(ts); }
 
 plainParser
-	= ts:(text /*/ emoji*/)* { return mergeText(ts); }
+	= ts:(customEmoji / textOrEmoji)* { return mergeText(ts); }
 
 inlineParser
 	= ts:(inline)* { return mergeText(ts); }
@@ -43,12 +45,8 @@ inline
 	// / hashtag
 	// / url
 	// / link
-	// / emoji
-	/ text
-
-text
-	= c:. { return createTree('text', { text: c }); }
-
+	/ customEmoji
+	/ textOrEmoji
 
 // block: title
 
@@ -273,6 +271,27 @@ mathInline
 	return createTree('mathInline', {
 		formula: content
 	});
+}
+
+
+// inline: custom emoji
+
+customEmoji
+	= ":" name:$[a-z0-9_+-]+ ":"
+{
+	return createTree('emoji', { name: name });
+}
+
+
+// inline: text or emoji
+
+textOrEmoji
+	= c:((a:[\uD800-\uDBFF] b:[\uDC00-\uDFFF] { return a + b; }) / .)
+{
+	if (emojiRegex.test(c)) {
+		return createTree('emoji', { emoji: c });
+	}
+	return createTree('text', { text: c });
 }
 
 
