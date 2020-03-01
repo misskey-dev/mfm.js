@@ -42,7 +42,7 @@ inline
 	/ inlineCode
 	/ mathInline
 	// / mention
-	// / hashtag
+	/ hashtag
 	// / url
 	// / link
 	/ customEmoji
@@ -251,6 +251,26 @@ mathInline
 		formula: content
 	});
 }
+
+
+// inline: hashtag
+
+hashtag
+	= "#" content:hashtag_content
+{
+	return createTree('hashtag', { hashtag: content });
+}
+
+hashtag_content
+	= (![\s!"#$%&'*+,\-./:;<=>?@\\^_`{|}~【】＜＞] (hashtag_bracket / hashtag_char))+ { return text(); }
+
+hashtag_bracket
+	= "(" hashtag_content* ")"
+	/ "[" hashtag_content* "]"
+	/ "「" hashtag_content* "」"
+
+hashtag_char
+	= ![()\[\]「」] CHAR
 
 
 // inline: custom emoji
