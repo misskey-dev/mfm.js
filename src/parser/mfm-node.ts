@@ -1,11 +1,14 @@
-import { Tree } from '.';
+export type MfmNode = {
+	type: string;
+	props: Record<string, any>;
+	children: MfmNode[];
+};
 
-export function createTree(type: string, props?: Record<string, any>, children?: Tree[]): Tree {
-	props = props || { };
-	children = children || [ ];
-	children = !Array.isArray(children) ? [children] : children;
-
-	return { type, props, children };
+export function createNode(type: string, props?: Record<string, any>, children?: MfmNode[]): MfmNode {
+	props = props ?? {};
+	children = children ?? [];
+	const node = { type, props, children };
+	return node;
 }
 
 /**
@@ -27,13 +30,13 @@ export function groupContinuous<T>(arr: T[], predicate: (prev: T, current: T) =>
 	return dest;
 }
 
-export function mergeGroupedTrees(groupedTrees: Tree[][]): Tree[] {
-	return groupedTrees.reduce((acc, val) => acc.concat(val), ([] as Tree[]));
+export function mergeGroupedTrees(groupedTrees: MfmNode[][]): MfmNode[] {
+	return groupedTrees.reduce((acc, val) => acc.concat(val), ([] as MfmNode[]));
 }
 
-export function mergeText(trees: Tree[], recursive?: boolean): Tree[] {
-	let dest: Tree[];
-	let groupes: Tree[][];
+export function mergeText(trees: MfmNode[], recursive?: boolean): MfmNode[] {
+	let dest: MfmNode[];
+	let groupes: MfmNode[][];
 
 	// group trees
 	groupes = groupContinuous(trees, (prev, current) => prev.type == current.type);
@@ -42,7 +45,7 @@ export function mergeText(trees: Tree[], recursive?: boolean): Tree[] {
 	groupes = groupes.map((group) => {
 		if (group[0].type == 'text') {
 			return [
-				createTree('text', {
+				createNode('text', {
 					text: group.map(i => i.props.text).join('')
 				})
 			];
@@ -55,6 +58,6 @@ export function mergeText(trees: Tree[], recursive?: boolean): Tree[] {
 
 	return dest.map(tree => {
 		// apply recursively to children
-		return createTree(tree.type, tree.props, recursive ? mergeText(tree.children) : tree.children);
+		return createNode(tree.type, tree.props, recursive ? mergeText(tree.children) : tree.children);
 	});
 }

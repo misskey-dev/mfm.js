@@ -1,315 +1,276 @@
 {
 	const {
-		createTree,
+		createNode,
 		mergeText
-	} = require('./parser-utils');
-
-	const emojiRegex = require('./twemoji').default;
+	} = require('./mfm-node');
 
 	function applyParser(input, startRule) {
 		let parseFunc = peg$parse;
 		return parseFunc(input, startRule ? { startRule } : { });
 	}
+
+	// emoji
+
+	const emojiRegex = require('./twemoji').default;
+
+	let emojiLoop = 0;
+	const anchoredEmojiRegex = RegExp(`^(?:${emojiRegex.source})`);
+
+	/**
+	 * check if the input matches the emoji regexp.
+	 * if they match, set the byte length of the emoji.
+	*/
+	function matchUnicodeEmoji() {
+		const offset = location().start.offset;
+		const src = input.substr(offset);
+
+		const result = anchoredEmojiRegex.exec(src);
+		if (result != null) {
+			emojiLoop = result[0].length; // length(utf-16 byte length) of emoji sequence.
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * this is the process when the input is consumed as emojis.
+	*/
+	function forwardUnicodeEmoji() {
+		const forwarding = (emojiLoop > 0);
+		if (forwarding) {
+			emojiLoop--;
+		}
+		return forwarding;
+	}
 }
 
-rootParser
-	= ts:(block / inline)* { return mergeText(ts); }
+//
+// parsers
+//
+
+fullParser
+	= nodes:(&. n:(block / inline) { return n; })* { return mergeText(nodes); }
 
 plainParser
-	= ts:(customEmoji / textOrEmoji)* { return mergeText(ts); }
+	= nodes:(&. n:(emoji / text) { return n; })* { return mergeText(nodes); }
 
 inlineParser
-	= ts:(inline)* { return mergeText(ts); }
+	= nodes:(&. n:inline { return n; })* { return mergeText(nodes); }
+
+//
+// block rules
+//
 
 block
-	= title
-	/ quote
+	= quote
 	/ search
-	/ blockCode
+	/ codeBlock
 	/ mathBlock
 	/ center
-
-inline
-	= big
-	/ bold
-	/ small
-	/ italic
-	/ strike
-	/ motion
-	/ spin
-	/ jump
-	/ flip
-	/ inlineCode
-	/ mathInline
-	// / mention
-	/ hashtag
-	// / url
-	// / link
-	/ customEmoji
-	/ textOrEmoji
-
-
-// block: title
-
-title
-	= BEGINLINE "【" content:(!(NEWLINE / "】" ENDLINE) i:inline { return i; })+ "】" ENDLINE
-{
-	return createTree('title', { }, mergeText(content));
-}
-	/ BEGINLINE "[" content:(!(NEWLINE / "]" ENDLINE) i:inline { return i; })+ "]" ENDLINE
-{
-	return createTree('title', { }, mergeText(content));
-}
-
 
 // block: quote
 
 quote
-	= lines:quote_line+
+	= head:quoteLine tails:(LF line:quoteLine { return line; })*
 {
-	const children = applyParser(lines.join('\n'), 'rootParser');
-	return createTree('quote', { }, children);
+	const lines = [head, ...tails];
+	const children = applyParser(lines.join('\n'), 'fullParser');
+	return createNode('quote', { }, children);
 }
 
-quote_line
-	= BEGINLINE (!"><" ">" / !"＞＜" "＞") _? content:$(CHAR+) ENDLINE { return content; }
-
+quoteLine
+	= BEGIN ">" _? text:$(CHAR+) END { return text; }
 
 // block: search
 
 search
-	= BEGINLINE q:search_query _ search_keyToken ENDLINE
+	= BEGIN q:searchQuery _ searchKey END
 {
-	return createTree('search', {
+	return createNode('search', {
 		query: q,
 		content: text()
 	});
 }
 
-search_query
-	= $(!(_ search_keyToken ENDLINE) c:CHAR { return c; })+
+searchQuery
+	= (!(_ searchKey END) CHAR)+ { return text(); }
 
-search_keyToken
-	= "検索" / "search"i
+searchKey
+	= "[" ("検索" / "Search"i) "]"
+	/ "検索"
+	/ "Search"i
 
+// block: codeBlock
 
-// block: blockCode
-
-blockCode
-	= BEGINLINE "```" lang:$(CHAR*) NEWLINE lines:blockCode_line* "```" ENDLINE
+codeBlock
+	= BEGIN "```" lang:$(CHAR*) LF code:codeBlockLines LF "```" END
 {
-	return createTree('blockCode', {
-		code: lines.join('\n'),
+	lang = lang.trim();
+	return createNode('blockCode', {
+		code: code,
 		lang: lang.length > 0 ? lang : null,
 	});
 }
 
-blockCode_line
-	= !("```" ENDLINE) line:$(CHAR+) NEWLINE { return line; }
+codeBlockLines
+	= head:codeBlockLine tails:(LF line:codeBlockLine { return line; })*
+{ return text(); }
 
+codeBlockLine
+	= BEGIN (!(BEGIN "```" END) CHAR)* END { return text(); }
 
 // block: mathBlock
 
 mathBlock
-	= BEGINLINE "\\[" content:$(!"\\]" c:. { return c; })+ "\\]" ENDLINE
+	= BEGIN "\\[" LF? formula:mathBlockLines LF? "\\]" END
 {
-	return createTree('mathBlock', {
-		formula: content.trim()
+	return createNode('mathBlock', {
+		formula: formula.trim()
 	});
 }
 
+mathBlockLines
+	= mathBlockLine (LF mathBlockLine)*
+{ return text(); }
+
+mathBlockLine
+	= (!("\\]" END) CHAR)+
 
 // block: center
 
 center
-	= BEGINLINE "<center>" content:(!"</center>" i:inline { return i; })+ "</center>"
+	= BEGIN "<center>" LF? content:centerLines LF? "</center>" END
 {
-	return createTree('center', { }, mergeText(content));
+	const children = applyParser(content, 'inlineParser');
+	return createNode('center', { }, children);
 }
 
+centerLines
+	= centerLine (LF centerLine)*
+{ return text(); }
+
+centerLine
+	= (!("</center>" END) CHAR)+
+
+//
+// inline rules
+//
+
+inline
+	= big
+	/ bold
+	/ small
+	/ strike
+	/ inlineCode
+	/ mathInline
+	/ emoji
+	/ text
 
 // inline: big
 
 big
 	= "***" content:(!"***" i:inline { return i; })+ "***"
 {
-	return createTree('big', { }, mergeText(content));
+	return createNode('fn', {
+		name: 'tada',
+		args: { }
+	}, mergeText());
 }
-
 
 // inline: bold
 
 bold
 	= "**" content:(!"**" i:inline { return i; })+ "**"
 {
-	return createTree('bold', { }, mergeText(content));
+	return createNode('bold', { }, mergeText(content));
 }
 	/ "__" content:$(!"__" c:[a-zA-Z0-9 \t] { return c; })+ "__"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
-	return createTree('bold', { }, parsedContent);
+	return createNode('bold', { }, parsedContent);
 }
-
 
 // inline: small
 
 small
 	= "<small>" content:(!"</small>" i:inline { return i; })+ "</small>"
 {
-	return createTree('small', { }, mergeText(content));
+	return createNode('small', { }, mergeText(content));
 }
-
-
-// inline: italic
-
-italic
-	= "<i>" content:(!"</i>" i:inline { return i; })+ "</i>"
-{
-	return createTree('italic', { }, mergeText(content));
-}
-	/ "*" content:$(!"*" c:[a-zA-Z0-9 \t] { return c; })+ "*"
-{
-	const parsedContent = applyParser(content, 'inlineParser');
-	return createTree('italic', { }, parsedContent);
-}
-	/ "_" content:$(!"_" c:[a-zA-Z0-9 \t] { return c; })+ "_"
-{
-	const parsedContent = applyParser(content, 'inlineParser');
-	return createTree('italic', { }, parsedContent);
-}
-
 
 // inline: strike
 
 strike
-	= "~~" content:(!"~~" i:inline { return i; })+ "~~"
+	= "~~" content:(!("~" / LF) i:inline { return i; })+ "~~"
 {
-	return createTree('strike', { }, mergeText(content));
+	return createNode('strike', { }, mergeText(content));
 }
-
-
-// inline: motion
-
-motion
-	= "<motion>" content:(!"</motion>" i:inline { return i; })+ "</motion>"
-{
-	return createTree('motion', { }, mergeText(content));
-}
-	/ "(((" content:(!")))" i:inline { return i; })+ ")))"
-{
-	return createTree('motion', { }, mergeText(content));
-}
-
-
-// inline: spin
-
-spin
-	= "<spin" attr:spin_attr? ">" content:(!"</spin>" i:inline { return i; })+ "</spin>"
-{
-	return createTree('spin', { attr: attr }, mergeText(content));
-}
-
-spin_attr
-	= _ str:$(!">" CHAR)* { return str; }
-
-
-// inline: jump
-
-jump
-	= "<jump>" content:(!"</jump>" i:inline { return i; })+ "</jump>"
-{
-	return createTree('jump', { }, mergeText(content));
-}
-
-
-// inline: flip
-
-flip
-	= "<flip>" content:(!"</flip>" i:inline { return i; })+ "</flip>"
-{
-	return createTree('flip', { }, mergeText(content));
-}
-
 
 // inline: inlineCode
 
 inlineCode
 	= "`" content:$(!"`" c:CHAR { return c; })+ "`"
 {
-	return createTree('inlineCode', {
+	return createNode('inlineCode', {
 		code: content
 	});
 }
-
 
 // inline: mathInline
 
 mathInline
 	= "\\(" content:$(!"\\)" c:CHAR { return c; })+ "\\)"
 {
-	return createTree('mathInline', {
+	return createNode('mathInline', {
 		formula: content
 	});
 }
 
+// inline: emoji
 
-// inline: hashtag
-
-hashtag
-	= "#" content:hashtag_content
-{
-	return createTree('hashtag', { hashtag: content });
-}
-
-hashtag_content
-	= (![\s!"#$%&'*+,\-./:;<=>?@\\^_`{|}~【】＜＞] (hashtag_bracket / hashtag_char))+ { return text(); }
-
-hashtag_bracket
-	= "(" hashtag_content* ")"
-	/ "[" hashtag_content* "]"
-	/ "「" hashtag_content* "」"
-
-hashtag_char
-	= ![()\[\]「」] CHAR
-
-
-// inline: custom emoji
+emoji
+	= customEmoji / unicodeEmoji
 
 customEmoji
-	= ":" name:$[a-z0-9_+-]+ ":"
+	= ":" name:emojiName ":"
 {
-	return createTree('emoji', { name: name });
+	return createNode('emoji', { name: name });
 }
 
+emojiName
+	= [a-z0-9_+-]i+ { return text(); }
 
-// inline: text or emoji
-
-textOrEmoji
-	= c:((a:[\uD800-\uDBFF] b:[\uDC00-\uDFFF] { return a + b; }) / .)
+// NOTE: if the text matches one of the emojis, it will count the length of the emoji sequence and consume it.
+unicodeEmoji
+	= &{ return matchUnicodeEmoji(); } (&{ return forwardUnicodeEmoji(); } .)+
 {
-	if (emojiRegex.test(c)) {
-		return createTree('emoji', { emoji: c });
-	}
-	return createTree('text', { text: c });
+	return createNode('emoji', { emoji: text() });
 }
 
+// inline: text
 
-// Core rules
+text
+	= . { return createNode('text', { text: text() }); }
 
-CHAR
-	= !NEWLINE c:. { return c; }
+//
+// General
+//
 
-ENDLINE
-	= NEWLINE / EOF
-
-NEWLINE
-	= "\r\n" / [\r\n]
-
-BEGINLINE
+BEGIN "beginning of line"
 	= &{ return location().start.column == 1; }
+
+END "end of line"
+	= &LF / EOF
 
 EOF
 	= !.
+
+CHAR
+	= !LF . { return text(); }
+
+LF
+	= "\r\n" / [\r\n]
 
 _ "whitespace"
 	= [ 　\t]
