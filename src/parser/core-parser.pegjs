@@ -162,11 +162,33 @@ inline
 	/ big
 	/ bold
 	/ small
+	/ italic
 	/ strike
 	/ inlineCode
 	/ mathInline
 	/ hashtag
 	/ text
+
+// inline: emoji
+
+emoji
+	= customEmoji / unicodeEmoji
+
+customEmoji
+	= ":" name:emojiName ":"
+{
+	return createNode('emoji', { name: name });
+}
+
+emojiName
+	= [a-z0-9_+-]i+ { return text(); }
+
+// NOTE: if the text matches one of the emojis, it will count the length of the emoji sequence and consume it.
+unicodeEmoji
+	= &{ return matchUnicodeEmoji(); } (&{ return forwardUnicodeEmoji(); } .)+
+{
+	return createNode('emoji', { emoji: text() });
+}
 
 // inline: big
 
@@ -186,7 +208,7 @@ bold
 {
 	return createNode('bold', { }, mergeText(content));
 }
-	/ "__" content:$(!"__" c:[a-zA-Z0-9 \t] { return c; })+ "__"
+	/ "__" content:$(!"__" c:[a-z0-9 \t]i { return c; })+ "__"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return createNode('bold', { }, parsedContent);
@@ -206,6 +228,24 @@ strike
 	= "~~" content:(!("~" / LF) i:inline { return i; })+ "~~"
 {
 	return createNode('strike', { }, mergeText(content));
+}
+
+// inline: italic
+
+italic
+	= "<i>" content:(!"</i>" i:inline { return i; })+ "</i>"
+{
+	return createNode('italic', { }, mergeText(content));
+}
+	/ "*" content:$(!"*" [a-z0-9 \t]i)+ "*"
+{
+	const parsedContent = applyParser(content, 'inlineParser');
+	return createNode('italic', { }, parsedContent);
+}
+	/ "_" content:$(!"_" [a-z0-9 \t]i)+ "_"
+{
+	const parsedContent = applyParser(content, 'inlineParser');
+	return createNode('italic', { }, parsedContent);
 }
 
 // inline: inlineCode
@@ -246,27 +286,6 @@ hashtagBracketPair
 
 hashtagChar
 	= ![ 　\t.,!?'"#:\/\[\]【】()「」] CHAR
-
-// inline: emoji
-
-emoji
-	= customEmoji / unicodeEmoji
-
-customEmoji
-	= ":" name:emojiName ":"
-{
-	return createNode('emoji', { name: name });
-}
-
-emojiName
-	= [a-z0-9_+-]i+ { return text(); }
-
-// NOTE: if the text matches one of the emojis, it will count the length of the emoji sequence and consume it.
-unicodeEmoji
-	= &{ return matchUnicodeEmoji(); } (&{ return forwardUnicodeEmoji(); } .)+
-{
-	return createNode('emoji', { emoji: text() });
-}
 
 // inline: text
 
