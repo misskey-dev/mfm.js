@@ -158,13 +158,14 @@ centerLine
 //
 
 inline
-	= big
+	= emoji
+	/ big
 	/ bold
 	/ small
 	/ strike
 	/ inlineCode
 	/ mathInline
-	/ emoji
+	/ hashtag
 	/ text
 
 // inline: big
@@ -226,6 +227,25 @@ mathInline
 		formula: content
 	});
 }
+
+// inline: hashtag
+
+hashtag
+	= "#" content:hashtagContent
+{
+	return createNode('hashtag', { hashtag: content });
+}
+
+hashtagContent
+	= (hashtagBracketPair / hashtagChar)+ { return text(); }
+
+hashtagBracketPair
+	= "(" hashtagContent* ")"
+	/ "[" hashtagContent* "]"
+	/ "「" hashtagContent* "」"
+
+hashtagChar
+	= ![ 　\t.,!?'"#:\/\[\]【】()「」] CHAR
 
 // inline: emoji
 
