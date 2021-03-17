@@ -1,6 +1,6 @@
 # mfm-parser-pegjs
 ## Description
-A MFM parser made with PEG.js (In developing)  
+A MFM parser implementation with PEG.js (In developing)  
 
 ## Installation
 ```
@@ -8,11 +8,12 @@ npm i mfm-parser-pegjs
 ```
 
 ## Usage
+TypeScript:  
 ```ts
 import * as mfm from 'mfm-parser-pegjs';
 
 // parse a MFM text
-const result = mfm.parse('good morning ***everyone!***');
+const result = mfm.parse('good morning ***everynyan!***');
 
 // parse a MFM plain text
 const plainResult = mfm.parsePlain('I like the hot soup :soup:​');
@@ -24,26 +25,21 @@ const plainResult = mfm.parsePlain('I like the hot soup :soup:​');
 git clone https://github.com/marihachi/mfm-parser-pegjs.git
 ```
 
-### 2. Build
-For production:  
+### 2. Install packages
+```
+cd mfm-parser-pegjs
+npm i
+```
+
+### 3. Build
 ```
 npm run build
 ```
 
-For development:  
-```
-npm run build-dev
-```
-
-### Use Interactive interface
+### Use the interactive CLI parser
 ```
 npm run parse
 ```
 
 ## License
-This software is released under the [MIT License](LICENSE) unless otherwise noted.  
-
-This software includes code of therd party softwares below:  
-- twemoji-parser  
-  Copyright (c) 2018 Twitter, Inc.  
-  MIT Licence: https://github.com/twitter/twemoji-parser/blob/master/LICENSE.md  
+This software is released under the [MIT License](LICENSE).  

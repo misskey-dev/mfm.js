@@ -11,7 +11,7 @@
 
 	// emoji
 
-	const emojiRegex = require('./twemoji').default;
+	const emojiRegex = require('twemoji-parser/dist/lib/regex').default;
 
 	let emojiLoop = 0;
 	const anchoredEmojiRegex = RegExp(`^(?:${emojiRegex.source})`);

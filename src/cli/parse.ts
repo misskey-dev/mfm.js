@@ -1,5 +1,5 @@
 import inputLine, { InputCanceledError } from './misc/inputLine';
-import { parse } from './parser/index';
+import { parse } from '..';
 
 async function entryPoint() {
 	console.log('intaractive parser');

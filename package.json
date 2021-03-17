@@ -1,17 +1,16 @@
 {
   "name": "mfm-parser-pegjs",
   "version": "0.2.0",
-  "description": "A MFM parser made with PEG.js",
+  "description": "A MFM parser implementation with PEG.js",
   "main": "./built/index.js",
   "scripts": {
-    "build": "npm run tsc && npm run peg && npm run webpack",
-    "build-dev": "npm run tsc && npm run peg-dev && npm run webpack-dev",
-    "peg": "mkdirp ./built/parser && pegjs -o built/parser/core-parser.js --allowed-start-rules fullParser,inlineParser,plainParser src/parser/core-parser.pegjs",
-    "peg-dev": "mkdirp ./built/parser && pegjs -o built/parser/core-parser.js --allowed-start-rules fullParser,inlineParser,plainParser --trace src/parser/core-parser.pegjs",
+    "build": "npm run tsc && npm run peg",
+    "build-debug": "npm run tsc && npm run peg-debug",
+    "peg": "pegjs -o built/parser.js --allowed-start-rules fullParser,inlineParser,plainParser src/parser.pegjs",
+    "peg-debug": "pegjs -o built/parser.js --allowed-start-rules fullParser,inlineParser,plainParser --trace src/parser.pegjs",
     "tsc": "tsc",
-    "webpack": "webpack --mode=production",
-    "webpack-dev": "webpack --mode=development",
-    "parse": "node ./built/parse"
+    "parse": "node ./built/cli/parse",
+    "test": "mocha -r ts-node/register 'test/**/*.ts'"
   },
   "repository": {
     "type": "git",
@@ -20,20 +19,18 @@
   "author": "Marihachi",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^12.0.4",
-    "@types/parsimmon": "^1.10.1",
-    "@types/pegjs": "^0.10.1",
-    "mkdirp": "^0.5.1",
-    "parsimmon": "^1.13.0",
-    "pegjs": "^0.10.0",
-    "ts-loader": "6.2.x",
-    "typescript": "3.7.x",
-    "webpack": "4.40.x",
-    "webpack-cli": "3.3.x"
+    "@types/mocha": "8.2.x",
+    "@types/node": "14.14.x",
+    "@types/pegjs": "0.10.x",
+    "mocha": "8.3.x",
+    "pegjs": "0.10.x",
+    "ts-node": "9.1.x",
+    "typescript": "4.2.x"
+  },
+  "dependencies": {
+    "twemoji-parser": "13.0.x"
   },
   "files": [
-    "built/index.js",
-    "built/index.d.ts",
-    "built/parser"
+    "built"
   ]
 }
