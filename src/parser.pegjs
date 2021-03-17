@@ -1,8 +1,10 @@
 {
 	const {
 		createNode,
-		mergeText
-	} = require('./mfm-node');
+		mergeText,
+		setConsumeCount,
+		consumeDynamically
+	} = require('./util');
 
 	function applyParser(input, startRule) {
 		let parseFunc = peg$parse;
@@ -12,8 +14,6 @@
 	// emoji
 
 	const emojiRegex = require('twemoji-parser/dist/lib/regex').default;
-
-	let emojiLoop = 0;
 	const anchoredEmojiRegex = RegExp(`^(?:${emojiRegex.source})`);
 
 	/**
@@ -26,22 +26,11 @@
 
 		const result = anchoredEmojiRegex.exec(src);
 		if (result != null) {
-			emojiLoop = result[0].length; // length(utf-16 byte length) of emoji sequence.
+			setConsumeCount(result[0].length); // length(utf-16 byte length) of emoji sequence.
 			return true;
 		}
 
 		return false;
-	}
-
-	/**
-	 * this is the process when the input is consumed as emojis.
-	*/
-	function forwardUnicodeEmoji() {
-		const forwarding = (emojiLoop > 0);
-		if (forwarding) {
-			emojiLoop--;
-		}
-		return forwarding;
 	}
 }
 
@@ -167,6 +156,7 @@ inline
 	/ inlineCode
 	/ mathInline
 	/ hashtag
+	/ url
 	/ text
 
 // inline: emoji
@@ -185,7 +175,7 @@ emojiName
 
 // NOTE: if the text matches one of the emojis, it will count the length of the emoji sequence and consume it.
 unicodeEmoji
-	= &{ return matchUnicodeEmoji(); } (&{ return forwardUnicodeEmoji(); } .)+
+	= &{ return matchUnicodeEmoji(); } (&{ return consumeDynamically(); } .)+
 {
 	return createNode('emoji', { emoji: text() });
 }
@@ -222,14 +212,6 @@ small
 	return createNode('small', { }, mergeText(content));
 }
 
-// inline: strike
-
-strike
-	= "~~" content:(!("~" / LF) i:inline { return i; })+ "~~"
-{
-	return createNode('strike', { }, mergeText(content));
-}
-
 // inline: italic
 
 italic
@@ -246,6 +228,14 @@ italic
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return createNode('italic', { }, parsedContent);
+}
+
+// inline: strike
+
+strike
+	= "~~" content:(!("~" / LF) i:inline { return i; })+ "~~"
+{
+	return createNode('strike', { }, mergeText(content));
 }
 
 // inline: inlineCode
@@ -286,6 +276,36 @@ hashtagBracketPair
 
 hashtagChar
 	= ![ 　\t.,!?'"#:\/\[\]【】()「」] CHAR
+
+// inline: URL
+
+url
+	= "<" url:urlFormat ">"
+{
+	return createNode('url', { url: url });
+}
+	/ url:urlFormat
+{
+	return createNode('url', { url: url });
+}
+
+urlFormat
+	= "http" "s"? "://" urlContent
+{
+	return text();
+}
+
+urlContent
+	= urlContentPart+
+
+urlContentPart
+	= urlBracketPair
+	/ [.,] &urlContentPart // last char is neither "." nor ",".
+	/ [a-z0-9/:%#@$&?!~=+-]i
+
+urlBracketPair
+	= "(" urlContentPart* ")"
+	/ "[" urlContentPart* "]"
 
 // inline: text
 

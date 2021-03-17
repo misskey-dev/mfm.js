@@ -2,7 +2,7 @@ import assert from 'assert';
 import { parse, parsePlain } from '../built/index';
 import { createNode } from '../built/mfm-node';
 import {
-	TEXT, EMOJI, UNI_EMOJI, HASHTAG
+	TEXT, EMOJI, UNI_EMOJI, HASHTAG, N_URL
 } from './node';
 
 describe('text', () => {
@@ -32,6 +32,18 @@ describe('hashtag', () => {
 	it('and unicode emoji', () => {
 		const input = '#️⃣abc123#abc';
 		const output = [UNI_EMOJI('#️⃣'), TEXT('abc123'), HASHTAG('abc')];
+		assert.deepStrictEqual(parse(input), output);
+	});
+});
+
+describe('url', () => {
+	it('basic', () => {
+		const input = 'official instance: https://misskey.io/@ai.';
+		const output = [
+			TEXT('official instance: '),
+			N_URL('https://misskey.io/@ai'),
+			TEXT('.')
+		];
 		assert.deepStrictEqual(parse(input), output);
 	});
 });

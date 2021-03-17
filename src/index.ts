@@ -1,5 +1,5 @@
 import peg from 'pegjs';
-import { MfmNode } from './mfm-node';
+import { MfmNode } from './util';
 const parser: peg.Parser = require('./parser');
 
 export function parse(input: string): MfmNode[] {
