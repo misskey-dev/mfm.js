@@ -198,7 +198,7 @@ big
 	return createNode('fn', {
 		name: 'tada',
 		args: { }
-	}, mergeText());
+	}, mergeText(content));
 }
 
 // inline: bold
