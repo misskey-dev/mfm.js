@@ -157,6 +157,7 @@ inline
 	/ mathInline
 	/ hashtag
 	/ url
+	/ link
 	/ text
 
 // inline: emoji
@@ -306,6 +307,23 @@ urlContentPart
 urlBracketPair
 	= "(" urlContentPart* ")"
 	/ "[" urlContentPart* "]"
+
+// inline: link
+
+link
+	= silent:"?"? "[" label:linkLabel "](" url:$(url) ")"
+{
+	return createNode('link', {
+		silent: (silent != null),
+		url: url
+	}, mergeText(label));
+}
+
+linkLabel
+	= (!"]" n:inline { return n; })+
+
+linkUrl
+	= url { return text(); }
 
 // inline: text
 
