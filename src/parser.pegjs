@@ -311,7 +311,7 @@ urlBracketPair
 // inline: link
 
 link
-	= silent:"?"? "[" label:linkLabel "](" url:$(url) ")"
+	= silent:"?"? "[" label:linkLabel "](" url:linkUrl ")"
 {
 	return createNode('link', {
 		silent: (silent != null),
