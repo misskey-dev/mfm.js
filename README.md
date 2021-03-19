@@ -1,16 +1,16 @@
-# mfm-parser-pegjs
+# rosee
 ## Description
 A MFM parser implementation with PEG.js (In developing)  
 
 ## Installation
 ```
-npm i mfm-parser-pegjs
+npm i rosee
 ```
 
 ## Usage
 TypeScript:  
 ```ts
-import * as mfm from 'mfm-parser-pegjs';
+import * as mfm from 'rosee';
 
 // parse a MFM text
 const result = mfm.parse('good morning ***everynyan!***');
@@ -22,12 +22,12 @@ const plainResult = mfm.parsePlain('I like the hot soup :soup:​');
 ## Usage (Repository)
 ### 1. Clone
 ```
-git clone https://github.com/marihachi/mfm-parser-pegjs.git
+git clone https://github.com/marihachi/rosee.git
 ```
 
 ### 2. Install packages
 ```
-cd mfm-parser-pegjs
+cd rosee
 npm i
 ```
 
