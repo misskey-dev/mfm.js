@@ -266,8 +266,9 @@ mention
 	= "@" name:mentionName host:("@" host:mentionHost { return host; })?
 {
 	return createNode('mention', {
-		name: name,
-		host: host
+		username: name,
+		host: host,
+		acct: text()
 	});
 }
 
