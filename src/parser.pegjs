@@ -335,7 +335,7 @@ urlContent
 urlContentPart
 	= urlBracketPair
 	/ [.,] &urlContentPart // last char is neither "." nor ",".
-	/ [a-z0-9/:%#@$&?!~=+-]i
+	/ [a-z0-9_/:%#@$&?!~=+-]i
 
 urlBracketPair
 	= "(" urlContentPart* ")"
