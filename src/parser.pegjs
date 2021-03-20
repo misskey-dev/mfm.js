@@ -155,6 +155,7 @@ inline
 	/ strike
 	/ inlineCode
 	/ mathInline
+	/ mention
 	/ hashtag
 	/ url
 	/ link
@@ -258,6 +259,37 @@ mathInline
 		formula: content
 	});
 }
+
+// inline: mention
+
+mention
+	= "@" name:mentionName host:("@" host:mentionHost { return host; })?
+{
+	return createNode('mention', {
+		name: name,
+		host: host
+	});
+}
+
+mentionName
+	= !"-" mentionNamePart+ // first char is not "-".
+{
+	return text();
+}
+
+mentionNamePart
+	= "-" &mentionNamePart // last char is not "-".
+	/ [a-z0-9_]i
+
+mentionHost
+	= ![.-] mentionHostPart+ // first char is neither "." nor "-".
+{
+	return text();
+}
+
+mentionHostPart
+	= [.-] &mentionHostPart // last char is neither "." nor "-".
+	/ [a-z0-9_]i
 
 // inline: hashtag
 
