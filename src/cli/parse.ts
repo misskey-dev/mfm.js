@@ -20,7 +20,8 @@ async function entryPoint() {
 		// replace special chars
 		input = input
 			.replace(/\\n/g, '\n')
-			.replace(/\\t/g, '\t');
+			.replace(/\\t/g, '\t')
+			.replace(/\\u00a0/g, '\u00a0');
 
 		let result: any;
 		try {

@@ -159,6 +159,7 @@ inline
 	/ hashtag
 	/ url
 	/ link
+	/ fn
 	/ text
 
 // inline: emoji
@@ -200,7 +201,7 @@ bold
 {
 	return createNode('bold', { }, mergeText(content));
 }
-	/ "__" content:$(!"__" c:[a-z0-9 \t]i { return c; })+ "__"
+	/ "__" content:$(!"__" c:([a-z0-9]i / _) { return c; })+ "__"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return createNode('bold', { }, parsedContent);
@@ -221,12 +222,12 @@ italic
 {
 	return createNode('italic', { }, mergeText(content));
 }
-	/ "*" content:$(!"*" [a-z0-9 \t]i)+ "*"
+	/ "*" content:$(!"*" ([a-z0-9]i / _))+ "*"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return createNode('italic', { }, parsedContent);
 }
-	/ "_" content:$(!"_" [a-z0-9 \t]i)+ "_"
+	/ "_" content:$(!"_" ([a-z0-9]i / _))+ "_"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return createNode('italic', { }, parsedContent);
@@ -358,6 +359,38 @@ linkLabel
 linkUrl
 	= url { return text(); }
 
+// inline: fn
+
+fn
+	= "[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:(!"]" i:inline { return i; })+ "]"
+{
+	args = args || {};
+	return createNode('fn', {
+		name: name,
+		args: args
+	}, mergeText(content));
+}
+
+fnArgs
+	= "." head:fnArg tails:("," arg:fnArg { return arg; })*
+{
+	const args = { };
+	for (const pair of [head, ...tails]) {
+		args[pair.k] = pair.v;
+	}
+	return args;
+}
+
+fnArg
+	= k:$([a-z0-9_]i)+ "=" v:$([a-z0-9_]i)+
+{
+	return { k, v };
+}
+	/ k:$([a-z0-9_]i)+
+{
+	return { k: k, v: true };
+}
+
 // inline: text
 
 text
@@ -383,4 +416,4 @@ LF
 	= "\r\n" / [\r\n]
 
 _ "whitespace"
-	= [ 　\t]
+	= [ 　\t\u00a0]
