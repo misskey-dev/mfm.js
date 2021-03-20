@@ -1,6 +1,6 @@
 {
   "name": "rosee",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A MFM parser implementation with PEG.js",
   "main": "./built/index.js",
   "scripts": {
