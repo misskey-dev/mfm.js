@@ -1,13 +1,9 @@
-export type MfmNode = {
-	type: string;
-	props: Record<string, any>;
-	children: MfmNode[];
-};
+import { MfmNode, MfmText } from './node';
 
 export function createNode(type: string, props?: Record<string, any>, children?: MfmNode[]): MfmNode {
 	props = props ?? {};
 	children = children ?? [];
-	const node = { type, props, children };
+	const node = { type, props, children } as MfmNode;
 	return node;
 }
 
@@ -46,7 +42,7 @@ export function mergeText(trees: MfmNode[], recursive?: boolean): MfmNode[] {
 		if (group[0].type == 'text') {
 			return [
 				createNode('text', {
-					text: group.map(i => i.props.text).join('')
+					text: group.map(i => (i as MfmText).props.text).join('')
 				})
 			];
 		}

@@ -23,9 +23,8 @@ async function entryPoint() {
 			.replace(/\\t/g, '\t')
 			.replace(/\\u00a0/g, '\u00a0');
 
-		let result: any;
 		try {
-			result = parse(input);
+			const result = parse(input);
 			console.log(JSON.stringify(result));
 		}
 		catch (err) {
