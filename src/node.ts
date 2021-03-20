@@ -39,7 +39,7 @@ export type MfmCenter = {
 	props: {
 
 	};
-	children: MfmNode[];
+	children: MfmInline[];
 };
 
 export type MfmInline = MfmEmoji | MfmBold | MfmSmall | MfmItalic | MfmStrike | MfmInlineCode |
