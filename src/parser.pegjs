@@ -129,18 +129,10 @@ mathBlockLine
 // block: center
 
 center
-	= BEGIN "<center>" LF? content:centerLines LF? "</center>" END
+	= BEGIN "<center>" content:(!("</center>" END) i:inline { return i; })+ "</center>" END
 {
-	const children = applyParser(content, 'inlineParser');
-	return createNode('center', { }, children);
+	return createNode('center', { }, mergeText(content));
 }
-
-centerLines
-	= centerLine (LF centerLine)*
-{ return text(); }
-
-centerLine
-	= (!("</center>" END) CHAR)+
 
 //
 // inline rules
