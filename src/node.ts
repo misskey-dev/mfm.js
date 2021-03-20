@@ -47,7 +47,10 @@ export type MfmInline = MfmEmoji | MfmBold | MfmSmall | MfmItalic | MfmStrike | 
 
 export type MfmEmoji = {
 	type: 'emoji';
-	props: { emoji: string; name: undefined; } | { emoji: undefined; name: string; };
+	props: {
+		emoji?: string;
+		name?: string;
+	};
 	children: [];
 };
 

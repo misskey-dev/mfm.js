@@ -1,6 +1,6 @@
 import { MfmNode, MfmText } from './node';
 
-export function createNode(type: string, props?: Record<string, any>, children?: MfmNode[]): MfmNode {
+export function createNode(type: string, props: Record<string, any>, children?: MfmNode[]): MfmNode {
 	props = props ?? {};
 	children = children ?? [];
 	const node = { type, props, children } as MfmNode;

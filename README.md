@@ -1,6 +1,6 @@
 # rosee
 ## Description
-A MFM parser implementation with PEG.js (In developing)  
+A MFM parser implementation with PEG.js
 
 ## Installation
 ```
@@ -12,8 +12,17 @@ TypeScript:
 ```ts
 import * as mfm from 'rosee';
 
+const input =
+`<center>
+Hello [tada everynyan! 🎉]
+
+I'm @ai, An bot of misskey!
+
+https://github.com/syuilo/ai
+</center>`;
+
 // parse a MFM text
-const result = mfm.parse('good morning ***everynyan!***');
+const result = mfm.parse(input);
 
 // parse a MFM plain text
 const plainResult = mfm.parsePlain('I like the hot soup :soup:​');
