@@ -1,3 +1,4 @@
+import { performance } from 'perf_hooks';
 import inputLine, { InputCanceledError } from './misc/inputLine';
 import { parse } from '..';
 
@@ -24,8 +25,12 @@ async function entryPoint() {
 			.replace(/\\u00a0/g, '\u00a0');
 
 		try {
+			const parseTimeStart = performance.now();
 			const result = parse(input);
+			const parseTimeEnd = performance.now();
 			console.log(JSON.stringify(result));
+			const parseTime = (parseTimeEnd - parseTimeStart).toFixed(3);
+			console.log(`parsing time: ${parseTime}ms`);
 		}
 		catch (err) {
 			console.log('parsing error:');
