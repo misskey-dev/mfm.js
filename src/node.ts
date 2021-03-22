@@ -4,7 +4,7 @@ export type MfmBlock = MfmQuote | MfmSearch | MfmCodeBlock | MfmMathBlock | MfmC
 
 export type MfmQuote = {
 	type: 'quote';
-	props: { };
+	props?: { };
 	children: MfmNode[];
 };
 
@@ -14,7 +14,7 @@ export type MfmSearch = {
 		q: string;
 		content: string;
 	};
-	children: [];
+	children?: [];
 };
 
 export type MfmCodeBlock = {
@@ -23,7 +23,7 @@ export type MfmCodeBlock = {
 		code: string;
 		lang: string | null;
 	};
-	children: [];
+	children?: [];
 };
 
 export type MfmMathBlock = {
@@ -31,14 +31,12 @@ export type MfmMathBlock = {
 	props: {
 		formula: string;
 	};
-	children: [];
+	children?: [];
 };
 
 export type MfmCenter = {
 	type: 'center';
-	props: {
-
-	};
+	props?: { };
 	children: MfmInline[];
 };
 
@@ -51,30 +49,30 @@ export type MfmEmoji = {
 		emoji?: string;
 		name?: string;
 	};
-	children: [];
+	children?: [];
 };
 
 export type MfmBold = {
 	type: 'bold';
-	props: { };
+	props?: { };
 	children: MfmInline[];
 };
 
 export type MfmSmall = {
 	type: 'small';
-	props: { };
+	props?: { };
 	children: MfmInline[];
 };
 
 export type MfmItalic = {
 	type: 'italic';
-	props: { };
+	props?: { };
 	children: MfmInline[];
 };
 
 export type MfmStrike = {
 	type: 'strike';
-	props: { };
+	props?: { };
 	children: MfmInline[];
 };
 
@@ -83,7 +81,7 @@ export type MfmInlineCode = {
 	props: {
 		code: string;
 	};
-	children: [];
+	children?: [];
 };
 
 export type MfmMathInline = {
@@ -91,7 +89,7 @@ export type MfmMathInline = {
 	props: {
 		formula: string;
 	};
-	children: [];
+	children?: [];
 };
 
 export type MfmMention = {
@@ -101,7 +99,7 @@ export type MfmMention = {
 		host: string | null;
 		acct: string;
 	};
-	children: [];
+	children?: [];
 };
 
 export type MfmHashtag = {
@@ -109,7 +107,7 @@ export type MfmHashtag = {
 	props: {
 		hashtag: string;
 	};
-	children: [];
+	children?: [];
 };
 
 export type MfmUrl = {
@@ -117,7 +115,7 @@ export type MfmUrl = {
 	props: {
 		url: string;
 	};
-	children: [];
+	children?: [];
 };
 
 export type MfmLink = {
@@ -143,5 +141,5 @@ export type MfmText = {
 	props: {
 		text: string;
 	};
-	children: [];
+	children?: [];
 };

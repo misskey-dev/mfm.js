@@ -65,7 +65,7 @@ quote
 {
 	const lines = [head, ...tails];
 	const children = applyParser(lines.join('\n'), 'fullParser');
-	return createNode('quote', { }, children);
+	return createNode('quote', null, children);
 }
 
 quoteLine
@@ -131,7 +131,7 @@ mathBlockLine
 center
 	= BEGIN "<center>" content:(!("</center>" END) i:inline { return i; })+ "</center>" END
 {
-	return createNode('center', { }, mergeText(content));
+	return createNode('center', null, mergeText(content));
 }
 
 //
@@ -191,12 +191,12 @@ big
 bold
 	= "**" content:(!"**" i:inline { return i; })+ "**"
 {
-	return createNode('bold', { }, mergeText(content));
+	return createNode('bold', null, mergeText(content));
 }
 	/ "__" content:$(!"__" c:([a-z0-9]i / _) { return c; })+ "__"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
-	return createNode('bold', { }, parsedContent);
+	return createNode('bold', null, parsedContent);
 }
 
 // inline: small
@@ -204,7 +204,7 @@ bold
 small
 	= "<small>" content:(!"</small>" i:inline { return i; })+ "</small>"
 {
-	return createNode('small', { }, mergeText(content));
+	return createNode('small', null, mergeText(content));
 }
 
 // inline: italic
@@ -212,17 +212,17 @@ small
 italic
 	= "<i>" content:(!"</i>" i:inline { return i; })+ "</i>"
 {
-	return createNode('italic', { }, mergeText(content));
+	return createNode('italic', null, mergeText(content));
 }
 	/ "*" content:$(!"*" ([a-z0-9]i / _))+ "*"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
-	return createNode('italic', { }, parsedContent);
+	return createNode('italic', null, parsedContent);
 }
 	/ "_" content:$(!"_" ([a-z0-9]i / _))+ "_"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
-	return createNode('italic', { }, parsedContent);
+	return createNode('italic', null, parsedContent);
 }
 
 // inline: strike
@@ -230,7 +230,7 @@ italic
 strike
 	= "~~" content:(!("~" / LF) i:inline { return i; })+ "~~"
 {
-	return createNode('strike', { }, mergeText(content));
+	return createNode('strike', null, mergeText(content));
 }
 
 // inline: inlineCode

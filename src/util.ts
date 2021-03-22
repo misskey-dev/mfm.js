@@ -1,9 +1,13 @@
 import { MfmNode, MfmText } from './node';
 
-export function createNode(type: string, props: Record<string, any>, children?: MfmNode[]): MfmNode {
-	props = props ?? {};
-	children = children ?? [];
-	const node = { type, props, children } as MfmNode;
+export function createNode(type: string, props?: Record<string, any>, children?: MfmNode[]): MfmNode {
+	const node: any = { type };
+	if (props != null) {
+		node.props = props;
+	}
+	if (children != null) {
+		node.children = children;
+	}
 	return node;
 }
 
@@ -30,9 +34,13 @@ export function mergeGroupedTrees(groupedTrees: MfmNode[][]): MfmNode[] {
 	return groupedTrees.reduce((acc, val) => acc.concat(val), ([] as MfmNode[]));
 }
 
-export function mergeText(trees: MfmNode[], recursive?: boolean): MfmNode[] {
+export function mergeText(trees: MfmNode[] | undefined, recursive?: boolean): MfmNode[] | undefined {
 	let dest: MfmNode[];
 	let groupes: MfmNode[][];
+
+	if (trees == null) {
+		return trees;
+	}
 
 	// group trees
 	groupes = groupContinuous(trees, (prev, current) => prev.type == current.type);
@@ -52,10 +60,15 @@ export function mergeText(trees: MfmNode[], recursive?: boolean): MfmNode[] {
 	// merge groups
 	dest = mergeGroupedTrees(groupes);
 
-	return dest.map(tree => {
-		// apply recursively to children
-		return createNode(tree.type, tree.props, recursive ? mergeText(tree.children) : tree.children);
-	});
+	if (recursive) {
+		return dest.map(tree => {
+			// apply recursively to children
+			return createNode(tree.type, tree.props, recursive ? mergeText(tree.children) : tree.children);
+		});
+	}
+	else {
+		return dest;
+	}
 }
 
 //
