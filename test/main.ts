@@ -2,13 +2,77 @@ import assert from 'assert';
 import { parse, parsePlain } from '../built/index';
 import { createNode } from '../built/util';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, CUSTOM_EMOJI, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, CUSTOM_EMOJI, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE
 } from './node';
 
 describe('text', () => {
 	it('basic', () => {
 		const input = 'abc';
 		const output = [TEXT('abc')];
+		assert.deepStrictEqual(parse(input), output);
+	});
+});
+
+describe('quote', () => {
+	it('single', () => {
+		const input = '> abc';
+		const output = [
+			QUOTE([
+				TEXT('abc')
+			])
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+	it('multiple', () => {
+		const input = `
+> abc
+> 123
+`;
+		const output = [
+			TEXT('\n'),
+			QUOTE([
+				TEXT('abc\n123')
+			]),
+			TEXT('\n')
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+
+	it('with block (center)', () => {
+		const input = `
+> <center>
+> a
+> </center>
+`;
+		const output = [
+			TEXT('\n'),
+			QUOTE([
+				CENTER([
+					TEXT('\na\n')
+				])
+			]),
+			TEXT('\n')
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+
+	it('with block (center, mention)', () => {
+		const input = `
+> <center>
+> I'm @ai, An bot of misskey!
+> </center>
+`;
+		const output = [
+			TEXT('\n'),
+			QUOTE([
+				CENTER([
+					TEXT('\nI\'m '),
+					MENTION('ai', null, '@ai'),
+					TEXT(', An bot of misskey!\n'),
+				])
+			]),
+			TEXT('\n')
+		];
 		assert.deepStrictEqual(parse(input), output);
 	});
 });
