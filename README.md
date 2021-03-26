@@ -1,6 +1,7 @@
 # mfm.js
-## Description
-A MFM parser implementation with PEG.js
+An MFM parser implementation with PEG.js
+
+[![NPM](https://nodei.co/npm/mfm-js.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/mfm-js)
 
 ## Installation
 ```
@@ -32,7 +33,7 @@ const text = mfm.toString(mfmTree);
 
 ```
 
-## Usage (Repository)
+## Develop
 ### 1. Clone
 ```
 git clone https://github.com/misskey-dev/mfm.js.git
