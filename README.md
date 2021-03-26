@@ -12,20 +12,24 @@ TypeScript:
 ```ts
 import * as mfm from 'rosee';
 
-const input =
+const inputText =
 `<center>
 Hello [tada everynyan! 🎉]
 
-I'm @ai, An bot of misskey!
+I'm @ai, A bot of misskey!
 
 https://github.com/syuilo/ai
 </center>`;
 
-// parse a MFM text
-const result = mfm.parse(input);
+// Generate a MFM tree from the MFM text.
+const mfmTree = mfm.parse(inputText);
 
-// parse a MFM plain text
-const plainResult = mfm.parsePlain('I like the hot soup :soup:​');
+// Generate a MFM tree from the MFM plain text.
+const plainMfmTree = mfm.parsePlain('I like the hot soup :soup:​');
+
+// Reverse to a MFM text from the MFM tree.
+const text = mfm.toString(mfmTree);
+
 ```
 
 ## Usage (Repository)
