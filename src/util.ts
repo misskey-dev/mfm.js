@@ -71,6 +71,91 @@ export function mergeText(trees: MfmNode[] | undefined, recursive?: boolean): Mf
 	}
 }
 
+export function stringifyNode(node: MfmNode): string {
+	switch(node.type) {
+		// block
+		case 'quote': {
+			return stringifyTree(node.children).split('\n').map(line => `>${line}`).join('\n');
+		}
+		case 'search': {
+			return node.props.content;
+		}
+		case 'blockCode': {
+			return `\`\`\`${ node.props.lang ?? '' }\n${ node.props.code }\n\`\`\``;
+		}
+		case 'mathBlock': {
+			return `\\[\n${ node.props.formula }\n\\]`;
+		}
+		case 'center': {
+			return `<center>${ stringifyTree(node.children) }</center>`;
+		}
+		// inline
+		case 'emoji': {
+			if (node.props.name) {
+				return `:${ node.props.name }:`;
+			}
+			else if (node.props.emoji) {
+				return node.props.emoji;
+			}
+			else {
+				return '';
+			}
+		}
+		case 'bold': {
+			return `**${ stringifyTree(node.children) }**`;
+		}
+		case 'small': {
+			return `<small>${ stringifyTree(node.children) }</small>`;
+		}
+		case 'italic': {
+			return `<i>${ stringifyTree(node.children) }</i>`;
+		}
+		case 'strike': {
+			return `~~${ stringifyTree(node.children) }~~`;
+		}
+		case 'inlineCode': {
+			return `\`${ node.props.code }\``;
+		}
+		case 'mathInline': {
+			return `\\(${ node.props.formula }\\)`;
+		}
+		case 'mention': {
+			return node.props.acct;
+		}
+		case 'hashtag': {
+			return `#${ node.props.hashtag }`;
+		}
+		case 'url': {
+			return node.props.url;
+		}
+		case 'link': {
+			const prefix = node.props.silent ? '?' : '';
+			return `${ prefix }[${ stringifyTree(node.children) }](${ node.props.url })`;
+		}
+		case 'fn': {
+			const argFields = Object.keys(node.props.args).map(key => {
+				const value = node.props.args[key];
+				if (value === true) {
+					return key;
+				}
+				else {
+					return `${ key }=${ value }`;
+				}
+			});
+			const args = (argFields.length > 0) ? '.' + argFields.join(',') : '';
+			return `[${ node.props.name }${ args } ${ stringifyTree(node.children) }]`;
+		}
+		case 'text': {
+			return node.props.text;
+		}
+	}
+	throw new Error('unknown mfm node');
+}
+
+export function stringifyTree(tree: MfmNode[]): string {
+	return tree.map(n => stringifyNode(n)).join('');
+}
+
 //
 // dynamic consuming
 //
