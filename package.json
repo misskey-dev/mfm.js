@@ -1,7 +1,7 @@
 {
   "name": "mfm-js",
   "version": "0.8.0",
-  "description": "A MFM parser implementation with PEG.js",
+  "description": "An MFM parser implementation with PEG.js",
   "main": "./built/index.js",
   "scripts": {
     "build": "npm run tsc && npm run peg",

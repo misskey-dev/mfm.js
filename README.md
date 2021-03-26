@@ -5,13 +5,13 @@ An MFM parser implementation with PEG.js
 
 ## Installation
 ```
-npm i rosee
+npm i mfm-js
 ```
 
 ## Usage
 TypeScript:  
 ```ts
-import * as mfm from 'rosee';
+import * as mfm from 'mfm-js';
 
 const inputText =
 `<center>
