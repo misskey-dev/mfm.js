@@ -1,4 +1,4 @@
-# rosee
+# mfm.js
 ## Description
 A MFM parser implementation with PEG.js
 
@@ -31,12 +31,12 @@ const plainResult = mfm.parsePlain('I like the hot soup :soup:​');
 ## Usage (Repository)
 ### 1. Clone
 ```
-git clone https://github.com/marihachi/rosee.git
+git clone https://github.com/misskey-dev/mfm.js.git
 ```
 
 ### 2. Install packages
 ```
-cd rosee
+cd mfm.js
 npm i
 ```
 

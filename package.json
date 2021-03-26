@@ -1,5 +1,5 @@
 {
-  "name": "rosee",
+  "name": "mfm-js",
   "version": "0.7.0",
   "description": "A MFM parser implementation with PEG.js",
   "main": "./built/index.js",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marihachi/rosee.git"
+    "url": "git+https://github.com/misskey-dev/mfm.js.git"
   },
   "author": "Marihachi",
   "license": "MIT",
