@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { parse, parsePlain } from '../built/index';
+import { inspect, parse, parsePlain, toString } from '../built/index';
 import { createNode } from '../built/util';
 import {
 	TEXT, CENTER, FN, UNI_EMOJI, MENTION, CUSTOM_EMOJI, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE
@@ -400,4 +400,17 @@ https://github.com/syuilo/ai
 		])
 	];
 	assert.deepStrictEqual(parse(input), output);
+});
+
+describe('inspect', () => {
+	it('replace text', () => {
+		const input = 'good morning [tada everynyan!]';
+		const result = parse(input);
+		inspect(result, node => {
+			if (node.type == 'text') {
+				node.props.text = node.props.text.replace(/good morning/g, 'hello');
+			}
+		});
+		assert.strictEqual(toString(result), 'hello [tada everynyan!]');
+	});
 });
