@@ -24,6 +24,15 @@ export function toString(node: MfmNode | MfmNode[]): string {
 	}
 }
 
+export function inspect(tree: MfmNode[], action: (node: MfmNode) => void): void {
+	for (const node of tree) {
+		action(node);
+		if (node.children != null) {
+			inspect(node.children, action);
+		}
+	}
+}
+
 export {
 	MfmNode,
 	MfmBlock,
