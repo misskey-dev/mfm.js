@@ -83,7 +83,7 @@ function nodeStringify(node: MfmNode): string {
 					return `${ key }=${ value }`;
 				}
 			});
-			const args = argFields.join(',');
+			const args = (argFields.length > 0) ? '.' + argFields.join(',') : '';
 			return `[${ node.props.name }${ args } ${ toString(node.children) }]`;
 		}
 		case 'text': {
