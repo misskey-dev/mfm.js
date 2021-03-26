@@ -93,8 +93,15 @@ function nodeStringify(node: MfmNode): string {
 	throw new Error('unknown mfm node');
 }
 
-export function toString(nodes: MfmNode[]): string {
-	return nodes.map(node => nodeStringify(node)).join('');
+export function toString(nodes: MfmNode[]): string
+export function toString(node: MfmNode): string
+export function toString(node: MfmNode | MfmNode[]): string {
+	if (Array.isArray(node)) {
+		return node.map(n => nodeStringify(n)).join('');
+	}
+	else {
+		return nodeStringify(node);
+	}
 }
 
 export {
