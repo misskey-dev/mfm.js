@@ -19,59 +19,78 @@ function nodeStringify(node: MfmNode): string {
 			return toString(node.children).split('\n').map(line => `>${line}`).join('\n');
 		}
 		case 'search': {
-			break;
+			return node.props.content;
 		}
 		case 'blockCode': {
-			break;
+			return `\`\`\`${ node.props.lang ?? '' }\n${ node.props.code }\n\`\`\``;
 		}
 		case 'mathBlock': {
-			break;
+			return `\\[\n${ node.props.formula }\n\\]`;
 		}
 		case 'center': {
-			break;
+			return `<center>${ toString(node.children) }</center>`;
 		}
 		// inline
 		case 'emoji': {
-			break;
+			if (node.props.name) {
+				return `:${ node.props.name }:`;
+			}
+			else if (node.props.emoji) {
+				return node.props.emoji;
+			}
+			else {
+				return '';
+			}
 		}
 		case 'bold': {
-			break;
+			return `**${ toString(node.children) }**`;
 		}
 		case 'small': {
-			break;
+			return `<small>${ toString(node.children) }</small>`;
 		}
 		case 'italic': {
-			break;
+			return `<i>${ toString(node.children) }</i>`;
 		}
 		case 'strike': {
-			break;
+			return `~~${ toString(node.children) }~~`;
 		}
 		case 'inlineCode': {
-			break;
+			return `\`${ node.props.code }\``;
 		}
 		case 'mathInline': {
-			break;
+			return `\\(${ node.props.formula }\\)`;
 		}
 		case 'mention': {
-			break;
+			return node.props.acct;
 		}
 		case 'hashtag': {
-			break;
+			return `#${ node.props.hashtag }`;
 		}
 		case 'url': {
-			break;
+			return node.props.url;
 		}
 		case 'link': {
-			break;
+			const prefix = node.props.silent ? '?' : '';
+			return `${ prefix }[${ toString(node.children) }](${ node.props.url })`;
 		}
 		case 'fn': {
-			break;
+			const argFields = Object.keys(node.props.args).map(key => {
+				const value = node.props.args[key];
+				if (value === true) {
+					return key;
+				}
+				else {
+					return `${ key }=${ value }`;
+				}
+			});
+			const args = argFields.join(',');
+			return `[${ node.props.name }${ args } ${ toString(node.children) }]`;
 		}
 		case 'text': {
 			return node.props.text;
 		}
 	}
-	return '';
+	throw new Error('unknown mfm node');
 }
 
 export function toString(nodes: MfmNode[]): string {
