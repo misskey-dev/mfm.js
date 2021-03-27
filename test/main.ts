@@ -2,7 +2,7 @@ import assert from 'assert';
 import { inspect, parse, parsePlain, toString } from '../built/index';
 import { createNode } from '../built/util';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, CUSTOM_EMOJI, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, CUSTOM_EMOJI, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK
 } from './node';
 
 describe('text', () => {
@@ -29,11 +29,9 @@ describe('quote', () => {
 > 123
 `;
 		const output = [
-			TEXT('\n'),
 			QUOTE([
 				TEXT('abc\n123')
-			]),
-			TEXT('\n')
+			])
 		];
 		assert.deepStrictEqual(parse(input), output);
 	});
@@ -45,13 +43,11 @@ describe('quote', () => {
 > </center>
 `;
 		const output = [
-			TEXT('\n'),
 			QUOTE([
 				CENTER([
-					TEXT('\na\n')
+					TEXT('a')
 				])
-			]),
-			TEXT('\n')
+			])
 		];
 		assert.deepStrictEqual(parse(input), output);
 	});
@@ -63,28 +59,162 @@ describe('quote', () => {
 > </center>
 `;
 		const output = [
-			TEXT('\n'),
 			QUOTE([
 				CENTER([
-					TEXT('\nI\'m '),
+					TEXT('I\'m '),
 					MENTION('ai', null, '@ai'),
-					TEXT(', An bot of misskey!\n'),
+					TEXT(', An bot of misskey!'),
 				])
-			]),
-			TEXT('\n')
+			])
 		];
 		assert.deepStrictEqual(parse(input), output);
 	});
 });
 
-describe('fn', () => {
-	it('basic', () => {
-		const input = '[tada abc]';
+describe('search', () => {
+	describe('basic', () => {
+		it('Search', () => {
+			const input = 'MFM 書き方 123 Search';
+			const output = [
+				createNode('search', {
+					query: 'MFM 書き方 123',
+					content: input
+				})
+			];
+			assert.deepStrictEqual(parse(input), output);
+		});
+		it('[Search]', () => {
+			const input = 'MFM 書き方 123 [Search]';
+			const output = [
+				createNode('search', {
+					query: 'MFM 書き方 123',
+					content: input
+				})
+			];
+			assert.deepStrictEqual(parse(input), output);
+		});
+		it('search', () => {
+			const input = 'MFM 書き方 123 search';
+			const output = [
+				createNode('search', {
+					query: 'MFM 書き方 123',
+					content: input
+				})
+			];
+			assert.deepStrictEqual(parse(input), output);
+		});
+		it('[search]', () => {
+			const input = 'MFM 書き方 123 [search]';
+			const output = [
+				createNode('search', {
+					query: 'MFM 書き方 123',
+					content: input
+				})
+			];
+			assert.deepStrictEqual(parse(input), output);
+		});
+		it('検索', () => {
+			const input = 'MFM 書き方 123 検索';
+			const output = [
+				createNode('search', {
+					query: 'MFM 書き方 123',
+					content: input
+				})
+			];
+			assert.deepStrictEqual(parse(input), output);
+		});
+		it('[検索]', () => {
+			const input = 'MFM 書き方 123 [検索]';
+			const output = [
+				createNode('search', {
+					query: 'MFM 書き方 123',
+					content: input
+				})
+			];
+			assert.deepStrictEqual(parse(input), output);
+		});
+	});
+	it('with text', () => {
+		const input = 'abc\nhoge piyo bebeyo 検索\n123';
 		const output = [
-			FN('tada', { }, [
+			TEXT('abc'),
+			SEARCH('hoge piyo bebeyo', 'hoge piyo bebeyo 検索'),
+			TEXT('123')
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+});
+
+describe('code block', () => {
+	it('basic', () => {
+		const input = '```\nabc\n```';
+		const output = [CODE_BLOCK('abc', null)];
+		assert.deepStrictEqual(parse(input), output);
+	});
+	it('with text', () => {
+		const input = 'abc\n```\nconst abc = 1;\n```\n123';
+		const output = [
+			TEXT('abc'),
+			CODE_BLOCK('const abc = 1;', null),
+			TEXT('123')
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+});
+
+describe('mathBlock', () => {
+	it('basic', () => {
+		const input = '123\n\\[math1\\]\nabc\n\\[math2\\]';
+		const output = [
+			TEXT('123'),
+			MATH_BLOCK('math1'),
+			TEXT('abc'),
+			MATH_BLOCK('math2')
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+	it('case of no matched', () => {
+		const input = '\\[aaa\\]\\[bbb\\]';
+		const output = [
+			TEXT('\\[aaa\\]\\[bbb\\]')
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+});
+
+describe('center', () => {
+	it('single text', () => {
+		const input = '<center>abc</center>';
+		const output = [
+			CENTER([
 				TEXT('abc')
 			])
 		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+	it('multiple text', () => {
+		const input = '<center>\nabc\n123\n\npiyo\n</center>';
+		const output = [
+			CENTER([
+				TEXT('\nabc\n123\n\npiyo\n')
+			])
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+});
+
+describe('custom emoji', () => {
+	it('basic', () => {
+		const input = ':abc:';
+		const output = [CUSTOM_EMOJI('abc')];
+		assert.deepStrictEqual(parse(input), output);
+	});
+});
+
+describe('unicode emoji', () => {
+	it('basic', () => {
+		const input = '今起きた😇';
+		const output = [TEXT('今起きた'), UNI_EMOJI('😇')];
 		assert.deepStrictEqual(parse(input), output);
 	});
 });
@@ -253,22 +383,13 @@ describe('italic 2', () => {
 	});
 });
 
+// strike
 
-describe('custom emoji', () => {
-	it('basic', () => {
-		const input = ':abc:';
-		const output = [CUSTOM_EMOJI('abc')];
-		assert.deepStrictEqual(parse(input), output);
-	});
-});
+// inlineCode
 
-describe('unicode emoji', () => {
-	it('basic', () => {
-		const input = '今起きた😇';
-		const output = [TEXT('今起きた'), UNI_EMOJI('😇')];
-		assert.deepStrictEqual(parse(input), output);
-	});
-});
+// mathInline
+
+// mention
 
 describe('hashtag', () => {
 	it('and unicode emoji', () => {
@@ -290,86 +411,14 @@ describe('url', () => {
 	});
 });
 
-describe('search', () => {
-	describe('basic', () => {
-		it('Search', () => {
-			const input = 'MFM 書き方 123 Search';
-			const output = [
-				createNode('search', {
-					query: 'MFM 書き方 123',
-					content: input
-				})
-			];
-			assert.deepStrictEqual(parse(input), output);
-		});
-		it('[Search]', () => {
-			const input = 'MFM 書き方 123 [Search]';
-			const output = [
-				createNode('search', {
-					query: 'MFM 書き方 123',
-					content: input
-				})
-			];
-			assert.deepStrictEqual(parse(input), output);
-		});
-		it('search', () => {
-			const input = 'MFM 書き方 123 search';
-			const output = [
-				createNode('search', {
-					query: 'MFM 書き方 123',
-					content: input
-				})
-			];
-			assert.deepStrictEqual(parse(input), output);
-		});
-		it('[search]', () => {
-			const input = 'MFM 書き方 123 [search]';
-			const output = [
-				createNode('search', {
-					query: 'MFM 書き方 123',
-					content: input
-				})
-			];
-			assert.deepStrictEqual(parse(input), output);
-		});
-		it('検索', () => {
-			const input = 'MFM 書き方 123 検索';
-			const output = [
-				createNode('search', {
-					query: 'MFM 書き方 123',
-					content: input
-				})
-			];
-			assert.deepStrictEqual(parse(input), output);
-		});
-		it('[検索]', () => {
-			const input = 'MFM 書き方 123 [検索]';
-			const output = [
-				createNode('search', {
-					query: 'MFM 書き方 123',
-					content: input
-				})
-			];
-			assert.deepStrictEqual(parse(input), output);
-		});
-	});
-});
+// link
 
-describe('center', () => {
-	it('single text', () => {
-		const input = '<center>abc</center>';
+describe('fn', () => {
+	it('basic', () => {
+		const input = '[tada abc]';
 		const output = [
-			CENTER([
+			FN('tada', { }, [
 				TEXT('abc')
-			])
-		];
-		assert.deepStrictEqual(parse(input), output);
-	});
-	it('multiple text', () => {
-		const input = '<center>\nabc\n123\n\npiyo\n</center>';
-		const output = [
-			CENTER([
-				TEXT('\nabc\n123\n\npiyo\n')
 			])
 		];
 		assert.deepStrictEqual(parse(input), output);
