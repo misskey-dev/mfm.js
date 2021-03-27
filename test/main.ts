@@ -434,14 +434,17 @@ describe('fn', () => {
 
 it('composite', () => {
 	const input =
-`<center>
+`before
+<center>
 Hello [tada everynyan! 🎉]
 
 I'm @ai, A bot of misskey!
 
 https://github.com/syuilo/ai
-</center>`;
+</center>
+after`;
 	const output = [
+		TEXT('before'),
 		CENTER([
 			TEXT('Hello '),
 			FN('tada', { }, [
@@ -452,9 +455,24 @@ https://github.com/syuilo/ai
 			MENTION('ai', null, '@ai'),
 			TEXT(', A bot of misskey!\n\n'),
 			N_URL('https://github.com/syuilo/ai')
-		])
+		]),
+		TEXT('after')
 	];
 	assert.deepStrictEqual(parse(input), output);
+});
+
+it('toString', () => {
+	const input =
+`before
+<center>
+Hello [tada everynyan! 🎉]
+
+I'm @ai, A bot of misskey!
+
+https://github.com/syuilo/ai
+</center>
+after`;
+	assert.strictEqual(toString(parse(input)), input);
 });
 
 describe('inspect', () => {
