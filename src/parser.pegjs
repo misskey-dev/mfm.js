@@ -61,9 +61,8 @@ block
 // block: quote
 
 quote
-	= head:quoteLine tails:(LF line:quoteLine { return line; })*
+	= lines:quoteLine+
 {
-	const lines = [head, ...tails];
 	const children = applyParser(lines.join('\n'), 'fullParser');
 	return createNode('quote', null, children);
 }
@@ -74,11 +73,11 @@ quoteLine
 // block: search
 
 search
-	= BEGIN q:searchQuery _ searchKey END
+	= BEGIN q:searchQuery sp:_ key:searchKey END
 {
 	return createNode('search', {
 		query: q,
-		content: text()
+		content: `${ q }${ sp }${ key }`
 	});
 }
 
@@ -86,14 +85,14 @@ searchQuery
 	= (!(_ searchKey END) CHAR)+ { return text(); }
 
 searchKey
-	= "[" ("検索" / "Search"i) "]"
+	= "[" ("検索" / "Search"i) "]" { return text(); }
 	/ "検索"
 	/ "Search"i
 
 // block: codeBlock
 
 codeBlock
-	= BEGIN "```" lang:$(CHAR*) LF code:codeBlockLines LF "```" END
+	= BEGIN "```" lang:$(CHAR*) LF code:codeBlockContent LF "```" END
 {
 	lang = lang.trim();
 	return createNode('blockCode', {
@@ -102,12 +101,9 @@ codeBlock
 	});
 }
 
-codeBlockLines
-	= head:codeBlockLine tails:(LF line:codeBlockLine { return line; })*
+codeBlockContent
+	= (!(LF "```" END) CHAR)+
 { return text(); }
-
-codeBlockLine
-	= BEGIN (!(BEGIN "```" END) CHAR)* END { return text(); }
 
 // block: mathBlock
 
@@ -124,7 +120,7 @@ mathBlockLines
 { return text(); }
 
 mathBlockLine
-	= (!("\\]" END) CHAR)+
+	= (!"\\]" CHAR)+
 
 // block: center
 
@@ -393,10 +389,10 @@ text
 //
 
 BEGIN "beginning of line"
-	= &{ return location().start.column == 1; }
+	= LF / &{ return location().start.column == 1; }
 
 END "end of line"
-	= &LF / EOF
+	= LF / EOF
 
 EOF
 	= !.
