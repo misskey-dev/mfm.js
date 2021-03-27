@@ -1,4 +1,4 @@
-import { MfmNode, MfmText } from './node';
+import { MfmNode } from './node';
 
 export function createNode(type: string, props?: Record<string, any>, children?: MfmNode[]): MfmNode {
 	const node: any = { type };
@@ -11,54 +11,32 @@ export function createNode(type: string, props?: Record<string, any>, children?:
 	return node;
 }
 
-/**
- * @param predicate specifies whether to group the previous item and the current item
- * @returns grouped items
-*/
-export function groupContinuous<T>(arr: T[], predicate: (prev: T, current: T) => boolean): T[][] {
-	const dest: any[][] = [];
+export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
+	const dest: MfmNode[] = [];
+	const storedChars: string[] = [];
 
-	for (let i = 0; i < arr.length; i++) {
-		if (i != 0 && predicate(arr[i - 1], arr[i])) {
-			dest[dest.length - 1].push(arr[i]);
-		}
-		else {
-			dest.push([arr[i]]);
+	/**
+	 * Generate a text node from the stored chars, And push it.
+	*/
+	function generateText() {
+		if (storedChars.length > 0) {
+			const textNode = createNode('text', { text: storedChars.join('') });
+			dest.push(textNode);
+			storedChars.length = 0;
 		}
 	}
 
-	return dest;
-}
-
-export function mergeGroupedTrees<T>(groupedTrees: T[][]): T[] {
-	return groupedTrees.reduce((acc, val) => acc.concat(val), ([] as T[]));
-}
-
-export function mergeText(trees: (MfmNode | string)[]): MfmNode[] {
-	// group trees
-	const groupes = groupContinuous(trees, (prev, current) => {
-		if (typeof prev == 'string' || typeof current == 'string') {
-			return (typeof prev == 'string' && typeof current == 'string');
+	for (const node of nodes) {
+		if (typeof node == 'string') {
+			// Store the char.
+			storedChars.push(node);
 		}
 		else {
-			return (prev.type == current.type);
+			generateText();
+			dest.push(node);
 		}
-	});
-
-	// concatinate text
-	const concatGroupes = groupes.map((group) => {
-		if (typeof group[0] == 'string') {
-			return [
-				createNode('text', {
-					text: (group as string[]).join('')
-				})
-			];
-		}
-		return (group as MfmNode[]);
-	});
-
-	// merge groups
-	const dest = mergeGroupedTrees(concatGroupes);
+	}
+	generateText();
 
 	return dest;
 }
