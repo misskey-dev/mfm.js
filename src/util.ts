@@ -30,45 +30,37 @@ export function groupContinuous<T>(arr: T[], predicate: (prev: T, current: T) =>
 	return dest;
 }
 
-export function mergeGroupedTrees(groupedTrees: MfmNode[][]): MfmNode[] {
-	return groupedTrees.reduce((acc, val) => acc.concat(val), ([] as MfmNode[]));
+export function mergeGroupedTrees<T>(groupedTrees: T[][]): T[] {
+	return groupedTrees.reduce((acc, val) => acc.concat(val), ([] as T[]));
 }
 
-export function mergeText(trees: MfmNode[] | undefined, recursive?: boolean): MfmNode[] | undefined {
-	let dest: MfmNode[];
-	let groupes: MfmNode[][];
-
-	if (trees == null) {
-		return trees;
-	}
-
+export function mergeText(trees: (MfmNode | string)[]): MfmNode[] {
 	// group trees
-	groupes = groupContinuous(trees, (prev, current) => prev.type == current.type);
+	const groupes = groupContinuous(trees, (prev, current) => {
+		if (typeof prev == 'string' || typeof current == 'string') {
+			return (typeof prev == 'string' && typeof current == 'string');
+		}
+		else {
+			return (prev.type == current.type);
+		}
+	});
 
 	// concatinate text
-	groupes = groupes.map((group) => {
-		if (group[0].type == 'text') {
+	const concatGroupes = groupes.map((group) => {
+		if (typeof group[0] == 'string') {
 			return [
 				createNode('text', {
-					text: group.map(i => (i as MfmText).props.text).join('')
+					text: (group as string[]).join('')
 				})
 			];
 		}
-		return group;
+		return (group as MfmNode[]);
 	});
 
 	// merge groups
-	dest = mergeGroupedTrees(groupes);
+	const dest = mergeGroupedTrees(concatGroupes);
 
-	if (recursive) {
-		return dest.map(tree => {
-			// apply recursively to children
-			return createNode(tree.type, tree.props, recursive ? mergeText(tree.children) : tree.children);
-		});
-	}
-	else {
-		return dest;
-	}
+	return dest;
 }
 
 export function stringifyNode(node: MfmNode): string {
