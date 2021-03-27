@@ -125,7 +125,7 @@ mathBlockLine
 // block: center
 
 center
-	= BEGIN "<center>" content:(!("</center>" END) i:inline { return i; })+ "</center>" END
+	= BEGIN "<center>" LF? content:(!(LF? "</center>" END) i:inline { return i; })+ LF? "</center>" END
 {
 	return createNode('center', null, mergeText(content));
 }
