@@ -11,7 +11,7 @@ export type MfmQuote = {
 export type MfmSearch = {
 	type: 'search';
 	props: {
-		q: string;
+		query: string;
 		content: string;
 	};
 	children?: [];
