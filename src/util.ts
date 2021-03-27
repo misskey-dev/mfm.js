@@ -1,4 +1,4 @@
-import { MfmNode } from './node';
+import { isMfmBlock, MfmNode } from './node';
 
 export function createNode(type: string, props?: Record<string, any>, children?: MfmNode[]): MfmNode {
 	const node: any = { type };
@@ -45,7 +45,7 @@ export function stringifyNode(node: MfmNode): string {
 	switch(node.type) {
 		// block
 		case 'quote': {
-			return stringifyTree(node.children).split('\n').map(line => `>${line}`).join('\n');
+			return stringifyTree(node.children).split('\n').map(line => `> ${line}`).join('\n');
 		}
 		case 'search': {
 			return node.props.content;
@@ -57,7 +57,7 @@ export function stringifyNode(node: MfmNode): string {
 			return `\\[\n${ node.props.formula }\n\\]`;
 		}
 		case 'center': {
-			return `<center>${ stringifyTree(node.children) }</center>`;
+			return `<center>\n${ stringifyTree(node.children) }\n</center>`;
 		}
 		// inline
 		case 'emoji': {
@@ -122,8 +122,46 @@ export function stringifyNode(node: MfmNode): string {
 	throw new Error('unknown mfm node');
 }
 
-export function stringifyTree(tree: MfmNode[]): string {
-	return tree.map(n => stringifyNode(n)).join('');
+enum stringifyState {
+	none = 0,
+	inline,
+	block
+};
+
+export function stringifyTree(nodes: MfmNode[]): string {
+	let dest: MfmNode[] = [];
+	let state: stringifyState = stringifyState.none;
+
+	for (const node of nodes) {
+		// 文脈に合わせて改行を追加する。
+		// none -> inline   : No
+		// none -> block    : No
+		// inline -> inline : No
+		// inline -> block  : Yes
+		// block -> inline  : Yes
+		// block -> block   : Yes
+
+		let pushLf: boolean = true;
+		if (isMfmBlock(node)) {
+			if (state == stringifyState.none) {
+				pushLf = false;
+			}
+			state = stringifyState.block;
+		}
+		else {
+			if (state == stringifyState.none || state == stringifyState.inline) {
+				pushLf = false;
+			}
+			state = stringifyState.inline;
+		}
+		if (pushLf) {
+			dest.push(createNode('text', { text: '\n' }));
+		}
+
+		dest.push(node);
+	}
+
+	return dest.map(n => stringifyNode(n)).join('');
 }
 
 //

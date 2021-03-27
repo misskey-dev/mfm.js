@@ -2,6 +2,11 @@ export type MfmNode = MfmBlock | MfmInline;
 
 export type MfmBlock = MfmQuote | MfmSearch | MfmCodeBlock | MfmMathBlock | MfmCenter;
 
+const blockTypes: MfmNode['type'][] = [ 'quote', 'search', 'blockCode', 'mathBlock', 'center' ];
+export function isMfmBlock(node: MfmNode): node is MfmBlock {
+	return blockTypes.includes(node.type);
+}
+
 export type MfmQuote = {
 	type: 'quote';
 	props?: { };
