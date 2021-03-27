@@ -151,6 +151,11 @@ describe('code block', () => {
 		const output = [CODE_BLOCK('abc', null)];
 		assert.deepStrictEqual(parse(input), output);
 	});
+	it('basic (lang)', () => {
+		const input = '```js\nconst a = 1;\n```';
+		const output = [CODE_BLOCK('const a = 1;', 'js')];
+		assert.deepStrictEqual(parse(input), output);
+	});
 	it('with text', () => {
 		const input = 'abc\n```\nconst abc = 1;\n```\n123';
 		const output = [
@@ -193,11 +198,13 @@ describe('center', () => {
 		assert.deepStrictEqual(parse(input), output);
 	});
 	it('multiple text', () => {
-		const input = '<center>\nabc\n123\n\npiyo\n</center>';
+		const input = 'before\n<center>\nabc\n123\n\npiyo\n</center>\nafter';
 		const output = [
+			TEXT('before'),
 			CENTER([
-				TEXT('\nabc\n123\n\npiyo\n')
-			])
+				TEXT('abc\n123\n\npiyo')
+			]),
+			TEXT('after')
 		];
 		assert.deepStrictEqual(parse(input), output);
 	});
@@ -436,7 +443,7 @@ https://github.com/syuilo/ai
 </center>`;
 	const output = [
 		CENTER([
-			TEXT('\nHello '),
+			TEXT('Hello '),
 			FN('tada', { }, [
 				TEXT('everynyan! '),
 				UNI_EMOJI('🎉')
@@ -444,8 +451,7 @@ https://github.com/syuilo/ai
 			TEXT('\n\nI\'m '),
 			MENTION('ai', null, '@ai'),
 			TEXT(', A bot of misskey!\n\n'),
-			N_URL('https://github.com/syuilo/ai'),
-			TEXT('\n')
+			N_URL('https://github.com/syuilo/ai')
 		])
 	];
 	assert.deepStrictEqual(parse(input), output);
