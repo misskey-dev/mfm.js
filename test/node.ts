@@ -5,7 +5,7 @@ import {
 } from '../built';
 
 export const QUOTE = (children: MfmNode[]): MfmQuote => { return { type:'quote', children }; };
-export const SEARCH = (q: string, content: string): MfmSearch => { return { type:'search', props: { q, content } }; };
+export const SEARCH = (query: string, content: string): MfmSearch => { return { type:'search', props: { query, content } }; };
 export const CODE_BLOCK = (code: string, lang: string | null): MfmCodeBlock => { return { type:'blockCode', props: { code, lang } }; };
 export const MATH_BLOCK = (formula: string): MfmMathBlock => { return { type:'mathBlock', props: { formula } }; };
 export const CENTER = (children: MfmInline[]): MfmCenter => { return { type:'center', children }; };
