@@ -386,7 +386,7 @@ fnArg
 // inline: text
 
 text
-	= . { return createNode('text', { text: text() }); }
+	= .
 
 //
 // General
