@@ -2,7 +2,7 @@ import assert from 'assert';
 import { inspect, parse, parsePlain, toString } from '../built/index';
 import { createNode } from '../built/util';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, CUSTOM_EMOJI, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK
 } from './node';
 
 describe('text', () => {
@@ -210,10 +210,10 @@ describe('center', () => {
 	});
 });
 
-describe('custom emoji', () => {
+describe('emoji code', () => {
 	it('basic', () => {
 		const input = ':abc:';
-		const output = [CUSTOM_EMOJI('abc')];
+		const output = [EMOJI_CODE('abc')];
 		assert.deepStrictEqual(parse(input), output);
 	});
 });
