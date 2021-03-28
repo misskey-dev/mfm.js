@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { inspect, parse, parsePlain, toString } from '../built/index';
+import { extract, inspect, parse, parsePlain, toString } from '../built/index';
 import { createNode } from '../built/util';
 import {
 	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK
@@ -485,5 +485,17 @@ describe('inspect', () => {
 			}
 		});
 		assert.strictEqual(toString(result), 'hello [tada everynyan!]');
+	});
+});
+
+describe('extract API', () => {
+	it('basic', () => {
+		const nodes = parse('abc:hoge:[tada 123:hoge:]:piyo:');
+		const expect = [
+			EMOJI_CODE('hoge'),
+			EMOJI_CODE('hoge'),
+			EMOJI_CODE('piyo')
+		];
+		assert.deepStrictEqual(extract(nodes, 'emojiCode'), expect);
 	});
 });
