@@ -33,6 +33,29 @@ export function inspect(tree: MfmNode[], action: (node: MfmNode) => void): void 
 	}
 }
 
+export function extract(nodes: MfmNode[], type: (MfmNode['type'] | MfmNode['type'][])): MfmNode[] {
+	function predicate(node: MfmNode, type: (MfmNode['type'] | MfmNode['type'][])): boolean {
+		if (Array.isArray(type)) {
+			return (type.some(i => i == node.type));
+		}
+		else {
+			return (type == node.type);
+		}
+	}
+
+	const dest = [] as MfmNode[];
+	for (const node of nodes) {
+		if (predicate(node, type)) {
+			dest.push(node);
+		}
+		if (node.children != null) {
+			dest.push(...extract(node.children, type));
+		}
+	}
+
+	return dest;
+}
+
 export {
 	MfmNode,
 	MfmBlock,
