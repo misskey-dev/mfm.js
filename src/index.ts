@@ -46,7 +46,8 @@ export {
 	MfmCenter,
 
 	// inline
-	MfmEmoji,
+	MfmUnicodeEmoji,
+	MfmCustomEmoji,
 	MfmBold,
 	MfmSmall,
 	MfmItalic,

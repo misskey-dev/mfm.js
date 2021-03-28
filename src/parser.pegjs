@@ -158,7 +158,7 @@ emoji
 customEmoji
 	= ":" name:emojiName ":"
 {
-	return createNode('emoji', { name: name });
+	return createNode('customEmoji', { name: name });
 }
 
 emojiName
@@ -168,7 +168,7 @@ emojiName
 unicodeEmoji
 	= &{ return matchUnicodeEmoji(); } (&{ return consumeDynamically(); } .)+
 {
-	return createNode('emoji', { emoji: text() });
+	return createNode('unicodeEmoji', { emoji: text() });
 }
 
 // inline: big

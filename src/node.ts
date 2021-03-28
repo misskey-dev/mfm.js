@@ -45,17 +45,25 @@ export type MfmCenter = {
 	children: MfmInline[];
 };
 
-export type MfmInline = MfmEmoji | MfmBold | MfmSmall | MfmItalic | MfmStrike | MfmInlineCode |
-	MfmMathInline | MfmMention | MfmHashtag | MfmUrl | MfmLink | MfmFn | MfmText;
+export type MfmInline = MfmUnicodeEmoji | MfmCustomEmoji | MfmBold | MfmSmall | MfmItalic | MfmStrike |
+	MfmInlineCode | MfmMathInline | MfmMention | MfmHashtag | MfmUrl | MfmLink | MfmFn | MfmText;
 
-export type MfmEmoji = {
-	type: 'emoji';
+export type MfmUnicodeEmoji = {
+	type: 'unicodeEmoji';
 	props: {
-		emoji?: string;
-		name?: string;
+		emoji: string;
 	};
 	children?: [];
 };
+
+export type MfmCustomEmoji = {
+	type: 'customEmoji';
+	props: {
+		name: string;
+	};
+	children?: [];
+};
+
 
 export type MfmBold = {
 	type: 'bold';
