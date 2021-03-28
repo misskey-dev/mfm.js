@@ -42,7 +42,7 @@ fullParser
 	= nodes:(&. n:(block / inline) { return n; })* { return mergeText(nodes); }
 
 plainParser
-	= nodes:(&. n:(emoji / text) { return n; })* { return mergeText(nodes); }
+	= nodes:(&. n:(emojiCode / unicodeEmoji / text) { return n; })* { return mergeText(nodes); }
 
 inlineParser
 	= nodes:(&. n:inline { return n; })* { return mergeText(nodes); }
@@ -135,7 +135,8 @@ center
 //
 
 inline
-	= emoji
+	= emojiCode
+	/ unicodeEmoji
 	/ big
 	/ bold
 	/ small
@@ -150,19 +151,18 @@ inline
 	/ fn
 	/ text
 
-// inline: emoji
+// inline: emoji code
 
-emoji
-	= customEmoji / unicodeEmoji
-
-customEmoji
-	= ":" name:emojiName ":"
+emojiCode
+	= ":" name:emojiCodeName ":"
 {
-	return createNode('customEmoji', { name: name });
+	return createNode('emojiCode', { name: name });
 }
 
-emojiName
+emojiCodeName
 	= [a-z0-9_+-]i+ { return text(); }
+
+// inline: unicode emoji
 
 // NOTE: if the text matches one of the emojis, it will count the length of the emoji sequence and consume it.
 unicodeEmoji

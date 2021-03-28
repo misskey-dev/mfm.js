@@ -60,7 +60,7 @@ export function stringifyNode(node: MfmNode): string {
 			return `<center>\n${ stringifyTree(node.children) }\n</center>`;
 		}
 		// inline
-		case 'customEmoji': {
+		case 'emojiCode': {
 			return `:${ node.props.name }:`;
 		}
 		case 'unicodeEmoji': {

@@ -45,7 +45,7 @@ export type MfmCenter = {
 	children: MfmInline[];
 };
 
-export type MfmInline = MfmUnicodeEmoji | MfmCustomEmoji | MfmBold | MfmSmall | MfmItalic | MfmStrike |
+export type MfmInline = MfmUnicodeEmoji | MfmEmojiCode | MfmBold | MfmSmall | MfmItalic | MfmStrike |
 	MfmInlineCode | MfmMathInline | MfmMention | MfmHashtag | MfmUrl | MfmLink | MfmFn | MfmText;
 
 export type MfmUnicodeEmoji = {
@@ -56,14 +56,13 @@ export type MfmUnicodeEmoji = {
 	children?: [];
 };
 
-export type MfmCustomEmoji = {
-	type: 'customEmoji';
+export type MfmEmojiCode = {
+	type: 'emojiCode';
 	props: {
 		name: string;
 	};
 	children?: [];
 };
-
 
 export type MfmBold = {
 	type: 'bold';
