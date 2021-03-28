@@ -464,15 +464,15 @@ after`;
 describe('toString API', () => {
 	it('basic', () => {
 		const input =
-	`before
-	<center>
-	Hello [tada everynyan! 🎉]
+`before
+<center>
+Hello [tada everynyan! 🎉]
 
-	I'm @ai, A bot of misskey!
+I'm @ai, A bot of misskey!
 
-	https://github.com/syuilo/ai
-	</center>
-	after`;
+https://github.com/syuilo/ai
+</center>
+after`;
 		assert.strictEqual(toString(parse(input)), input);
 	});
 });
