@@ -10,6 +10,8 @@ npm i mfm-js
 ```
 
 ## Usage
+Please see [wiki](https://github.com/misskey-dev/mfm.js/wiki) for the detail.  
+
 TypeScript:  
 ```ts
 import * as mfm from 'mfm-js';
