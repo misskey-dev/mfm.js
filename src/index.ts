@@ -1,5 +1,5 @@
 import peg from 'pegjs';
-import { MfmNode } from './node';
+import { MfmNode, MfmPlainNode } from './node';
 import { stringifyNode, stringifyTree } from './util';
 const parser: peg.Parser = require('./parser');
 
@@ -8,7 +8,7 @@ export function parse(input: string): MfmNode[] {
 	return nodes;
 }
 
-export function parsePlain(input: string): MfmNode[] {
+export function parsePlain(input: string): MfmPlainNode[] {
 	const nodes = parser.parse(input, { startRule: 'plainParser' });
 	return nodes;
 }

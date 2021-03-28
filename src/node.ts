@@ -1,5 +1,7 @@
 export type MfmNode = MfmBlock | MfmInline;
 
+export type MfmPlainNode = MfmUnicodeEmoji | MfmEmojiCode | MfmText;
+
 export type MfmBlock = MfmQuote | MfmSearch | MfmCodeBlock | MfmMathBlock | MfmCenter;
 
 const blockTypes: MfmNode['type'][] = [ 'quote', 'search', 'blockCode', 'mathBlock', 'center' ];
