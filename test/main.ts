@@ -461,21 +461,23 @@ after`;
 	assert.deepStrictEqual(parse(input), output);
 });
 
-it('toString', () => {
-	const input =
-`before
-<center>
-Hello [tada everynyan! 🎉]
+describe('toString API', () => {
+	it('basic', () => {
+		const input =
+	`before
+	<center>
+	Hello [tada everynyan! 🎉]
 
-I'm @ai, A bot of misskey!
+	I'm @ai, A bot of misskey!
 
-https://github.com/syuilo/ai
-</center>
-after`;
-	assert.strictEqual(toString(parse(input)), input);
+	https://github.com/syuilo/ai
+	</center>
+	after`;
+		assert.strictEqual(toString(parse(input)), input);
+	});
 });
 
-describe('inspect', () => {
+describe('inspect API', () => {
 	it('replace text', () => {
 		const input = 'good morning [tada everynyan!]';
 		const result = parse(input);
