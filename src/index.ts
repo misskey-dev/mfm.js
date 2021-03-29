@@ -56,6 +56,8 @@ export function extract(nodes: MfmNode[], type: (MfmNode['type'] | MfmNode['type
 	return dest;
 }
 
+export { getNodeByType } from './node';
+
 export {
 	MfmNode,
 	MfmBlock,
