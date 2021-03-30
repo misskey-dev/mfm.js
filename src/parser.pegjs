@@ -102,7 +102,7 @@ codeBlock
 }
 
 codeBlockContent
-	= (!(LF "```" END) CHAR)+
+	= (!(LF "```" END) .)+
 { return text(); }
 
 // block: mathBlock
