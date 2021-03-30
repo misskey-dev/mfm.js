@@ -4,11 +4,11 @@
  */
 
 import { expectType } from 'tsd';
-import { getNodeByType, MfmUrl } from '../built';
+import { NodeType, MfmUrl } from '../built';
 
-describe('#getNodeByType', () => {
+describe('#NodeType', () => {
 	it('returns node that has sprcified type', () => {
-		const x = null as unknown as getNodeByType<'url'>;
+		const x = null as unknown as NodeType<'url'>;
 		expectType<MfmUrl>(x);
 	});
 });

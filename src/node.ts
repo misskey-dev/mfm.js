@@ -158,7 +158,7 @@ export type MfmText = {
 	children?: [];
 };
 
-export type getNodeByType<T extends MfmNode['type']> =
+export type NodeType<T extends MfmNode['type']> =
 	T extends 'quote' ? MfmQuote :
 	T extends 'search' ? MfmSearch :
 	T extends 'blockCode' ? MfmCodeBlock :
