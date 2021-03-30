@@ -151,6 +151,11 @@ describe('code block', () => {
 		const output = [CODE_BLOCK('abc', null)];
 		assert.deepStrictEqual(parse(input), output);
 	});
+	it('multi line', () => {
+		const input = '```\na\nb\nc\n```';
+		const output = [CODE_BLOCK('a\nb\nc', null)];
+		assert.deepStrictEqual(parse(input), output);
+	});
 	it('basic (lang)', () => {
 		const input = '```js\nconst a = 1;\n```';
 		const output = [CODE_BLOCK('const a = 1;', 'js')];
