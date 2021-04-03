@@ -7,7 +7,7 @@ import {
 
 describe('parser', () => {
 	describe('text', () => {
-		it('basic', () => {
+		it('普通のテキストを入力すると1つのテキストノードが返される', () => {
 			const input = 'abc';
 			const output = [TEXT('abc')];
 			assert.deepStrictEqual(parse(input), output);
@@ -15,7 +15,7 @@ describe('parser', () => {
 	});
 
 	describe('quote', () => {
-		it('single', () => {
+		it('1行の引用ブロックを使用できる', () => {
 			const input = '> abc';
 			const output = [
 				QUOTE([
@@ -24,7 +24,7 @@ describe('parser', () => {
 			];
 			assert.deepStrictEqual(parse(input), output);
 		});
-		it('multiple', () => {
+		it('複数行の引用ブロックを使用できる', () => {
 			const input = `
 > abc
 > 123
@@ -36,8 +36,7 @@ describe('parser', () => {
 			];
 			assert.deepStrictEqual(parse(input), output);
 		});
-
-		it('with block (center)', () => {
+		it('引用ブロックはブロックをネストできる', () => {
 			const input = `
 > <center>
 > a
@@ -52,8 +51,7 @@ describe('parser', () => {
 			];
 			assert.deepStrictEqual(parse(input), output);
 		});
-
-		it('with block (center, mention)', () => {
+		it('引用ブロックはインライン構文を含んだブロックをネストできる', () => {
 			const input = `
 > <center>
 > I'm @ai, An bot of misskey!
@@ -73,7 +71,7 @@ describe('parser', () => {
 	});
 
 	describe('search', () => {
-		describe('basic', () => {
+		describe('検索構文を使用できる', () => {
 			it('Search', () => {
 				const input = 'MFM 書き方 123 Search';
 				const output = [
@@ -135,7 +133,7 @@ describe('parser', () => {
 				assert.deepStrictEqual(parse(input), output);
 			});
 		});
-		it('with text', () => {
+		it('ブロックの前後にあるテキストが正しく解釈される', () => {
 			const input = 'abc\nhoge piyo bebeyo 検索\n123';
 			const output = [
 				TEXT('abc'),
@@ -147,22 +145,22 @@ describe('parser', () => {
 	});
 
 	describe('code block', () => {
-		it('basic', () => {
+		it('コードブロックを使用できる', () => {
 			const input = '```\nabc\n```';
 			const output = [CODE_BLOCK('abc', null)];
 			assert.deepStrictEqual(parse(input), output);
 		});
-		it('multi line', () => {
+		it('コードブロックには複数行のコードを入力できる', () => {
 			const input = '```\na\nb\nc\n```';
 			const output = [CODE_BLOCK('a\nb\nc', null)];
 			assert.deepStrictEqual(parse(input), output);
 		});
-		it('basic (lang)', () => {
+		it('コードブロックは言語を指定できる', () => {
 			const input = '```js\nconst a = 1;\n```';
 			const output = [CODE_BLOCK('const a = 1;', 'js')];
 			assert.deepStrictEqual(parse(input), output);
 		});
-		it('with text', () => {
+		it('ブロックの前後にあるテキストが正しく解釈される', () => {
 			const input = 'abc\n```\nconst abc = 1;\n```\n123';
 			const output = [
 				TEXT('abc'),
@@ -174,20 +172,33 @@ describe('parser', () => {
 	});
 
 	describe('mathBlock', () => {
-		it('basic', () => {
-			const input = '123\n\\[math1\\]\nabc\n\\[math2\\]';
+		it('1行の数式ブロックを使用できる', () => {
+			const input = '\\[math1\\]';
 			const output = [
-				TEXT('123'),
-				MATH_BLOCK('math1'),
-				TEXT('abc'),
-				MATH_BLOCK('math2')
+				MATH_BLOCK('math1')
 			];
 			assert.deepStrictEqual(parse(input), output);
 		});
-		it('case of no matched', () => {
-			const input = '\\[aaa\\]\\[bbb\\]';
+		it('ブロックの前後にあるテキストが正しく解釈される', () => {
+			const input = 'abc\n\\[math1\\]\n123';
 			const output = [
-				TEXT('\\[aaa\\]\\[bbb\\]')
+				TEXT('abc'),
+				MATH_BLOCK('math1'),
+				TEXT('123')
+			];
+			assert.deepStrictEqual(parse(input), output);
+		});
+		it('行末以外に閉じタグがある場合はマッチしない', () => {
+			const input = '\\[aaa\\]after';
+			const output = [
+				TEXT('\\[aaa\\]after')
+			];
+			assert.deepStrictEqual(parse(input), output);
+		});
+		it('行頭以外に開始タグがある場合はマッチしない', () => {
+			const input = 'before\\[aaa\\]';
+			const output = [
+				TEXT('before\\[aaa\\]')
 			];
 			assert.deepStrictEqual(parse(input), output);
 		});
