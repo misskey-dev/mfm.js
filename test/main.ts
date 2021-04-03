@@ -2,7 +2,7 @@ import assert from 'assert';
 import { extract, inspect, parse, parsePlain, toString } from '../built/index';
 import { createNode } from '../built/util';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK
 } from './node';
 
 describe('text', () => {
@@ -423,7 +423,41 @@ describe('url', () => {
 	});
 });
 
-// link
+describe('link', () => {
+	it('basic', () => {
+		const input = '[official instance](https://misskey.io/@ai).';
+		const output = [
+			LINK(false, 'https://misskey.io/@ai', [
+				TEXT('official instance')
+			]),
+			TEXT('.')
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+
+	it('silent flag', () => {
+		const input = '?[official instance](https://misskey.io/@ai).';
+		const output = [
+			LINK(true, 'https://misskey.io/@ai', [
+				TEXT('official instance')
+			]),
+			TEXT('.')
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+
+	it('do not yield url node even if label is recognisable as a url', () => {
+		const input = 'official instance: [https://misskey.io/@ai](https://misskey.io/@ai).';
+		const output = [
+			TEXT('official instance: '),
+			LINK(false, 'https://misskey.io/@ai', [
+				TEXT('https://misskey.io/@ai')
+			]),
+			TEXT('.')
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+});
 
 describe('fn', () => {
 	it('basic', () => {
