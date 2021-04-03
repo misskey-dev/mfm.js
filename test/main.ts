@@ -2,7 +2,7 @@ import assert from 'assert';
 import { extract, inspect, parse, parsePlain, toString } from '../built/index';
 import { createNode } from '../built/util';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK
 } from './node';
 
 describe('text', () => {
@@ -423,7 +423,53 @@ describe('url', () => {
 	});
 });
 
-// link
+describe('link', () => {
+	it('basic', () => {
+		const input = '[official instance](https://misskey.io/@ai).';
+		const output = [
+			LINK(false, 'https://misskey.io/@ai', [
+				TEXT('official instance')
+			]),
+			TEXT('.')
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+
+	it('silent flag', () => {
+		const input = '?[official instance](https://misskey.io/@ai).';
+		const output = [
+			LINK(true, 'https://misskey.io/@ai', [
+				TEXT('official instance')
+			]),
+			TEXT('.')
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+
+	it('do not yield url node even if label is recognisable as a url', () => {
+		const input = 'official instance: [https://misskey.io/@ai](https://misskey.io/@ai).';
+		const output = [
+			TEXT('official instance: '),
+			LINK(false, 'https://misskey.io/@ai', [
+				TEXT('https://misskey.io/@ai')
+			]),
+			TEXT('.')
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+
+	it('do not yield link node even if label is recognisable as a link', () => {
+		const input = 'official instance: [[https://misskey.io/@ai](https://misskey.io/@ai)](https://misskey.io/@ai).';
+		const output = [
+			TEXT('official instance: '),
+			LINK(false, 'https://misskey.io/@ai', [
+				TEXT('[https://misskey.io/@ai](https://misskey.io/@ai)')
+			]),
+			TEXT('.')
+		];
+		assert.deepStrictEqual(parse(input), output);
+	});
+});
 
 describe('fn', () => {
 	it('basic', () => {
@@ -497,10 +543,20 @@ describe('inspect API', () => {
 
 describe('extract API', () => {
 	it('basic', () => {
-		const nodes = parse('abc:hoge:[tada 123:hoge:]:piyo:');
+		const nodes = parse('@hoge @piyo @bebeyo');
+		const expect = [
+			MENTION('hoge', null, '@hoge'),
+			MENTION('piyo', null, '@piyo'),
+			MENTION('bebeyo', null, '@bebeyo')
+		];
+		assert.deepStrictEqual(extract(nodes, 'mention'), expect);
+	});
+
+	it('nested', () => {
+		const nodes = parse('abc:hoge:[tada 123 @hoge :foo:]:piyo:');
 		const expect = [
 			EMOJI_CODE('hoge'),
-			EMOJI_CODE('hoge'),
+			EMOJI_CODE('foo'),
 			EMOJI_CODE('piyo')
 		];
 		assert.deepStrictEqual(extract(nodes, 'emojiCode'), expect);

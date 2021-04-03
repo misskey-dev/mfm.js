@@ -333,7 +333,7 @@ urlBracketPair
 // inline: link
 
 link
-	= silent:"?"? "[" label:linkLabel "](" url:linkUrl ")"
+	= silent:"?"? "[" label:linkLabelPart+ "](" url:linkUrl ")"
 {
 	return createNode('link', {
 		silent: (silent != null),
@@ -341,8 +341,10 @@ link
 	}, mergeText(label));
 }
 
-linkLabel
-	= (!"]" n:inline { return n; })+
+linkLabelPart
+	= url { return text(); /* text node */ }
+	/ link { return text(); /* text node */ }
+	/ !"]" n:inline { return n; }
 
 linkUrl
 	= url { return text(); }
@@ -382,7 +384,7 @@ fnArg
 // inline: text
 
 text
-	= .
+	= . /* text node */
 
 //
 // General
