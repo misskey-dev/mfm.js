@@ -343,6 +343,7 @@ link
 
 linkLabelPart
 	= url { return text(); /* text node */ }
+	/ link { return text(); /* text node */ }
 	/ !"]" n:inline { return n; }
 
 linkUrl
