@@ -543,10 +543,20 @@ describe('inspect API', () => {
 
 describe('extract API', () => {
 	it('basic', () => {
-		const nodes = parse('abc:hoge:[tada 123:hoge:]:piyo:');
+		const nodes = parse('@hoge @piyo @bebeyo');
+		const expect = [
+			MENTION('hoge', null, '@hoge'),
+			MENTION('piyo', null, '@piyo'),
+			MENTION('bebeyo', null, '@bebeyo')
+		];
+		assert.deepStrictEqual(extract(nodes, 'mention'), expect);
+	});
+
+	it('nested', () => {
+		const nodes = parse('abc:hoge:[tada 123 @hoge :foo:]:piyo:');
 		const expect = [
 			EMOJI_CODE('hoge'),
-			EMOJI_CODE('hoge'),
+			EMOJI_CODE('foo'),
 			EMOJI_CODE('piyo')
 		];
 		assert.deepStrictEqual(extract(nodes, 'emojiCode'), expect);
