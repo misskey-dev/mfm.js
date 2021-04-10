@@ -1,16 +1,5 @@
 import { isMfmBlock, MfmNode, TEXT } from './node';
 
-export function createNode(type: string, props?: Record<string, any>, children?: MfmNode[]): MfmNode {
-	const node: any = { type };
-	if (props != null) {
-		node.props = props;
-	}
-	if (children != null) {
-		node.children = children;
-	}
-	return node;
-}
-
 export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
 	const dest: MfmNode[] = [];
 	const storedChars: string[] = [];
