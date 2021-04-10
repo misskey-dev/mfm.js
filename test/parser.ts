@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { parse } from '../built/index';
+import * as mfm from '../built/index';
 import { createNode } from '../built/util';
 import {
 	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK
@@ -10,7 +10,7 @@ describe('parser', () => {
 		it('普通のテキストを入力すると1つのテキストノードが返される', () => {
 			const input = 'abc';
 			const output = [TEXT('abc')];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -22,7 +22,7 @@ describe('parser', () => {
 					TEXT('abc')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('複数行の引用ブロックを使用できる', () => {
 			const input = `
@@ -34,7 +34,7 @@ describe('parser', () => {
 					TEXT('abc\n123')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('引用ブロックはブロックをネストできる', () => {
 			const input = `
@@ -49,7 +49,7 @@ describe('parser', () => {
 					])
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('引用ブロックはインライン構文を含んだブロックをネストできる', () => {
 			const input = `
@@ -66,7 +66,7 @@ describe('parser', () => {
 					])
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -80,7 +80,7 @@ describe('parser', () => {
 						content: input
 					})
 				];
-				assert.deepStrictEqual(parse(input), output);
+				assert.deepStrictEqual(mfm.parse(input), output);
 			});
 			it('[Search]', () => {
 				const input = 'MFM 書き方 123 [Search]';
@@ -90,7 +90,7 @@ describe('parser', () => {
 						content: input
 					})
 				];
-				assert.deepStrictEqual(parse(input), output);
+				assert.deepStrictEqual(mfm.parse(input), output);
 			});
 			it('search', () => {
 				const input = 'MFM 書き方 123 search';
@@ -100,7 +100,7 @@ describe('parser', () => {
 						content: input
 					})
 				];
-				assert.deepStrictEqual(parse(input), output);
+				assert.deepStrictEqual(mfm.parse(input), output);
 			});
 			it('[search]', () => {
 				const input = 'MFM 書き方 123 [search]';
@@ -110,7 +110,7 @@ describe('parser', () => {
 						content: input
 					})
 				];
-				assert.deepStrictEqual(parse(input), output);
+				assert.deepStrictEqual(mfm.parse(input), output);
 			});
 			it('検索', () => {
 				const input = 'MFM 書き方 123 検索';
@@ -120,7 +120,7 @@ describe('parser', () => {
 						content: input
 					})
 				];
-				assert.deepStrictEqual(parse(input), output);
+				assert.deepStrictEqual(mfm.parse(input), output);
 			});
 			it('[検索]', () => {
 				const input = 'MFM 書き方 123 [検索]';
@@ -130,7 +130,7 @@ describe('parser', () => {
 						content: input
 					})
 				];
-				assert.deepStrictEqual(parse(input), output);
+				assert.deepStrictEqual(mfm.parse(input), output);
 			});
 		});
 		it('ブロックの前後にあるテキストが正しく解釈される', () => {
@@ -140,7 +140,7 @@ describe('parser', () => {
 				SEARCH('hoge piyo bebeyo', 'hoge piyo bebeyo 検索'),
 				TEXT('123')
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -148,17 +148,17 @@ describe('parser', () => {
 		it('コードブロックを使用できる', () => {
 			const input = '```\nabc\n```';
 			const output = [CODE_BLOCK('abc', null)];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('コードブロックには複数行のコードを入力できる', () => {
 			const input = '```\na\nb\nc\n```';
 			const output = [CODE_BLOCK('a\nb\nc', null)];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('コードブロックは言語を指定できる', () => {
 			const input = '```js\nconst a = 1;\n```';
 			const output = [CODE_BLOCK('const a = 1;', 'js')];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('ブロックの前後にあるテキストが正しく解釈される', () => {
 			const input = 'abc\n```\nconst abc = 1;\n```\n123';
@@ -167,7 +167,7 @@ describe('parser', () => {
 				CODE_BLOCK('const abc = 1;', null),
 				TEXT('123')
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -177,7 +177,7 @@ describe('parser', () => {
 			const output = [
 				MATH_BLOCK('math1')
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('ブロックの前後にあるテキストが正しく解釈される', () => {
 			const input = 'abc\n\\[math1\\]\n123';
@@ -186,21 +186,21 @@ describe('parser', () => {
 				MATH_BLOCK('math1'),
 				TEXT('123')
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('行末以外に閉じタグがある場合はマッチしない', () => {
 			const input = '\\[aaa\\]after';
 			const output = [
 				TEXT('\\[aaa\\]after')
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('行頭以外に開始タグがある場合はマッチしない', () => {
 			const input = 'before\\[aaa\\]';
 			const output = [
 				TEXT('before\\[aaa\\]')
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -212,7 +212,7 @@ describe('parser', () => {
 					TEXT('abc')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('multiple text', () => {
 			const input = 'before\n<center>\nabc\n123\n\npiyo\n</center>\nafter';
@@ -223,7 +223,7 @@ describe('parser', () => {
 				]),
 				TEXT('after')
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -231,7 +231,7 @@ describe('parser', () => {
 		it('basic', () => {
 			const input = ':abc:';
 			const output = [EMOJI_CODE('abc')];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -239,7 +239,7 @@ describe('parser', () => {
 		it('basic', () => {
 			const input = '今起きた😇';
 			const output = [TEXT('今起きた'), UNI_EMOJI('😇')];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -251,7 +251,7 @@ describe('parser', () => {
 					TEXT('abc')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('内容にはインライン構文を利用できる', () => {
 			const input = '***123**abc**123***';
@@ -264,7 +264,7 @@ describe('parser', () => {
 					TEXT('123')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('内容は改行できる', () => {
 			const input = '***123\n**abc**\n123***';
@@ -277,7 +277,7 @@ describe('parser', () => {
 					TEXT('\n123')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -289,7 +289,7 @@ describe('parser', () => {
 					TEXT('abc')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('内容にはインライン構文を利用できる', () => {
 			const input = '**123~~abc~~123**';
@@ -302,7 +302,7 @@ describe('parser', () => {
 					TEXT('123')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('内容は改行できる', () => {
 			const input = '**123\n~~abc~~\n123**';
@@ -315,7 +315,7 @@ describe('parser', () => {
 					TEXT('\n123')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -327,7 +327,7 @@ describe('parser', () => {
 					TEXT('abc')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('内容にはインライン構文を利用できる', () => {
 			const input = '<small>abc**123**abc</small>';
@@ -340,7 +340,7 @@ describe('parser', () => {
 					TEXT('abc')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('内容は改行できる', () => {
 			const input = '<small>abc\n**123**\nabc</small>';
@@ -353,7 +353,7 @@ describe('parser', () => {
 					TEXT('\nabc')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -365,7 +365,7 @@ describe('parser', () => {
 					TEXT('abc')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('内容にはインライン構文を利用できる', () => {
 			const input = '<i>abc**123**abc</i>';
@@ -378,7 +378,7 @@ describe('parser', () => {
 					TEXT('abc')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('内容は改行できる', () => {
 			const input = '<i>abc\n**123**\nabc</i>';
@@ -391,7 +391,7 @@ describe('parser', () => {
 					TEXT('\nabc')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -403,7 +403,7 @@ describe('parser', () => {
 					TEXT('abc')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -419,7 +419,7 @@ describe('parser', () => {
 		it('and unicode emoji', () => {
 			const input = '#️⃣abc123#abc';
 			const output = [UNI_EMOJI('#️⃣'), TEXT('abc123'), HASHTAG('abc')];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -431,7 +431,7 @@ describe('parser', () => {
 				N_URL('https://misskey.io/@ai'),
 				TEXT('.')
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -444,7 +444,7 @@ describe('parser', () => {
 				]),
 				TEXT('.')
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
 		it('silent flag', () => {
@@ -455,7 +455,7 @@ describe('parser', () => {
 				]),
 				TEXT('.')
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
 		it('do not yield url node even if label is recognisable as a url', () => {
@@ -467,7 +467,7 @@ describe('parser', () => {
 				]),
 				TEXT('.')
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
 		it('do not yield link node even if label is recognisable as a link', () => {
@@ -479,7 +479,7 @@ describe('parser', () => {
 				]),
 				TEXT('.')
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -491,7 +491,7 @@ describe('parser', () => {
 					TEXT('abc')
 				])
 			];
-			assert.deepStrictEqual(parse(input), output);
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
@@ -521,6 +521,6 @@ after`;
 			]),
 			TEXT('after')
 		];
-		assert.deepStrictEqual(parse(input), output);
+		assert.deepStrictEqual(mfm.parse(input), output);
 	});
 });

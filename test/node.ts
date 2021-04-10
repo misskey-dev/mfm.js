@@ -1,7 +1,7 @@
 import {
 	MfmFn, MfmInline, MfmNode, NodeType
 } from '../built';
- 
+
 export const QUOTE = (children: MfmNode[]): NodeType<'quote'> => { return { type:'quote', children }; };
 export const SEARCH = (query: string, content: string): NodeType<'search'> => { return { type:'search', props: { query, content } }; };
 export const CODE_BLOCK = (code: string, lang: string | null): NodeType<'blockCode'> => { return { type:'blockCode', props: { code, lang } }; };
