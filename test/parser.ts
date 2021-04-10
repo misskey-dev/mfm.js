@@ -1,9 +1,8 @@
 import assert from 'assert';
 import * as mfm from '../built/index';
-import { createNode } from '../built/util';
 import {
 	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK
-} from './node';
+} from '../built/index';
 
 describe('parser', () => {
 	describe('text', () => {
@@ -75,60 +74,42 @@ describe('parser', () => {
 			it('Search', () => {
 				const input = 'MFM 書き方 123 Search';
 				const output = [
-					createNode('search', {
-						query: 'MFM 書き方 123',
-						content: input
-					})
+					SEARCH('MFM 書き方 123', input)
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
 			});
 			it('[Search]', () => {
 				const input = 'MFM 書き方 123 [Search]';
 				const output = [
-					createNode('search', {
-						query: 'MFM 書き方 123',
-						content: input
-					})
+					SEARCH('MFM 書き方 123', input)
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
 			});
 			it('search', () => {
 				const input = 'MFM 書き方 123 search';
 				const output = [
-					createNode('search', {
-						query: 'MFM 書き方 123',
-						content: input
-					})
+					SEARCH('MFM 書き方 123', input)
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
 			});
 			it('[search]', () => {
 				const input = 'MFM 書き方 123 [search]';
 				const output = [
-					createNode('search', {
-						query: 'MFM 書き方 123',
-						content: input
-					})
+					SEARCH('MFM 書き方 123', input)
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
 			});
 			it('検索', () => {
 				const input = 'MFM 書き方 123 検索';
 				const output = [
-					createNode('search', {
-						query: 'MFM 書き方 123',
-						content: input
-					})
+					SEARCH('MFM 書き方 123', input)
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
 			});
 			it('[検索]', () => {
 				const input = 'MFM 書き方 123 [検索]';
 				const output = [
-					createNode('search', {
-						query: 'MFM 書き方 123',
-						content: input
-					})
+					SEARCH('MFM 書き方 123', input)
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
 			});

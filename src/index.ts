@@ -6,13 +6,14 @@ export {
 	extract
 } from './api';
 
-export { NodeType } from './node';
-
 export {
+	NodeType,
 	MfmNode,
 	MfmBlock,
-	MfmInline,
+	MfmInline
+} from './node';
 
+export {
 	// block
 	MfmQuote,
 	MfmSearch,
@@ -35,4 +36,29 @@ export {
 	MfmLink,
 	MfmFn,
 	MfmText
+} from './node';
+
+export {
+	// block
+	QUOTE,
+	SEARCH,
+	CODE_BLOCK,
+	MATH_BLOCK,
+	CENTER,
+
+	// inline
+	UNI_EMOJI,
+	EMOJI_CODE,
+	BOLD,
+	SMALL,
+	ITALIC,
+	STRIKE,
+	INLINE_CODE,
+	MATH_INLINE,
+	MENTION,
+	HASHTAG,
+	N_URL,
+	LINK,
+	FN,
+	TEXT
 } from './node';

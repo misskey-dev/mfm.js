@@ -2,7 +2,7 @@ import assert from 'assert';
 import * as mfm from '../built/index';
 import {
 	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK
-} from './node';
+} from '../built/index';
 
 describe('API', () => {
 	describe('toString', () => {
