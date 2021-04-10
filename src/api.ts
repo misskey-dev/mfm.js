@@ -5,7 +5,7 @@ import { stringifyNode, stringifyTree } from './util';
 const parser: peg.Parser = require('./parser');
 
 /**
- * generate a node tree from the MFM string.
+ * Generates a MfmNode tree from the MFM string.
 */
 export function parse(input: string): MfmNode[] {
 	const nodes = parser.parse(input, { startRule: 'fullParser' });
@@ -13,7 +13,7 @@ export function parse(input: string): MfmNode[] {
 }
 
 /**
- * generate a node tree of plain from the MFM string.
+ * Generates a MfmNode tree of plain from the MFM string.
 */
 export function parsePlain(input: string): MfmPlainNode[] {
 	const nodes = parser.parse(input, { startRule: 'plainParser' });
@@ -21,7 +21,7 @@ export function parsePlain(input: string): MfmPlainNode[] {
 }
 
 /**
- * generate a MFM string from the node tree.
+ * Generates a MFM string from the MfmNode tree.
 */
 export function toString(tree: MfmNode[]): string
 export function toString(node: MfmNode): string
@@ -35,7 +35,7 @@ export function toString(node: MfmNode | MfmNode[]): string {
 }
 
 /**
- * Inspects the node tree.
+ * Inspects the MfmNode tree.
 */
 export function inspect(nodes: MfmNode[], action: (node: MfmNode) => void): void {
 	for (const node of nodes) {
@@ -47,7 +47,7 @@ export function inspect(nodes: MfmNode[], action: (node: MfmNode) => void): void
 }
 
 /**
- * Inspects the node tree and returns as an array the nodes that match the conditions
+ * Inspects the MfmNode tree and returns as an array the nodes that match the conditions
  * of the predicate function.
 */
 export function extract(nodes: MfmNode[], predicate: (node: MfmNode) => boolean): MfmNode[] {
