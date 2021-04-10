@@ -42,7 +42,7 @@ after`;
 				MENTION('piyo', null, '@piyo'),
 				MENTION('bebeyo', null, '@bebeyo')
 			];
-			assert.deepStrictEqual(mfm.extract(nodes, 'mention'), expect);
+			assert.deepStrictEqual(mfm.extract(nodes, node => node.type == 'mention'), expect);
 		});
 
 		it('nested', () => {
@@ -52,7 +52,7 @@ after`;
 				EMOJI_CODE('foo'),
 				EMOJI_CODE('piyo')
 			];
-			assert.deepStrictEqual(mfm.extract(nodes, 'emojiCode'), expect);
+			assert.deepStrictEqual(mfm.extract(nodes, node => node.type == 'emojiCode'), expect);
 		});
 	});
 });

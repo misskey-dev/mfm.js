@@ -34,19 +34,12 @@ export function inspect(tree: MfmNode[], action: (node: MfmNode) => void): void 
 	}
 }
 
-export function extract(nodes: MfmNode[], type: (MfmNode['type'] | MfmNode['type'][])): MfmNode[] {
+export function extract(nodes: MfmNode[], predicate: (node: MfmNode) => boolean): MfmNode[] {
 	const dest = [] as MfmNode[];
 
 	inspect(nodes, (node) => {
-		if (Array.isArray(type)) {
-			if (type.some(i => i == node.type)) {
-				dest.push(node);
-			}
-		}
-		else {
-			if (type == node.type) {
-				dest.push(node);
-			}
+		if (predicate(node)) {
+			dest.push(node);
 		}
 	});
 
