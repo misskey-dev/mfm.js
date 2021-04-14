@@ -474,6 +474,16 @@ describe('parser', () => {
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		it('with a string argument', () => {
+			const input = '[spin.speed=1.1s a]';
+			const output = [
+				FN('spin', { speed: '1.1s' }, [
+					TEXT('a')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	it('composite', () => {
