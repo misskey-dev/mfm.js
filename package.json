@@ -12,6 +12,7 @@
     "tsc": "tsc",
     "tsd": "tsd",
     "parse": "node ./built/cli/parse",
+    "parse-plain": "node ./built/cli/parsePlain",
     "test": "mocha -r ts-node/register 'test/**/*.ts' && npm run tsd"
   },
   "repository": {
