@@ -366,7 +366,7 @@ describe('FullParser', () => {
 		});
 	});
 
-	describe('italic 1', () => {
+	describe('italic tag', () => {
 		it('basic', () => {
 			const input = '<i>abc</i>';
 			const output = [
@@ -404,7 +404,7 @@ describe('FullParser', () => {
 		});
 	});
 
-	describe('italic 2', () => {
+	describe('italic alt 1', () => {
 		it('basic', () => {
 			const input = '*abc*';
 			const output = [
@@ -412,6 +412,54 @@ describe('FullParser', () => {
 					TEXT('abc')
 				])
 			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic 2', () => {
+			const input = 'before *abc* after';
+			const output = [
+				TEXT('before '),
+				ITALIC([
+					TEXT('abc')
+				]),
+				TEXT(' after')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore a italic syntax if the before char is neither a space nor an LF', () => {
+			const input = 'before*abc*after';
+			const output = [TEXT('before*abc*after')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
+
+	describe('italic alt 2', () => {
+		it('basic', () => {
+			const input = '_abc_';
+			const output = [
+				ITALIC([
+					TEXT('abc')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic 2', () => {
+			const input = 'before _abc_ after';
+			const output = [
+				TEXT('before '),
+				ITALIC([
+					TEXT('abc')
+				]),
+				TEXT(' after')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore a italic syntax if the before char is neither a space nor an LF', () => {
+			const input = 'before_abc_after';
+			const output = [TEXT('before_abc_after')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
