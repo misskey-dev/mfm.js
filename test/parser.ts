@@ -426,6 +426,12 @@ describe('FullParser', () => {
 
 	describe('hashtag', () => {
 		it('basic', () => {
+			const input = '#abc';
+			const output = [HASHTAG('abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic 2', () => {
 			const input = 'before #abc after';
 			const output = [TEXT('before '), HASHTAG('abc'), TEXT(' after')];
 			assert.deepStrictEqual(mfm.parse(input), output);
