@@ -219,16 +219,22 @@ small
 // inline: italic
 
 italic
+	= italicTag
+	/ italicAlt
+
+italicTag
 	= "<i>" content:(!"</i>" i:inline { return i; })+ "</i>"
 {
 	return ITALIC(mergeText(content));
 }
-	/ "*" content:$(!"*" ([a-z0-9]i / _))+ "*"
+
+italicAlt
+	= "*" content:$(!"*" ([a-z0-9]i / _))+ "*" &(LF / _)
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return ITALIC(parsedContent);
 }
-	/ "_" content:$(!"_" ([a-z0-9]i / _))+ "_"
+	/ "_" content:$(!"_" ([a-z0-9]i / _))+ "_" &(LF / _)
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return ITALIC(parsedContent);
@@ -383,7 +389,7 @@ fnArg
 // inline: text
 
 inlineText
-	= !(LF / _) . &(hashtag / mention) . { return text(); } // hashtag, mention ignore
+	= !(LF / _) . &(hashtag / mention / italicAlt) . { return text(); } // hashtag, mention, italic ignore
 	/ . /* text node */
 
 // inline: text (for plainParser)
