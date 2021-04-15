@@ -229,12 +229,12 @@ italicTag
 }
 
 italicAlt
-	= "*" content:$(!"*" ([a-z0-9]i / _))+ "*" &(LF / _)
+	= "*" content:$(!"*" ([a-z0-9]i / _))+ "*" &(EOF / LF / _)
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return ITALIC(parsedContent);
 }
-	/ "_" content:$(!"_" ([a-z0-9]i / _))+ "_" &(LF / _)
+	/ "_" content:$(!"_" ([a-z0-9]i / _))+ "_" &(EOF / LF / _)
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return ITALIC(parsedContent);
