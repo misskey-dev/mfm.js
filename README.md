@@ -54,8 +54,14 @@ npm run build
 ```
 
 ### Use the interactive CLI parser
+full parser:
 ```
 npm run parse
+```
+
+plain parser:
+```
+npm run parse-plain
 ```
 
 ## License
