@@ -66,7 +66,7 @@ fullParser
 	= nodes:(&. n:(block / inline) { return n; })* { return mergeText(nodes); }
 
 plainParser
-	= nodes:(&. n:(emojiCode / unicodeEmoji / text) { return n; })* { return mergeText(nodes); }
+	= nodes:(&. n:(emojiCode / unicodeEmoji / plainText) { return n; })* { return mergeText(nodes); }
 
 inlineParser
 	= nodes:(&. n:inline { return n; })* { return mergeText(nodes); }
@@ -165,7 +165,7 @@ inline
 	/ url
 	/ link
 	/ fn
-	/ text
+	/ inlineText
 
 // inline: emoji code
 
@@ -289,7 +289,7 @@ mentionHostPart
 // inline: hashtag
 
 hashtag
-	= "#" content:hashtagContent
+	= "#" !("\uFE0F"? "\u20E3") content:hashtagContent
 {
 	return HASHTAG(content);
 }
@@ -382,7 +382,13 @@ fnArg
 
 // inline: text
 
-text
+inlineText
+	= !(LF / _) . &hashtag . { return text(); } // hashtag ignore
+	/ . /* text node */
+
+// inline: text (for plainParser)
+
+plainText
 	= . /* text node */
 
 //
