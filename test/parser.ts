@@ -422,7 +422,43 @@ describe('FullParser', () => {
 
 	// mathInline
 
-	// mention
+	describe('mention', () => {
+		it('basic', () => {
+			const input = '@abc';
+			const output = [MENTION('abc', null, '@abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic 2', () => {
+			const input = 'before @abc after';
+			const output = [TEXT('before '), MENTION('abc', null, '@abc'), TEXT(' after')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic remote', () => {
+			const input = '@abc@misskey.io';
+			const output = [MENTION('abc', 'misskey.io', '@abc@misskey.io')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic remote 2', () => {
+			const input = 'before @abc@misskey.io after';
+			const output = [TEXT('before '), MENTION('abc', 'misskey.io', '@abc@misskey.io'), TEXT(' after')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic remote 3', () => {
+			const input = 'before\n@abc@misskey.io\nafter';
+			const output = [TEXT('before\n'), MENTION('abc', 'misskey.io', '@abc@misskey.io'), TEXT('\nafter')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore format of mail address', () => {
+			const input = 'abc@example.com';
+			const output = [TEXT('abc@example.com')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
 
 	describe('hashtag', () => {
 		it('basic', () => {

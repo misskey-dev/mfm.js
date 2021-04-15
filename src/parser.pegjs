@@ -383,7 +383,7 @@ fnArg
 // inline: text
 
 inlineText
-	= !(LF / _) . &hashtag . { return text(); } // hashtag ignore
+	= !(LF / _) . &(hashtag / mention) . { return text(); } // hashtag, mention ignore
 	/ . /* text node */
 
 // inline: text (for plainParser)
