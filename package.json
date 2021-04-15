@@ -1,6 +1,6 @@
 {
   "name": "mfm-js",
-  "version": "0.14.1",
+  "version": "0.15.0",
   "description": "An MFM parser implementation with PEG.js",
   "main": "./built/index.js",
   "types": "./built/index.d.ts",
@@ -12,6 +12,7 @@
     "tsc": "tsc",
     "tsd": "tsd",
     "parse": "node ./built/cli/parse",
+    "parse-plain": "node ./built/cli/parsePlain",
     "test": "mocha -r ts-node/register 'test/**/*.ts' && npm run tsd"
   },
   "repository": {

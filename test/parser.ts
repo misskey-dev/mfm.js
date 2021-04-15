@@ -4,7 +4,29 @@ import {
 	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK
 } from '../built/index';
 
-describe('parser', () => {
+describe('PlainParser', () => {
+	describe('text', () => {
+		it('basic', () => {
+			const input = 'abc';
+			const output = [TEXT('abc')];
+			assert.deepStrictEqual(mfm.parsePlain(input), output);
+		});
+
+		it('ignore hashtag', () => {
+			const input = 'abc#abc';
+			const output = [TEXT('abc#abc')];
+			assert.deepStrictEqual(mfm.parsePlain(input), output);
+		});
+
+		it('keycap number sign', () => {
+			const input = 'abc#️⃣abc';
+			const output = [TEXT('abc'), UNI_EMOJI('#️⃣'), TEXT('abc')];
+			assert.deepStrictEqual(mfm.parsePlain(input), output);
+		});
+	});
+});
+
+describe('FullParser', () => {
 	describe('text', () => {
 		it('普通のテキストを入力すると1つのテキストノードが返される', () => {
 			const input = 'abc';
@@ -222,6 +244,12 @@ describe('parser', () => {
 			const output = [TEXT('今起きた'), UNI_EMOJI('😇')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		it('keycap number sign', () => {
+			const input = 'abc#️⃣123';
+			const output = [TEXT('abc'), UNI_EMOJI('#️⃣'), TEXT('123')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('big', () => {
@@ -338,7 +366,7 @@ describe('parser', () => {
 		});
 	});
 
-	describe('italic 1', () => {
+	describe('italic tag', () => {
 		it('basic', () => {
 			const input = '<i>abc</i>';
 			const output = [
@@ -376,7 +404,7 @@ describe('parser', () => {
 		});
 	});
 
-	describe('italic 2', () => {
+	describe('italic alt 1', () => {
 		it('basic', () => {
 			const input = '*abc*';
 			const output = [
@@ -384,6 +412,54 @@ describe('parser', () => {
 					TEXT('abc')
 				])
 			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic 2', () => {
+			const input = 'before *abc* after';
+			const output = [
+				TEXT('before '),
+				ITALIC([
+					TEXT('abc')
+				]),
+				TEXT(' after')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore a italic syntax if the before char is neither a space nor an LF', () => {
+			const input = 'before*abc*after';
+			const output = [TEXT('before*abc*after')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
+
+	describe('italic alt 2', () => {
+		it('basic', () => {
+			const input = '_abc_';
+			const output = [
+				ITALIC([
+					TEXT('abc')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic 2', () => {
+			const input = 'before _abc_ after';
+			const output = [
+				TEXT('before '),
+				ITALIC([
+					TEXT('abc')
+				]),
+				TEXT(' after')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore a italic syntax if the before char is neither a space nor an LF', () => {
+			const input = 'before_abc_after';
+			const output = [TEXT('before_abc_after')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
@@ -394,12 +470,73 @@ describe('parser', () => {
 
 	// mathInline
 
-	// mention
+	describe('mention', () => {
+		it('basic', () => {
+			const input = '@abc';
+			const output = [MENTION('abc', null, '@abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic 2', () => {
+			const input = 'before @abc after';
+			const output = [TEXT('before '), MENTION('abc', null, '@abc'), TEXT(' after')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic remote', () => {
+			const input = '@abc@misskey.io';
+			const output = [MENTION('abc', 'misskey.io', '@abc@misskey.io')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic remote 2', () => {
+			const input = 'before @abc@misskey.io after';
+			const output = [TEXT('before '), MENTION('abc', 'misskey.io', '@abc@misskey.io'), TEXT(' after')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic remote 3', () => {
+			const input = 'before\n@abc@misskey.io\nafter';
+			const output = [TEXT('before\n'), MENTION('abc', 'misskey.io', '@abc@misskey.io'), TEXT('\nafter')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore format of mail address', () => {
+			const input = 'abc@example.com';
+			const output = [TEXT('abc@example.com')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
 
 	describe('hashtag', () => {
-		it('and unicode emoji', () => {
-			const input = '#️⃣abc123#abc';
-			const output = [UNI_EMOJI('#️⃣'), TEXT('abc123'), HASHTAG('abc')];
+		it('basic', () => {
+			const input = '#abc';
+			const output = [HASHTAG('abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('basic 2', () => {
+			const input = 'before #abc after';
+			const output = [TEXT('before '), HASHTAG('abc'), TEXT(' after')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with keycap number sign', () => {
+			const input = '#️⃣abc123 #abc';
+			const output = [UNI_EMOJI('#️⃣'), TEXT('abc123 '), HASHTAG('abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with keycap number sign 2', () => {
+			const input = `abc
+#️⃣abc`;
+			const output = [TEXT('abc\n'), UNI_EMOJI('#️⃣'), TEXT('abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore a hashtag if the before char is neither a space nor an LF', () => {
+			const input = 'abc#abc';
+			const output = [TEXT('abc#abc')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
