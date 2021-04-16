@@ -53,7 +53,7 @@ export type MfmCenter = {
 export const CENTER = (children: MfmInline[]): NodeType<'center'> => { return { type:'center', children }; };
 
 export type MfmInline = MfmUnicodeEmoji | MfmEmojiCode | MfmBold | MfmSmall | MfmItalic | MfmStrike |
-	MfmInlineCode | MfmMathInline | MfmMention | MfmHashtag | MfmUrl | MfmLink | MfmFn | MfmText;
+	MfmInlineCode | MfmMathInline | MfmMention | MfmGroupMention | MfmHashtag | MfmUrl | MfmLink | MfmFn | MfmText;
 
 export type MfmUnicodeEmoji = {
 	type: 'unicodeEmoji';
@@ -130,6 +130,21 @@ export type MfmMention = {
 };
 export const MENTION = (username: string, host: string | null, acct: string): NodeType<'mention'> => { return { type:'mention', props: { username, host, acct } }; };
 
+/**
+ * NOTE: experimental syntax
+*/
+export type MfmGroupMention = {
+	type: 'groupMention';
+	props: {
+		groupName: string;
+	};
+	children?: [];
+};
+/**
+ * NOTE: experimental syntax
+*/
+export const GROUP_MENTION = (groupName: string): NodeType<'groupMention'> => { return { type: 'groupMention', props: { groupName } }; };
+
 export type MfmHashtag = {
 	type: 'hashtag';
 	props: {
@@ -192,6 +207,7 @@ export type NodeType<T extends MfmNode['type']> =
 	T extends 'inlineCode' ? MfmInlineCode :
 	T extends 'mathInline' ? MfmMathInline :
 	T extends 'mention' ? MfmMention :
+	T extends 'groupMention' ? MfmGroupMention :
 	T extends 'hashtag' ? MfmHashtag :
 	T extends 'url' ? MfmUrl :
 	T extends 'link' ? MfmLink :

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import * as mfm from '../built/index';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, GROUP_MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK
 } from '../built/index';
 
 describe('PlainParser', () => {
@@ -505,6 +505,20 @@ describe('FullParser', () => {
 			const input = 'abc@example.com';
 			const output = [TEXT('abc@example.com')];
 			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
+
+	describe('groupMention', () => {
+		it('basic', () => {
+			const input = '@@abc';
+			const output = [GROUP_MENTION('abc')];
+			assert.deepStrictEqual(mfm.parse(input, { experimental: { useGroupMention: true } }), output); // enable group mention syntax
+		});
+
+		it('basic 2', () => {
+			const input = 'before@@abc after';
+			const output = [TEXT('before'), GROUP_MENTION('abc'), TEXT(' after')];
+			assert.deepStrictEqual(mfm.parse(input, { experimental: { useGroupMention: true } }), output); // enable group mention syntax
 		});
 	});
 

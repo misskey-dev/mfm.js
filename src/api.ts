@@ -4,11 +4,19 @@ import { stringifyNode, stringifyTree } from './util';
 
 const parser: peg.Parser = require('./parser');
 
+type ParseOptions = Partial<{
+	experimental: Partial<{
+		useGroupMention: boolean;
+	}>;
+}>;
+
 /**
  * Generates a MfmNode tree from the MFM string.
 */
-export function parse(input: string): MfmNode[] {
-	const nodes = parser.parse(input, { startRule: 'fullParser' });
+export function parse(input: string, opts?: ParseOptions): MfmNode[] {
+	opts = opts ?? { };
+	opts.experimental = opts.experimental ?? { };
+	const nodes = parser.parse(input, { ...opts, startRule: 'fullParser' });
 	return nodes;
 }
 

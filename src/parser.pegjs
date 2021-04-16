@@ -17,6 +17,7 @@
 		INLINE_CODE,
 		MATH_INLINE,
 		MENTION,
+		GROUP_MENTION,
 		HASHTAG,
 		N_URL,
 		LINK,
@@ -32,7 +33,9 @@
 
 	function applyParser(input, startRule) {
 		let parseFunc = peg$parse;
-		return parseFunc(input, startRule ? { startRule } : { });
+		const opt = { ...options };
+		if (startRule) opt.startRule = startRule;
+		return parseFunc(input, opt);
 	}
 
 	// emoji
@@ -160,6 +163,7 @@ inline
 	/ strike
 	/ inlineCode
 	/ mathInline
+	/ groupMention
 	/ mention
 	/ hashtag
 	/ url
@@ -263,6 +267,20 @@ mathInline
 {
 	return MATH_INLINE(content);
 }
+
+// inline: groupMention
+
+groupMention
+	= &{ return options.experimental.useGroupMention; } "@@" name:gMentionName
+{
+	return GROUP_MENTION(name);
+}
+
+gMentionName
+	= gMentionNameChar+ { return text(); }
+
+gMentionNameChar
+	= !(_ / LF) .
 
 // inline: mention
 
