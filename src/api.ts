@@ -1,5 +1,5 @@
 import peg from 'pegjs';
-import { MfmNode, MfmPlainNode, TEXT } from './node';
+import { MfmNode, MfmPlainNode } from './node';
 import { stringifyNode, stringifyTree, inspectOne } from './util';
 
 const parser: peg.Parser = require('./parser');
