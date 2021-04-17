@@ -85,14 +85,25 @@ block
 // block: quote
 
 quote
-	= lines:quoteLine+
+	= head:quoteMultiLine tails:quoteMultiLine+
 {
-	const children = applyParser(lines.join('\n'), 'fullParser');
+	const children = applyParser([head, ...tails].join('\n'), 'fullParser');
+	return QUOTE(children);
+}
+	/ line:quoteLine
+{
+	const children = applyParser(line, 'fullParser');
 	return QUOTE(children);
 }
 
+quoteMultiLine
+	= quoteLine / quoteEmptyLine
+
 quoteLine
 	= BEGIN ">" _? text:$(CHAR+) END { return text; }
+
+quoteEmptyLine
+	= BEGIN ">" _? END { return ''; }
 
 // block: search
 

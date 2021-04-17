@@ -89,6 +89,26 @@ describe('FullParser', () => {
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+		it('複数行の引用ブロックでは空行を含めることができる', () => {
+			const input = `
+> abc
+>
+> 123
+`;
+			const output = [
+				QUOTE([
+					TEXT('abc\n\n123')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+		it('1行の引用ブロックを空行にはできない', () => {
+			const input = `> `;
+			const output = [
+				TEXT('> ')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('search', () => {
