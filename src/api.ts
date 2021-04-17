@@ -1,6 +1,6 @@
 import peg from 'pegjs';
-import { MfmNode, MfmPlainNode } from './node';
-import { stringifyNode, stringifyTree } from './util';
+import { MfmNode, MfmPlainNode, TEXT } from './node';
+import { stringifyNode, stringifyTree, inspectOne } from './util';
 
 const parser: peg.Parser = require('./parser');
 
@@ -37,12 +37,16 @@ export function toString(node: MfmNode | MfmNode[]): string {
 /**
  * Inspects the MfmNode tree.
 */
-export function inspect(nodes: MfmNode[], action: (node: MfmNode) => void): void {
-	for (const node of nodes) {
-		action(node);
-		if (node.children != null) {
-			inspect(node.children, action);
+export function inspect(node: MfmNode, action: (node: MfmNode) => void): void
+export function inspect(nodes: MfmNode[], action: (node: MfmNode) => void): void
+export function inspect(node: (MfmNode | MfmNode[]), action: (node: MfmNode) => void): void {
+	if (Array.isArray(node)) {
+		for (const n of node) {
+			inspectOne(n, action);
 		}
+	}
+	else {
+		inspectOne(node, action);
 	}
 }
 

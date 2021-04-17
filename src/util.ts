@@ -147,6 +147,15 @@ export function stringifyTree(nodes: MfmNode[]): string {
 	return dest.map(n => stringifyNode(n)).join('');
 }
 
+export function inspectOne(node: MfmNode, action: (node: MfmNode) => void) {
+	action(node);
+	if (node.children != null) {
+		for (const child of node.children) {
+			inspectOne(child, action);
+		}
+	}
+}
+
 //
 // dynamic consuming
 //
