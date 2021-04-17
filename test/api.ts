@@ -32,6 +32,17 @@ after`;
 			});
 			assert.strictEqual(mfm.toString(result), 'hello [tada everynyan!]');
 		});
+
+		it('replace text (one item)', () => {
+			const input = 'good morning [tada everyone!]';
+			const result = mfm.parse(input);
+			mfm.inspect(result[1], node => {
+				if (node.type == 'text') {
+					node.props.text = node.props.text.replace(/one/g, 'nyan');
+				}
+			});
+			assert.strictEqual(mfm.toString(result), 'good morning [tada everynyan!]');
+		});
 	});
 
 	describe('extract', () => {
