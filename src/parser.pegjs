@@ -121,7 +121,10 @@ inline
 // block: quote
 
 quote
-	= &(BEGIN ">") head:quoteMultiLine tails:quoteMultiLine+
+	= &(BEGIN ">") q:quoteInner { return q; }
+
+quoteInner
+	= head:quoteMultiLine tails:quoteMultiLine+
 {
 	const children = applyParser([head, ...tails].join('\n'), 'fullParser');
 	return QUOTE(children);
