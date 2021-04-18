@@ -66,7 +66,7 @@
 //
 
 fullParser
-	= nodes:(&. n:(block / inline) { return n; })* { return mergeText(nodes); }
+	= nodes:(&. n:full { return n; })* { return mergeText(nodes); }
 
 plainParser
 	= nodes:(&. n:(emojiCode / unicodeEmoji / plainText) { return n; })* { return mergeText(nodes); }
@@ -75,27 +75,81 @@ inlineParser
 	= nodes:(&. n:inline { return n; })* { return mergeText(nodes); }
 
 //
-// block rules
+// syntax list
 //
 
-block
-	= quote
-	/ search
-	/ codeBlock
-	/ mathBlock
-	/ center
+full
+	= quote // block
+	/ codeBlock // block
+	/ mathBlock // block
+	/ center // block
+	/ emojiCode
+	/ unicodeEmoji
+	/ big
+	/ bold
+	/ small
+	/ italic
+	/ strike
+	/ inlineCode
+	/ mathInline
+	/ groupMention
+	/ mention
+	/ hashtag
+	/ url
+	/ fnVer2
+	/ link
+	/ fnVer1
+	/ search // block
+	/ inlineText
+
+inline
+	= emojiCode
+	/ unicodeEmoji
+	/ big
+	/ bold
+	/ small
+	/ italic
+	/ strike
+	/ inlineCode
+	/ mathInline
+	/ groupMention
+	/ mention
+	/ hashtag
+	/ url
+	/ fnVer2
+	/ link
+	/ fnVer1
+	/ inlineText
+
+//
+// block rules
+//
 
 // block: quote
 
 quote
-	= lines:quoteLine+
+	= &(BEGIN ">") q:quoteInner { return q; }
+
+quoteInner
+	= head:quoteMultiLine tails:quoteMultiLine+
 {
-	const children = applyParser(lines.join('\n'), 'fullParser');
+	const children = applyParser([head, ...tails].join('\n'), 'fullParser');
+	return QUOTE(children);
+}
+	/ line:quoteLine
+{
+	const children = applyParser(line, 'fullParser');
 	return QUOTE(children);
 }
 
+quoteMultiLine
+	= quoteLine / quoteEmptyLine
+
 quoteLine
 	= BEGIN ">" _? text:$(CHAR+) END { return text; }
+
+quoteEmptyLine
+	= BEGIN ">" _? END { return ''; }
 
 // block: search
 
@@ -152,24 +206,6 @@ center
 //
 // inline rules
 //
-
-inline
-	= emojiCode
-	/ unicodeEmoji
-	/ big
-	/ bold
-	/ small
-	/ italic
-	/ strike
-	/ inlineCode
-	/ mathInline
-	/ groupMention
-	/ mention
-	/ hashtag
-	/ url
-	/ link
-	/ fn
-	/ inlineText
 
 // inline: emoji code
 
@@ -377,8 +413,15 @@ linkUrl
 
 // inline: fn
 
-fn
+fnVer1
 	= "[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:(!"]" i:inline { return i; })+ "]"
+{
+	args = args || {};
+	return FN(name, args, mergeText(content));
+}
+
+fnVer2
+	= "$[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:(!"]" i:inline { return i; })+ "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
