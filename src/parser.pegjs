@@ -92,8 +92,9 @@ full
 	/ mention
 	/ hashtag
 	/ url
+	/ fnVer2
 	/ link
-	/ fn
+	/ fnVer1
 	/ search // block
 	/ inlineText
 
@@ -110,8 +111,9 @@ inline
 	/ mention
 	/ hashtag
 	/ url
+	/ fnVer2
 	/ link
-	/ fn
+	/ fnVer1
 	/ inlineText
 
 //
@@ -392,8 +394,15 @@ linkUrl
 
 // inline: fn
 
-fn
+fnVer1
 	= "[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:(!"]" i:inline { return i; })+ "]"
+{
+	args = args || {};
+	return FN(name, args, mergeText(content));
+}
+
+fnVer2
+	= "$[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:(!"]" i:inline { return i; })+ "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
