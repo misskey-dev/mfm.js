@@ -63,7 +63,7 @@
 //
 
 fullParser
-	= nodes:(&. n:(block / inline) { return n; })* { return mergeText(nodes); }
+	= nodes:(&. n:full { return n; })* { return mergeText(nodes); }
 
 plainParser
 	= nodes:(&. n:(emojiCode / unicodeEmoji / plainText) { return n; })* { return mergeText(nodes); }
@@ -72,20 +72,56 @@ inlineParser
 	= nodes:(&. n:inline { return n; })* { return mergeText(nodes); }
 
 //
-// block rules
+// syntax list
 //
 
-block
-	= quote
-	/ search
-	/ codeBlock
-	/ mathBlock
-	/ center
+full
+	= quote // block
+	/ codeBlock // block
+	/ mathBlock // block
+	/ center // block
+	/ emojiCode
+	/ unicodeEmoji
+	/ big
+	/ bold
+	/ small
+	/ italic
+	/ strike
+	/ inlineCode
+	/ mathInline
+	/ mention
+	/ hashtag
+	/ url
+	/ link
+	/ fn
+	/ search // block
+	/ inlineText
+
+inline
+	= emojiCode
+	/ unicodeEmoji
+	/ big
+	/ bold
+	/ small
+	/ italic
+	/ strike
+	/ inlineCode
+	/ mathInline
+	/ mention
+	/ hashtag
+	/ url
+	/ link
+	/ fn
+	/ inlineText
+
+//
+// block rules
+//
 
 // block: quote
 
 quote
-	= head:quoteMultiLine tails:quoteMultiLine+
+	= &(BEGIN ">") head:quoteMultiLine tails:quoteMultiLine+
 {
 	const children = applyParser([head, ...tails].join('\n'), 'fullParser');
 	return QUOTE(children);
@@ -160,23 +196,6 @@ center
 //
 // inline rules
 //
-
-inline
-	= emojiCode
-	/ unicodeEmoji
-	/ big
-	/ bold
-	/ small
-	/ italic
-	/ strike
-	/ inlineCode
-	/ mathInline
-	/ mention
-	/ hashtag
-	/ url
-	/ link
-	/ fn
-	/ inlineText
 
 // inline: emoji code
 
