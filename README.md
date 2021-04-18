@@ -18,7 +18,7 @@ import * as mfm from 'mfm-js';
 
 const inputText =
 `<center>
-Hello [tada everynyan! 🎉]
+Hello $[tada everynyan! 🎉]
 
 I'm @ai, A bot of misskey!
 
