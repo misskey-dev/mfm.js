@@ -621,7 +621,7 @@ describe('FullParser', () => {
 		});
 	});
 
-	describe('fn', () => {
+	describe('fn v1', () => {
 		it('basic', () => {
 			const input = '[tada abc]';
 			const output = [
@@ -637,6 +637,52 @@ describe('FullParser', () => {
 			const output = [
 				FN('spin', { speed: '1.1s' }, [
 					TEXT('a')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('nest', () => {
+			const input = '[spin.speed=1.1s [shake a]]';
+			const output = [
+				FN('spin', { speed: '1.1s' }, [
+					FN('shake', { }, [
+						TEXT('a')
+					])
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
+
+	describe('fn v2', () => {
+		it('basic', () => {
+			const input = '$[tada abc]';
+			const output = [
+				FN('tada', { }, [
+					TEXT('abc')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with a string argument', () => {
+			const input = '$[spin.speed=1.1s a]';
+			const output = [
+				FN('spin', { speed: '1.1s' }, [
+					TEXT('a')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('nest', () => {
+			const input = '$[spin.speed=1.1s $[shake a]]';
+			const output = [
+				FN('spin', { speed: '1.1s' }, [
+					FN('shake', { }, [
+						TEXT('a')
+					])
 				])
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
