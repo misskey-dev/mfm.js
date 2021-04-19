@@ -10,7 +10,7 @@ describe('API', () => {
 			const input =
 `before
 <center>
-Hello [tada everynyan! 🎉]
+Hello $[tada everynyan! 🎉]
 
 I'm @ai, A bot of misskey!
 
@@ -23,25 +23,25 @@ after`;
 
 	describe('inspect', () => {
 		it('replace text', () => {
-			const input = 'good morning [tada everynyan!]';
+			const input = 'good morning $[tada everynyan!]';
 			const result = mfm.parse(input);
 			mfm.inspect(result, node => {
 				if (node.type == 'text') {
 					node.props.text = node.props.text.replace(/good morning/g, 'hello');
 				}
 			});
-			assert.strictEqual(mfm.toString(result), 'hello [tada everynyan!]');
+			assert.strictEqual(mfm.toString(result), 'hello $[tada everynyan!]');
 		});
 
 		it('replace text (one item)', () => {
-			const input = 'good morning [tada everyone!]';
+			const input = 'good morning $[tada everyone!]';
 			const result = mfm.parse(input);
 			mfm.inspect(result[1], node => {
 				if (node.type == 'text') {
 					node.props.text = node.props.text.replace(/one/g, 'nyan');
 				}
 			});
-			assert.strictEqual(mfm.toString(result), 'good morning [tada everynyan!]');
+			assert.strictEqual(mfm.toString(result), 'good morning $[tada everynyan!]');
 		});
 	});
 
@@ -57,7 +57,7 @@ after`;
 		});
 
 		it('nested', () => {
-			const nodes = mfm.parse('abc:hoge:[tada 123 @hoge :foo:]:piyo:');
+			const nodes = mfm.parse('abc:hoge:$[tada 123 @hoge :foo:]:piyo:');
 			const expect = [
 				EMOJI_CODE('hoge'),
 				EMOJI_CODE('foo'),
