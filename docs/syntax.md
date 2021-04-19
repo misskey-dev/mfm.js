@@ -1,13 +1,4 @@
-<style>
-h1 {
-	margin-top: 4rem;
-}
-h1.head {
-	margin-top: 0;
-}
-</style>
-
-<h1 class="head">目次</h2>
+<h1>目次</h2>
 
 ブロック構文:
 - [引用ブロック](#quote)
