@@ -10,7 +10,7 @@ npm i mfm-js
 ```
 
 ## Usage
-Please see [wiki](https://github.com/misskey-dev/mfm.js/wiki) for the detail.  
+Please see [docs](./docs/index.md) for the detail.  
 
 TypeScript:  
 ```ts
