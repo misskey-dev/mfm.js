@@ -92,9 +92,9 @@ full
 	/ mention
 	/ hashtag
 	/ url
-	/ fnVer2
+	/// fnVer2
 	/ link
-	/ fnVer1
+	/// fnVer1
 	/ search // block
 	/ inlineText
 
@@ -111,9 +111,9 @@ inline
 	/ mention
 	/ hashtag
 	/ url
-	/ fnVer2
+	/// fnVer2
 	/ link
-	/ fnVer1
+	/// fnVer1
 	/ inlineText
 
 //
@@ -384,10 +384,12 @@ link
 	return LINK((silent != null), url, mergeText(label));
 }
 
+// linkLabelPart
+// 	= url { return text(); /* text node */ }
+// 	/ link { return text(); /* text node */ }
+// 	/ !"]" n:inline { return n; }
 linkLabelPart
-	= url { return text(); /* text node */ }
-	/ link { return text(); /* text node */ }
-	/ !"]" n:inline { return n; }
+	= !"]" . { return text(); }
 
 linkUrl
 	= url { return text(); }
