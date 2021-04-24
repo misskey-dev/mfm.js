@@ -66,7 +66,7 @@ fullParser
 	= nodes:(&. n:full { return n; })* { return mergeText(nodes); }
 
 plainParser
-	= nodes:(&. n:(emojiCode / unicodeEmoji / plainText) { return n; })* { return mergeText(nodes); }
+	= nodes:(&. n:plain { return n; })* { return mergeText(nodes); }
 
 inlineParser
 	= nodes:(&. n:inline { return n; })* { return mergeText(nodes); }
@@ -92,9 +92,9 @@ full
 	/ mention
 	/ hashtag
 	/ url
-	/// fnVer2
+	/ fnVer2
 	/ link
-	/// fnVer1
+	/ fnVer1
 	/ search // block
 	/ inlineText
 
@@ -111,10 +111,31 @@ inline
 	/ mention
 	/ hashtag
 	/ url
-	/// fnVer2
+	/ fnVer2
 	/ link
-	/// fnVer1
+	/ fnVer1
 	/ inlineText
+
+inlineWithoutFn
+	= emojiCode
+	/ unicodeEmoji
+	/ big
+	/ bold
+	/ small
+	/ italic
+	/ strike
+	/ inlineCode
+	/ mathInline
+	/ mention
+	/ hashtag
+	/ url
+	/ link
+	/ inlineText
+
+plain
+	= emojiCode
+	/ unicodeEmoji
+	/ plainText
 
 //
 // block rules
@@ -336,15 +357,21 @@ hashtag
 }
 
 hashtagContent
-	= (hashtagBracketPair / hashtagChar)+ { return text(); }
-
-hashtagBracketPair
-	= "(" hashtagContent* ")"
-	/ "[" hashtagContent* "]"
-	/ "「" hashtagContent* "」"
+	= hashtagChar+ { return text(); }
 
 hashtagChar
-	= ![ 　\t.,!?'"#:\/\[\]【】()「」] CHAR
+	= ![ 　\t.,!?'"#:\/【】] CHAR
+
+// hashtagContent
+// 	= (hashtagBracketPair / hashtagChar)+ { return text(); }
+
+// hashtagBracketPair
+// 	= "(" hashtagContent* ")"
+// 	/ "[" hashtagContent* "]"
+// 	/ "「" hashtagContent* "」"
+
+// hashtagChar
+// 	= ![ 　\t.,!?'"#:\/\[\]【】()「」] CHAR
 
 // inline: URL
 
@@ -368,28 +395,41 @@ urlContent
 	= urlContentPart+
 
 urlContentPart
-	= urlBracketPair
-	/ [.,] &urlContentPart // last char is neither "." nor ",".
+	= [.,] &urlContentPart // last char is neither "." nor ",".
 	/ [a-z0-9_/:%#@$&?!~=+-]i
 
-urlBracketPair
-	= "(" urlContentPart* ")"
-	/ "[" urlContentPart* "]"
+// urlContentPart
+// 	= urlBracketPair
+// 	/ [.,] &urlContentPart // last char is neither "." nor ",".
+// 	/ [a-z0-9_/:%#@$&?!~=+-]i
+
+// urlBracketPair
+// 	= "(" urlContentPart* ")"
+// 	/ "[" urlContentPart* "]"
 
 // inline: link
 
 link
-	= silent:"?"? "[" label:linkLabelPart+ "](" url:linkUrl ")"
+	= silent:"?"? "[" label:linkLabel "](" url:linkUrl ")"
 {
 	return LINK((silent != null), url, mergeText(label));
+}
+
+linkLabel
+	= parts:linkLabelPart+
+{
+	return parts;
+	//return parts.flat(Infinity);
 }
 
 // linkLabelPart
 // 	= url { return text(); /* text node */ }
 // 	/ link { return text(); /* text node */ }
 // 	/ !"]" n:inline { return n; }
+
 linkLabelPart
-	= !"]" . { return text(); }
+	// = "[" linkLabelPart* "]"
+	= !"]" p:plain { return p; }
 
 linkUrl
 	= url { return text(); }
@@ -397,14 +437,14 @@ linkUrl
 // inline: fn
 
 fnVer1
-	= "[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:(!"]" i:inline { return i; })+ "]"
+	= "[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:fnContentPart+ "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
 }
 
 fnVer2
-	= "$[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:(!"]" i:inline { return i; })+ "]"
+	= "$[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:fnContentPart+ "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
@@ -429,6 +469,9 @@ fnArg
 {
 	return { k: k, v: true };
 }
+
+fnContentPart
+	= !("]") i:inlineWithoutFn { return i; }
 
 // inline: text
 
