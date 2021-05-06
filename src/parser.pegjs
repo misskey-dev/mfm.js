@@ -285,12 +285,12 @@ italicTag
 }
 
 italicAlt
-	= "*" content:$(!"*" ([a-z0-9]i / _))+ "*" &(EOF / LF / _)
+	= "*" content:$(!"*" ([a-z0-9]i / _))+ "*" &(EOF / LF / _ / ![a-z0-9]i)
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return ITALIC(parsedContent);
 }
-	/ "_" content:$(!"_" ([a-z0-9]i / _))+ "_" &(EOF / LF / _)
+	/ "_" content:$(!"_" ([a-z0-9]i / _))+ "_" &(EOF / LF / _ / ![a-z0-9]i)
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return ITALIC(parsedContent);
@@ -476,7 +476,7 @@ fnContentPart
 // inline: text
 
 inlineText
-	= !(LF / _) . &(hashtag / mention / italicAlt) . { return text(); } // hashtag, mention, italic ignore
+	= !(LF / _) [a-z0-9]i &(hashtag / mention / italicAlt) . { return text(); } // hashtag, mention, italic ignore
 	/ . /* text node */
 
 // inline: text (for plainParser)
