@@ -447,9 +447,19 @@ describe('FullParser', () => {
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
-		it('ignore a italic syntax if the before char is neither a space nor an LF', () => {
-			const input = 'before*abc*after';
-			const output = [TEXT('before*abc*after')];
+		it('ignore a italic syntax if the before char is neither a space nor an LF nor [^a-z0-9]i', () => {
+			let input = 'before*abc*after';
+			let output: mfm.MfmNode[] = [TEXT('before*abc*after')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+
+			input = 'あいう*abc*えお';
+			output = [
+				TEXT('あいう'),
+				ITALIC([
+					TEXT('abc')
+				]),
+				TEXT('えお')
+			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
@@ -477,9 +487,19 @@ describe('FullParser', () => {
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
-		it('ignore a italic syntax if the before char is neither a space nor an LF', () => {
-			const input = 'before_abc_after';
-			const output = [TEXT('before_abc_after')];
+		it('ignore a italic syntax if the before char is neither a space nor an LF nor [^a-z0-9]i', () => {
+			let input = 'before_abc_after';
+			let output: mfm.MfmNode[] = [TEXT('before_abc_after')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+
+			input = 'あいう_abc_えお';
+			output = [
+				TEXT('あいう'),
+				ITALIC([
+					TEXT('abc')
+				]),
+				TEXT('えお')
+			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
@@ -526,6 +546,12 @@ describe('FullParser', () => {
 			const output = [TEXT('abc@example.com')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		it('detect as a mention if the before char is [^a-z0-9]i', () => {
+			const input = 'あいう@abc';
+			const output = [TEXT('あいう'), MENTION('abc', null, '@abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('hashtag', () => {
@@ -554,9 +580,13 @@ describe('FullParser', () => {
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
-		it('ignore a hashtag if the before char is neither a space nor an LF', () => {
-			const input = 'abc#abc';
-			const output = [TEXT('abc#abc')];
+		it('ignore a hashtag if the before char is neither a space nor an LF nor [^a-z0-9]i', () => {
+			let input = 'abc#abc';
+			let output: mfm.MfmNode[] = [TEXT('abc#abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+
+			input = 'あいう#abc';
+			output = [TEXT('あいう'), HASHTAG('abc')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
