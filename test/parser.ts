@@ -625,6 +625,96 @@ describe('FullParser', () => {
 			output = [TEXT('あいう'), HASHTAG('abc')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		it('ignore comma and period', () => {
+			const input = 'Foo #bar, baz #piyo.';
+			const output = [TEXT('Foo '), HASHTAG('bar'), TEXT(', baz '), HASHTAG('piyo'), TEXT('.')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore exclamation mark', () => {
+			const input = '#Foo!';
+			const output = [HASHTAG('Foo'), TEXT('!')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore colon', () => {
+			const input = '#Foo:';
+			const output = [HASHTAG('Foo'), TEXT(':')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore single quote', () => {
+			const input = '#Foo\'';
+			const output = [HASHTAG('Foo'), TEXT('\'')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore double quote', () => {
+			const input = '#Foo"';
+			const output = [HASHTAG('Foo'), TEXT('"')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore square bracket', () => {
+			const input = '#Foo]';
+			const output = [HASHTAG('Foo'), TEXT(']')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore slash', () => {
+			const input = '#foo/bar';
+			const output = [HASHTAG('foo'), TEXT('/bar')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('allow including number', () => {
+			const input = '#foo123';
+			const output = [HASHTAG('foo123')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with brackets "()"', () => {
+			const input = '(#foo)';
+			const output = [TEXT('('), HASHTAG('foo'), TEXT(')')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with brackets "「」"', () => {
+			const input = '「#foo」';
+			const output = [TEXT('「'), HASHTAG('foo'), TEXT('」')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with mixed brackets', () => {
+			const input = '「#foo(bar)」';
+			const output = [TEXT('「'), HASHTAG('foo(bar)'), TEXT('」')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with brackets "()" (space before)', () => {
+			const input = '(bar #foo)';
+			const output = [TEXT('(bar '), HASHTAG('foo'), TEXT(')')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with brackets "「」" (space before)', () => {
+			const input = '「bar #foo」';
+			const output = [TEXT('「bar '), HASHTAG('foo'), TEXT('」')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow number only', () => {
+			const input = '#123';
+			const output = [TEXT('#123')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow number only (with brackets)', () => {
+			const input = '(#123)';
+			const output = [TEXT('(#123)')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('url', () => {
