@@ -756,6 +756,28 @@ describe('FullParser', () => {
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		it('with brackets', () => {
+			const input = '[foo](https://example.com/foo(bar))';
+			const output = [
+				LINK(false, 'https://example.com/foo(bar)', [
+					TEXT('foo')
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with parent brackets', () => {
+			const input = '([foo](https://example.com/foo(bar)))';
+			const output = [
+				TEXT('('),
+				LINK(false, 'https://example.com/foo(bar)', [
+					TEXT('foo')
+				]),
+				TEXT(')'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('fn v1', () => {
