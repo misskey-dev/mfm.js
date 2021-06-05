@@ -116,22 +116,6 @@ inline
 	/ fnVer1
 	/ inlineText
 
-inlineWithoutFn
-	= emojiCode
-	/ unicodeEmoji
-	/ big
-	/ bold
-	/ small
-	/ italic
-	/ strike
-	/ inlineCode
-	/ mathInline
-	/ mention
-	/ hashtag
-	/ url
-	/ link
-	/ inlineText
-
 plain
 	= emojiCode
 	/ unicodeEmoji
@@ -357,21 +341,15 @@ hashtag
 }
 
 hashtagContent
-	= hashtagChar+ { return text(); }
+	= (hashtagBracketPair / hashtagChar)+ { return text(); }
+
+hashtagBracketPair
+	= "(" hashtagContent* ")"
+	/ "[" hashtagContent* "]"
+	/ "「" hashtagContent* "」"
 
 hashtagChar
-	= ![ 　\t.,!?'"#:\/【】] CHAR
-
-// hashtagContent
-// 	= (hashtagBracketPair / hashtagChar)+ { return text(); }
-
-// hashtagBracketPair
-// 	= "(" hashtagContent* ")"
-// 	/ "[" hashtagContent* "]"
-// 	/ "「" hashtagContent* "」"
-
-// hashtagChar
-// 	= ![ 　\t.,!?'"#:\/\[\]【】()「」] CHAR
+	= ![ 　\t.,!?'"#:\/\[\]【】()「」] CHAR
 
 // inline: URL
 
@@ -395,17 +373,13 @@ urlContent
 	= urlContentPart+
 
 urlContentPart
-	= [.,] &urlContentPart // last char is neither "." nor ",".
+	= urlBracketPair
+	/ [.,] &urlContentPart // last char is neither "." nor ",".
 	/ [a-z0-9_/:%#@$&?!~=+-]i
 
-// urlContentPart
-// 	= urlBracketPair
-// 	/ [.,] &urlContentPart // last char is neither "." nor ",".
-// 	/ [a-z0-9_/:%#@$&?!~=+-]i
-
-// urlBracketPair
-// 	= "(" urlContentPart* ")"
-// 	/ "[" urlContentPart* "]"
+urlBracketPair
+	= "(" urlContentPart* ")"
+	/ "[" urlContentPart* "]"
 
 // inline: link
 
@@ -419,17 +393,12 @@ linkLabel
 	= parts:linkLabelPart+
 {
 	return parts;
-	//return parts.flat(Infinity);
 }
 
-// linkLabelPart
-// 	= url { return text(); /* text node */ }
-// 	/ link { return text(); /* text node */ }
-// 	/ !"]" n:inline { return n; }
-
 linkLabelPart
-	// = "[" linkLabelPart* "]"
-	= !"]" p:plain { return p; }
+	= url { return text(); /* text node */ }
+	/ link { return text(); /* text node */ }
+	/ !"]" n:inline { return n; }
 
 linkUrl
 	= url { return text(); }
@@ -471,7 +440,7 @@ fnArg
 }
 
 fnContentPart
-	= !("]") i:inlineWithoutFn { return i; }
+	= !("]") i:inline { return i; }
 
 // inline: text
 
