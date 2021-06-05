@@ -341,7 +341,10 @@ hashtag
 }
 
 hashtagContent
-	= (hashtagBracketPair / hashtagChar)+ { return text(); }
+	= !([0-9]+ !hashtagContentPart) hashtagContentPart+ { return text(); }
+
+hashtagContentPart
+	= hashtagBracketPair / hashtagChar
 
 hashtagBracketPair
 	= "(" hashtagContent* ")"
