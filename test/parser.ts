@@ -593,11 +593,118 @@ describe('FullParser', () => {
 
 	describe('url', () => {
 		it('basic', () => {
+			const input = 'https://misskey.io/@ai';
+			const output = [
+				N_URL('https://misskey.io/@ai'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with other texts', () => {
 			const input = 'official instance: https://misskey.io/@ai.';
 			const output = [
 				TEXT('official instance: '),
 				N_URL('https://misskey.io/@ai'),
 				TEXT('.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore trailing period', () => {
+			const input = 'https://misskey.io/@ai.';
+			const output = [
+				N_URL('https://misskey.io/@ai'),
+				TEXT('.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore trailing periods', () => {
+			const input = 'https://misskey.io/@ai...';
+			const output = [
+				N_URL('https://misskey.io/@ai'),
+				TEXT('...')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with comma', () => {
+			const input = 'https://example.com/foo?bar=a,b';
+			const output = [
+				N_URL('https://example.com/foo?bar=a,b'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore trailing comma', () => {
+			const input = 'https://example.com/foo, bar';
+			const output = [
+				N_URL('https://example.com/foo'),
+				TEXT(', bar')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with brackets', () => {
+			const input = 'https://example.com/foo(bar)';
+			const output = [
+				N_URL('https://example.com/foo(bar)'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore parent brackets', () => {
+			const input = '(https://example.com/foo)';
+			const output = [
+				TEXT('('),
+				N_URL('https://example.com/foo'),
+				TEXT(')'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore parent brackets (2)', () => {
+			const input = '(foo https://example.com/foo)';
+			const output = [
+				TEXT('(foo '),
+				N_URL('https://example.com/foo'),
+				TEXT(')'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore parent brackets with internal brackets', () => {
+			const input = '(https://example.com/foo(bar))';
+			const output = [
+				TEXT('('),
+				N_URL('https://example.com/foo(bar)'),
+				TEXT(')'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore parent []', () => {
+			const input = 'foo [https://example.com/foo] bar';
+			const output = [
+				TEXT('foo ['),
+				N_URL('https://example.com/foo'),
+				TEXT('] bar'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore non-ascii characters contained url without angle brackets', () => {
+			const input = 'https://大石泉すき.example.com';
+			const output = [
+				TEXT('https://大石泉すき.example.com'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('match non-ascii characters contained url with angle brackets', () => {
+			const input = '<https://大石泉すき.example.com>';
+			const output = [
+				N_URL('https://大石泉すき.example.com'),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
