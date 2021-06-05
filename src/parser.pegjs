@@ -341,7 +341,10 @@ hashtag
 }
 
 hashtagContent
-	= !([0-9]+ !hashtagContentPart) hashtagContentPart+ { return text(); }
+	= !(invalidHashtagContent !hashtagContentPart) hashtagContentPart+ { return text(); }
+
+invalidHashtagContent
+	= [0-9]+
 
 hashtagContentPart
 	= hashtagBracketPair / hashtagChar
