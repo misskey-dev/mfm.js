@@ -379,7 +379,7 @@ urlBracketPair
 	/ "[" urlContentPart* "]"
 
 altUrlFormat
-	= "http" "s"? "://" (!">" CHAR)+
+	= "http" "s"? "://" (!(">" / _) CHAR)+
 {
 	return text();
 }
