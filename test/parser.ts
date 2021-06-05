@@ -173,22 +173,40 @@ describe('FullParser', () => {
 			const output = [CODE_BLOCK('abc', null)];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
 		it('コードブロックには複数行のコードを入力できる', () => {
 			const input = '```\na\nb\nc\n```';
 			const output = [CODE_BLOCK('a\nb\nc', null)];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
 		it('コードブロックは言語を指定できる', () => {
 			const input = '```js\nconst a = 1;\n```';
 			const output = [CODE_BLOCK('const a = 1;', 'js')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
 		it('ブロックの前後にあるテキストが正しく解釈される', () => {
 			const input = 'abc\n```\nconst abc = 1;\n```\n123';
 			const output = [
 				TEXT('abc'),
 				CODE_BLOCK('const abc = 1;', null),
 				TEXT('123')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore internal marker', () => {
+			const input = '```\naaa```bbb\n```';
+			const output = [CODE_BLOCK('aaa```bbb', null)];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('trim after line break', () => {
+			const input = '```\nfoo\n```\nbar';
+			const output = [
+				CODE_BLOCK('foo', null),
+				TEXT('bar'),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
