@@ -1,4 +1,4 @@
-import peg from 'pegjs';
+import peg from 'peggy';
 import { MfmNode, MfmPlainNode } from './node';
 import { stringifyNode, stringifyTree, inspectOne } from './util';
 

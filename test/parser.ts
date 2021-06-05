@@ -638,18 +638,17 @@ describe('FullParser', () => {
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
-		// disabled
-		// it('do not yield link node even if label is recognisable as a link', () => {
-		// 	const input = 'official instance: [[https://misskey.io/@ai](https://misskey.io/@ai)](https://misskey.io/@ai).';
-		// 	const output = [
-		// 		TEXT('official instance: '),
-		// 		LINK(false, 'https://misskey.io/@ai', [
-		// 			TEXT('[https://misskey.io/@ai](https://misskey.io/@ai)')
-		// 		]),
-		// 		TEXT('.')
-		// 	];
-		// 	assert.deepStrictEqual(mfm.parse(input), output);
-		// });
+		it('do not yield link node even if label is recognisable as a link', () => {
+			const input = 'official instance: [[https://misskey.io/@ai](https://misskey.io/@ai)](https://misskey.io/@ai).';
+			const output = [
+				TEXT('official instance: '),
+				LINK(false, 'https://misskey.io/@ai', [
+					TEXT('[https://misskey.io/@ai](https://misskey.io/@ai)')
+				]),
+				TEXT('.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('fn v1', () => {
@@ -673,18 +672,17 @@ describe('FullParser', () => {
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
-		// fn nest is disabled
-		// it('nest', () => {
-		// 	const input = '[spin.speed=1.1s [shake a]]';
-		// 	const output = [
-		// 		FN('spin', { speed: '1.1s' }, [
-		// 			FN('shake', { }, [
-		// 				TEXT('a')
-		// 			])
-		// 		])
-		// 	];
-		// 	assert.deepStrictEqual(mfm.parse(input), output);
-		// });
+		it('nest', () => {
+			const input = '[spin.speed=1.1s [shake a]]';
+			const output = [
+				FN('spin', { speed: '1.1s' }, [
+					FN('shake', { }, [
+						TEXT('a')
+					])
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('fn v2', () => {
@@ -708,18 +706,17 @@ describe('FullParser', () => {
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
-		// fn nest is disabled
-		// it('nest', () => {
-		// 	const input = '$[spin.speed=1.1s $[shake a]]';
-		// 	const output = [
-		// 		FN('spin', { speed: '1.1s' }, [
-		// 			FN('shake', { }, [
-		// 				TEXT('a')
-		// 			])
-		// 		])
-		// 	];
-		// 	assert.deepStrictEqual(mfm.parse(input), output);
-		// });
+		it('nest', () => {
+			const input = '$[spin.speed=1.1s $[shake a]]';
+			const output = [
+				FN('spin', { speed: '1.1s' }, [
+					FN('shake', { }, [
+						TEXT('a')
+					])
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	it('composite', () => {
