@@ -291,7 +291,7 @@ strike
 // inline: inlineCode
 
 inlineCode
-	= "`" content:$(!"`" c:CHAR { return c; })+ "`"
+	= "`" content:$(![`´] c:CHAR { return c; })+ "`"
 {
 	return INLINE_CODE(content);
 }
