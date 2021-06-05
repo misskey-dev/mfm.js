@@ -354,7 +354,7 @@ hashtagChar
 // inline: URL
 
 url
-	= "<" url:urlFormat ">"
+	= "<" url:altUrlFormat ">"
 {
 	return N_URL(url);
 }
@@ -364,13 +364,10 @@ url
 }
 
 urlFormat
-	= "http" "s"? "://" urlContent
+	= "http" "s"? "://" urlContentPart+
 {
 	return text();
 }
-
-urlContent
-	= urlContentPart+
 
 urlContentPart
 	= urlBracketPair
@@ -380,6 +377,12 @@ urlContentPart
 urlBracketPair
 	= "(" urlContentPart* ")"
 	/ "[" urlContentPart* "]"
+
+altUrlFormat
+	= "http" "s"? "://" (!">" CHAR)+
+{
+	return text();
+}
 
 // inline: link
 
