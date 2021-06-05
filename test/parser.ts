@@ -1,7 +1,7 @@
 import assert from 'assert';
 import * as mfm from '../built/index';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE
 } from '../built/index';
 
 describe('PlainParser', () => {
@@ -23,6 +23,26 @@ describe('PlainParser', () => {
 			const output = [TEXT('abc'), UNI_EMOJI('#️⃣'), TEXT('abc')];
 			assert.deepStrictEqual(mfm.parsePlain(input), output);
 		});
+	});
+
+	describe('emoji', () => {
+		it('basic', () => {
+			const input = ':foo:';
+			const output = [EMOJI_CODE('foo')];
+			assert.deepStrictEqual(mfm.parsePlain(input), output);
+		});
+
+		it('between texts', () => {
+			const input = 'foo:bar:baz';
+			const output = [TEXT('foo'), EMOJI_CODE('bar'), TEXT('baz')];
+			assert.deepStrictEqual(mfm.parsePlain(input), output);
+		});
+	});
+
+	it('disallow other syntaxes', () => {
+		const input = 'foo **bar** baz';
+		const output = [TEXT('foo **bar** baz')];
+		assert.deepStrictEqual(mfm.parsePlain(input), output);
 	});
 });
 
@@ -173,22 +193,40 @@ describe('FullParser', () => {
 			const output = [CODE_BLOCK('abc', null)];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
 		it('コードブロックには複数行のコードを入力できる', () => {
 			const input = '```\na\nb\nc\n```';
 			const output = [CODE_BLOCK('a\nb\nc', null)];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
 		it('コードブロックは言語を指定できる', () => {
 			const input = '```js\nconst a = 1;\n```';
 			const output = [CODE_BLOCK('const a = 1;', 'js')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
 		it('ブロックの前後にあるテキストが正しく解釈される', () => {
 			const input = 'abc\n```\nconst abc = 1;\n```\n123';
 			const output = [
 				TEXT('abc'),
 				CODE_BLOCK('const abc = 1;', null),
 				TEXT('123')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore internal marker', () => {
+			const input = '```\naaa```bbb\n```';
+			const output = [CODE_BLOCK('aaa```bbb', null)];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('trim after line break', () => {
+			const input = '```\nfoo\n```\nbar';
+			const output = [
+				CODE_BLOCK('foo', null),
+				TEXT('bar'),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
@@ -506,7 +544,25 @@ describe('FullParser', () => {
 
 	// strike
 
-	// inlineCode
+	describe('inlineCode', () => {
+		it('basic', () => {
+			const input = '`var x = "Strawberry Pasta";`';
+			const output = [INLINE_CODE('var x = "Strawberry Pasta";')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow line break', () => {
+			const input = '`foo\nbar`';
+			const output = [TEXT('`foo\nbar`')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow ´', () => {
+			const input = '`foo´bar`';
+			const output = [TEXT('`foo´bar`')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
 
 	// mathInline
 
@@ -589,15 +645,212 @@ describe('FullParser', () => {
 			output = [TEXT('あいう'), HASHTAG('abc')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		it('ignore comma and period', () => {
+			const input = 'Foo #bar, baz #piyo.';
+			const output = [TEXT('Foo '), HASHTAG('bar'), TEXT(', baz '), HASHTAG('piyo'), TEXT('.')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore exclamation mark', () => {
+			const input = '#Foo!';
+			const output = [HASHTAG('Foo'), TEXT('!')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore colon', () => {
+			const input = '#Foo:';
+			const output = [HASHTAG('Foo'), TEXT(':')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore single quote', () => {
+			const input = '#Foo\'';
+			const output = [HASHTAG('Foo'), TEXT('\'')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore double quote', () => {
+			const input = '#Foo"';
+			const output = [HASHTAG('Foo'), TEXT('"')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore square bracket', () => {
+			const input = '#Foo]';
+			const output = [HASHTAG('Foo'), TEXT(']')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore slash', () => {
+			const input = '#foo/bar';
+			const output = [HASHTAG('foo'), TEXT('/bar')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('allow including number', () => {
+			const input = '#foo123';
+			const output = [HASHTAG('foo123')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with brackets "()"', () => {
+			const input = '(#foo)';
+			const output = [TEXT('('), HASHTAG('foo'), TEXT(')')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with brackets "「」"', () => {
+			const input = '「#foo」';
+			const output = [TEXT('「'), HASHTAG('foo'), TEXT('」')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with mixed brackets', () => {
+			const input = '「#foo(bar)」';
+			const output = [TEXT('「'), HASHTAG('foo(bar)'), TEXT('」')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with brackets "()" (space before)', () => {
+			const input = '(bar #foo)';
+			const output = [TEXT('(bar '), HASHTAG('foo'), TEXT(')')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with brackets "「」" (space before)', () => {
+			const input = '「bar #foo」';
+			const output = [TEXT('「bar '), HASHTAG('foo'), TEXT('」')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow number only', () => {
+			const input = '#123';
+			const output = [TEXT('#123')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow number only (with brackets)', () => {
+			const input = '(#123)';
+			const output = [TEXT('(#123)')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('url', () => {
 		it('basic', () => {
+			const input = 'https://misskey.io/@ai';
+			const output = [
+				N_URL('https://misskey.io/@ai'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with other texts', () => {
 			const input = 'official instance: https://misskey.io/@ai.';
 			const output = [
 				TEXT('official instance: '),
 				N_URL('https://misskey.io/@ai'),
 				TEXT('.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore trailing period', () => {
+			const input = 'https://misskey.io/@ai.';
+			const output = [
+				N_URL('https://misskey.io/@ai'),
+				TEXT('.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore trailing periods', () => {
+			const input = 'https://misskey.io/@ai...';
+			const output = [
+				N_URL('https://misskey.io/@ai'),
+				TEXT('...')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with comma', () => {
+			const input = 'https://example.com/foo?bar=a,b';
+			const output = [
+				N_URL('https://example.com/foo?bar=a,b'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore trailing comma', () => {
+			const input = 'https://example.com/foo, bar';
+			const output = [
+				N_URL('https://example.com/foo'),
+				TEXT(', bar')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with brackets', () => {
+			const input = 'https://example.com/foo(bar)';
+			const output = [
+				N_URL('https://example.com/foo(bar)'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore parent brackets', () => {
+			const input = '(https://example.com/foo)';
+			const output = [
+				TEXT('('),
+				N_URL('https://example.com/foo'),
+				TEXT(')'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore parent brackets (2)', () => {
+			const input = '(foo https://example.com/foo)';
+			const output = [
+				TEXT('(foo '),
+				N_URL('https://example.com/foo'),
+				TEXT(')'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore parent brackets with internal brackets', () => {
+			const input = '(https://example.com/foo(bar))';
+			const output = [
+				TEXT('('),
+				N_URL('https://example.com/foo(bar)'),
+				TEXT(')'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore parent []', () => {
+			const input = 'foo [https://example.com/foo] bar';
+			const output = [
+				TEXT('foo ['),
+				N_URL('https://example.com/foo'),
+				TEXT('] bar'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore non-ascii characters contained url without angle brackets', () => {
+			const input = 'https://大石泉すき.example.com';
+			const output = [
+				TEXT('https://大石泉すき.example.com'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('match non-ascii characters contained url with angle brackets', () => {
+			const input = '<https://大石泉すき.example.com>';
+			const output = [
+				N_URL('https://大石泉すき.example.com'),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
@@ -646,6 +899,28 @@ describe('FullParser', () => {
 					TEXT('[https://misskey.io/@ai](https://misskey.io/@ai)')
 				]),
 				TEXT('.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with brackets', () => {
+			const input = '[foo](https://example.com/foo(bar))';
+			const output = [
+				LINK(false, 'https://example.com/foo(bar)', [
+					TEXT('foo')
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('with parent brackets', () => {
+			const input = '([foo](https://example.com/foo(bar)))';
+			const output = [
+				TEXT('('),
+				LINK(false, 'https://example.com/foo(bar)', [
+					TEXT('foo')
+				]),
+				TEXT(')'),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});

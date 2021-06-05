@@ -291,7 +291,7 @@ strike
 // inline: inlineCode
 
 inlineCode
-	= "`" content:$(!"`" c:CHAR { return c; })+ "`"
+	= "`" content:$(![`´] c:CHAR { return c; })+ "`"
 {
 	return INLINE_CODE(content);
 }
@@ -341,7 +341,13 @@ hashtag
 }
 
 hashtagContent
-	= (hashtagBracketPair / hashtagChar)+ { return text(); }
+	= !(invalidHashtagContent !hashtagContentPart) hashtagContentPart+ { return text(); }
+
+invalidHashtagContent
+	= [0-9]+
+
+hashtagContentPart
+	= hashtagBracketPair / hashtagChar
 
 hashtagBracketPair
 	= "(" hashtagContent* ")"
@@ -354,7 +360,7 @@ hashtagChar
 // inline: URL
 
 url
-	= "<" url:urlFormat ">"
+	= "<" url:altUrlFormat ">"
 {
 	return N_URL(url);
 }
@@ -364,13 +370,10 @@ url
 }
 
 urlFormat
-	= "http" "s"? "://" urlContent
+	= "http" "s"? "://" urlContentPart+
 {
 	return text();
 }
-
-urlContent
-	= urlContentPart+
 
 urlContentPart
 	= urlBracketPair
@@ -380,6 +383,12 @@ urlContentPart
 urlBracketPair
 	= "(" urlContentPart* ")"
 	/ "[" urlContentPart* "]"
+
+altUrlFormat
+	= "http" "s"? "://" (!(">" / _) CHAR)+
+{
+	return text();
+}
 
 // inline: link
 
