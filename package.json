@@ -7,8 +7,8 @@
   "scripts": {
     "build": "npm run tsc && npm run peg",
     "build-debug": "npm run tsc && npm run peg-debug",
-    "peg": "peggy -o built/parser.js --allowed-start-rules fullParser,inlineParser,plainParser src/parser.pegjs",
-    "peg-debug": "peggy -o built/parser.js --allowed-start-rules fullParser,inlineParser,plainParser --trace src/parser.pegjs",
+    "peg": "peggy --cache -o built/parser.js --allowed-start-rules fullParser,inlineParser,plainParser src/parser.pegjs",
+    "peg-debug": "peggy --cache -o built/parser.js --allowed-start-rules fullParser,inlineParser,plainParser --trace src/parser.pegjs",
     "tsc": "tsc",
     "tsd": "tsd",
     "parse": "node ./built/cli/parse",
