@@ -24,6 +24,26 @@ describe('PlainParser', () => {
 			assert.deepStrictEqual(mfm.parsePlain(input), output);
 		});
 	});
+
+	describe('emoji', () => {
+		it('basic', () => {
+			const input = ':foo:';
+			const output = [EMOJI_CODE('foo')];
+			assert.deepStrictEqual(mfm.parsePlain(input), output);
+		});
+
+		it('between texts', () => {
+			const input = 'foo:bar:baz';
+			const output = [TEXT('foo'), EMOJI_CODE('bar'), TEXT('baz')];
+			assert.deepStrictEqual(mfm.parsePlain(input), output);
+		});
+	});
+
+	it('disallow other syntaxes', () => {
+		const input = 'foo **bar** baz';
+		const output = [TEXT('foo **bar** baz')];
+		assert.deepStrictEqual(mfm.parsePlain(input), output);
+	});
 });
 
 describe('FullParser', () => {
