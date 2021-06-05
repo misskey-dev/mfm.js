@@ -1,7 +1,7 @@
 import assert from 'assert';
 import * as mfm from '../built/index';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE
 } from '../built/index';
 
 describe('PlainParser', () => {
@@ -506,7 +506,25 @@ describe('FullParser', () => {
 
 	// strike
 
-	// inlineCode
+	describe('inlineCode', () => {
+		it('basic', () => {
+			const input = '`var x = "Strawberry Pasta";`';
+			const output = [INLINE_CODE('var x = "Strawberry Pasta";')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow line break', () => {
+			const input = '`foo\nbar`';
+			const output = [TEXT('`foo\nbar`')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow ´', () => {
+			const input = '`foo´bar`';
+			const output = [TEXT('`foo´bar`')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
 
 	// mathInline
 
