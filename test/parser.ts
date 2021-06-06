@@ -542,7 +542,15 @@ describe('FullParser', () => {
 		});
 	});
 
-	// strike
+	describe('strike', () => {
+		it('basic', () => {
+			const input = '~~foo~~';
+			const output = [STRIKE([
+				TEXT('foo')
+			])];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
 
 	describe('inlineCode', () => {
 		it('basic', () => {
