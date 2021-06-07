@@ -31,7 +31,7 @@
     "typescript": "4.2.x"
   },
   "dependencies": {
-    "twemoji-parser": "13.0.x"
+    "twemoji-parser": "13.1.x"
   },
   "files": [
     "built"
