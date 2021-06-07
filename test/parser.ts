@@ -1,7 +1,7 @@
 import assert from 'assert';
 import * as mfm from '../built/index';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE, MATH_INLINE
 } from '../built/index';
 
 describe('PlainParser', () => {
@@ -572,7 +572,13 @@ describe('FullParser', () => {
 		});
 	});
 
-	// mathInline
+	describe('mathInline', () => {
+		it('basic', () => {
+			const input = '\\(x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}\\)';
+			const output = [MATH_INLINE('x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
 
 	describe('mention', () => {
 		it('basic', () => {
