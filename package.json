@@ -1,6 +1,6 @@
 {
   "name": "mfm-js",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "An MFM parser implementation with PEG.js",
   "main": "./built/index.js",
   "types": "./built/index.d.ts",
@@ -31,7 +31,7 @@
     "typescript": "4.2.x"
   },
   "dependencies": {
-    "twemoji-parser": "13.0.x"
+    "twemoji-parser": "13.1.x"
   },
   "files": [
     "built"
