@@ -1,4 +1,4 @@
-import { isMfmBlock, MfmNode, TEXT } from './node';
+import { isMfmBlock, MfmNode, TEXT } from '../node';
 
 export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
 	const dest: MfmNode[] = [];
@@ -96,7 +96,7 @@ export function stringifyNode(node: MfmNode): string {
 				}
 			});
 			const args = (argFields.length > 0) ? '.' + argFields.join(',') : '';
-			return `[${ node.props.name }${ args } ${ stringifyTree(node.children) }]`;
+			return `$[${ node.props.name }${ args } ${ stringifyTree(node.children) }]`;
 		}
 		case 'text': {
 			return node.props.text;

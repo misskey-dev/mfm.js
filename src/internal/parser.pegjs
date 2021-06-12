@@ -23,7 +23,7 @@
 		LINK,
 		FN,
 		TEXT
-	} = require('./node');
+	} = require('../node');
 
 	const {
 		mergeText,
@@ -69,7 +69,7 @@ fullParser
 	= nodes:(&. n:full { return n; })* { return mergeText(nodes); }
 
 plainParser
-	= nodes:(&. n:(emojiCode / unicodeEmoji / plainText) { return n; })* { return mergeText(nodes); }
+	= nodes:(&. n:plain { return n; })* { return mergeText(nodes); }
 
 inlineParser
 	= nodes:(&. n:inline { return n; })* { return mergeText(nodes); }
@@ -121,6 +121,11 @@ inline
 	/ fnVer1
 	/ inlineText
 
+plain
+	= emojiCode
+	/ unicodeEmoji
+	/ plainText
+
 //
 // block rules
 //
@@ -128,7 +133,7 @@ inline
 // block: quote
 
 quote
-	= &(BEGIN ">") q:quoteInner { return q; }
+	= &(BEGIN ">") q:quoteInner LF? { return q; }
 
 quoteInner
 	= head:quoteMultiLine tails:quoteMultiLine+
@@ -269,12 +274,12 @@ italicTag
 }
 
 italicAlt
-	= "*" content:$(!"*" ([a-z0-9]i / _))+ "*" &(EOF / LF / _)
+	= "*" content:$(!"*" ([a-z0-9]i / _))+ "*" &(EOF / LF / _ / ![a-z0-9]i)
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return ITALIC(parsedContent);
 }
-	/ "_" content:$(!"_" ([a-z0-9]i / _))+ "_" &(EOF / LF / _)
+	/ "_" content:$(!"_" ([a-z0-9]i / _))+ "_" &(EOF / LF / _ / ![a-z0-9]i)
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return ITALIC(parsedContent);
@@ -291,7 +296,7 @@ strike
 // inline: inlineCode
 
 inlineCode
-	= "`" content:$(!"`" c:CHAR { return c; })+ "`"
+	= "`" content:$(![`´] c:CHAR { return c; })+ "`"
 {
 	return INLINE_CODE(content);
 }
@@ -355,7 +360,13 @@ hashtag
 }
 
 hashtagContent
-	= (hashtagBracketPair / hashtagChar)+ { return text(); }
+	= !(invalidHashtagContent !hashtagContentPart) hashtagContentPart+ { return text(); }
+
+invalidHashtagContent
+	= [0-9]+
+
+hashtagContentPart
+	= hashtagBracketPair / hashtagChar
 
 hashtagBracketPair
 	= "(" hashtagContent* ")"
@@ -368,7 +379,7 @@ hashtagChar
 // inline: URL
 
 url
-	= "<" url:urlFormat ">"
+	= "<" url:altUrlFormat ">"
 {
 	return N_URL(url);
 }
@@ -378,13 +389,10 @@ url
 }
 
 urlFormat
-	= "http" "s"? "://" urlContent
+	= "http" "s"? "://" urlContentPart+
 {
 	return text();
 }
-
-urlContent
-	= urlContentPart+
 
 urlContentPart
 	= urlBracketPair
@@ -395,12 +403,24 @@ urlBracketPair
 	= "(" urlContentPart* ")"
 	/ "[" urlContentPart* "]"
 
+altUrlFormat
+	= "http" "s"? "://" (!(">" / _) CHAR)+
+{
+	return text();
+}
+
 // inline: link
 
 link
-	= silent:"?"? "[" label:linkLabelPart+ "](" url:linkUrl ")"
+	= silent:"?"? "[" label:linkLabel "](" url:linkUrl ")"
 {
 	return LINK((silent != null), url, mergeText(label));
+}
+
+linkLabel
+	= parts:linkLabelPart+
+{
+	return parts;
 }
 
 linkLabelPart
@@ -414,14 +434,14 @@ linkUrl
 // inline: fn
 
 fnVer1
-	= "[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:(!"]" i:inline { return i; })+ "]"
+	= "[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:fnContentPart+ "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
 }
 
 fnVer2
-	= "$[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:(!"]" i:inline { return i; })+ "]"
+	= "$[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:fnContentPart+ "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
@@ -447,10 +467,13 @@ fnArg
 	return { k: k, v: true };
 }
 
+fnContentPart
+	= !("]") i:inline { return i; }
+
 // inline: text
 
 inlineText
-	= !(LF / _) . &(hashtag / mention / italicAlt) . { return text(); } // hashtag, mention, italic ignore
+	= !(LF / _) [a-z0-9]i &(hashtag / mention / italicAlt) . { return text(); } // hashtag, mention, italic ignore
 	/ . /* text node */
 
 // inline: text (for plainParser)
