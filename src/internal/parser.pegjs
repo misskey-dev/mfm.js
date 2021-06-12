@@ -22,7 +22,7 @@
 		LINK,
 		FN,
 		TEXT
-	} = require('./node');
+	} = require('../node');
 
 	const {
 		mergeText,
