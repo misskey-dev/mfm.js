@@ -1,8 +1,8 @@
 import peg from 'peggy';
 import { MfmNode, MfmPlainNode } from './node';
-import { stringifyNode, stringifyTree, inspectOne } from './util';
+import { stringifyNode, stringifyTree, inspectOne } from './internal/util';
 
-const parser: peg.Parser = require('./parser');
+const parser: peg.Parser = require('./internal/parser');
 
 /**
  * Generates a MfmNode tree from the MFM string.

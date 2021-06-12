@@ -22,7 +22,7 @@
 		LINK,
 		FN,
 		TEXT
-	} = require('./node');
+	} = require('../node');
 
 	const {
 		mergeText,
@@ -128,7 +128,7 @@ plain
 // block: quote
 
 quote
-	= &(BEGIN ">") q:quoteInner { return q; }
+	= &(BEGIN ">") q:quoteInner LF? { return q; }
 
 quoteInner
 	= head:quoteMultiLine tails:quoteMultiLine+

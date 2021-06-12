@@ -129,6 +129,20 @@ describe('FullParser', () => {
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+		it('引用ブロックの後ろの空行は無視される', () => {
+			const input = `
+> foo
+> bar
+
+hoge`;
+			const output = [
+				QUOTE([
+					TEXT('foo\nbar')
+				]),
+				TEXT('hoge')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('search', () => {

@@ -1,4 +1,4 @@
-import { isMfmBlock, MfmNode, TEXT } from './node';
+import { isMfmBlock, MfmNode, TEXT } from '../node';
 
 export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
 	const dest: MfmNode[] = [];
