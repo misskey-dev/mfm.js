@@ -2,6 +2,8 @@
 An MFM parser implementation with PEG.js.
 [Try it out!](https://runkit.com/npm/mfm-js)
 
+[![Test](https://github.com/misskey-dev/mfm.js/actions/workflows/test.yml/badge.svg)](https://github.com/misskey-dev/mfm.js/actions/workflows/test.yml)
+
 [![NPM](https://nodei.co/npm/mfm-js.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/mfm-js)
 
 ## Installation
