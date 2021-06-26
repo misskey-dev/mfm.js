@@ -401,14 +401,13 @@ link
 linkLabel
 	= parts:linkLabelPart+
 {
-	return parts.flat();
+	return parts;
 }
 
 linkLabelPart
-	= "[" linkLabelPart* "]" linkLabelPart* &("](" url:linkUrl ")")
-{ return applyParser(text(), 'inlineParser'); }
-	/ !"]" n:plain
-{ return n; }
+	= url { return text(); /* text node */ }
+	/ link { return text(); /* text node */ }
+	/ !"]" n:inline { return n; }
 
 linkUrl
 	= url { return text(); }
