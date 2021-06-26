@@ -7,13 +7,15 @@
   "scripts": {
     "build": "npm run tsc && npm run peg",
     "build-debug": "npm run tsc && npm run peg-debug",
-    "peg": "peggy --cache -o built/internal/parser.js --allowed-start-rules fullParser,inlineParser,plainParser src/internal/parser.pegjs",
-    "peg-debug": "peggy --cache -o built/internal/parser.js --allowed-start-rules fullParser,inlineParser,plainParser --trace src/internal/parser.pegjs",
+    "peg": "peggy --cache -o src/internal/parser.js --allowed-start-rules fullParser,inlineParser,plainParser src/internal/parser.pegjs && npm run peg-copy",
+    "peg-debug": "peggy --cache -o src/internal/parser.js --allowed-start-rules fullParser,inlineParser,plainParser --trace src/internal/parser.pegjs && npm run peg-copy",
+    "peg-copy": "copyfiles -f src/internal/parser.js built/internal/",
     "tsc": "tsc",
     "tsd": "tsd",
     "parse": "node ./built/cli/parse",
     "parse-plain": "node ./built/cli/parsePlain",
-    "test": "mocha -r ts-node/register 'test/**/*.ts' && npm run tsd"
+    "jest": "jest --coverage",
+    "test": "npm run jest && npm run tsd"
   },
   "repository": {
     "type": "git",
@@ -22,10 +24,12 @@
   "author": "Marihachi",
   "license": "MIT",
   "devDependencies": {
-    "@types/mocha": "8.2.x",
+    "@types/jest": "^26.0.23",
     "@types/node": "14.14.x",
-    "mocha": "8.3.x",
+    "copyfiles": "^2.4.1",
+    "jest": "^27.0.5",
     "peggy": "1.2.0",
+    "ts-jest": "^27.0.3",
     "ts-node": "9.1.x",
     "tsd": "^0.14.0",
     "typescript": "4.2.x"

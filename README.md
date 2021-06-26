@@ -4,6 +4,8 @@ An MFM parser implementation with PEG.js.
 
 [![Test](https://github.com/misskey-dev/mfm.js/actions/workflows/test.yml/badge.svg)](https://github.com/misskey-dev/mfm.js/actions/workflows/test.yml)
 
+[![codecov](https://codecov.io/gh/misskey-dev/mfm.js/branch/develop/graph/badge.svg?token=irAWFiHK8T)](https://codecov.io/gh/misskey-dev/mfm.js)
+
 [![NPM](https://nodei.co/npm/mfm-js.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/mfm-js)
 
 ## Installation

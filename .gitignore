@@ -8,3 +8,7 @@ package-lock.json
 # app dir
 built
 temp
+
+coverage
+
+src/internal/parser.js
