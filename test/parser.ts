@@ -931,6 +931,16 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
+		it('do not yield mention', () => {
+			const input = '[@example](https://example.com)';
+			const output = [
+				LINK(false, 'https://example.com', [
+					TEXT('@example')
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
 		it('with brackets', () => {
 			const input = '[foo](https://example.com/foo(bar))';
 			const output = [
