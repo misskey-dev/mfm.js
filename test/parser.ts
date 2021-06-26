@@ -919,18 +919,6 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
-		it('do not yield link node even if label is recognisable as a link', () => {
-			const input = 'official instance: [[https://misskey.io/@ai](https://misskey.io/@ai)](https://misskey.io/@ai).';
-			const output = [
-				TEXT('official instance: '),
-				LINK(false, 'https://misskey.io/@ai', [
-					TEXT('[https://misskey.io/@ai](https://misskey.io/@ai)')
-				]),
-				TEXT('.')
-			];
-			assert.deepStrictEqual(mfm.parse(input), output);
-		});
-
 		it('with brackets', () => {
 			const input = '[foo](https://example.com/foo(bar))';
 			const output = [
