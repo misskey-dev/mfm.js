@@ -19,6 +19,10 @@ export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
 			// Store the char.
 			storedChars.push(node);
 		}
+		else if (node.type == 'text') {
+			// Store the text.
+			storedChars.push(node.props.text);
+		}
 		else {
 			generateText();
 			dest.push(node);
