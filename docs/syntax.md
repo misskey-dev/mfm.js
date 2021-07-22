@@ -475,11 +475,35 @@ http://hoge.jp/abc
 ```
 
 ## ノード
+構文1:
 ```js
 {
   type: 'url',
   props: {
     url: 'https://misskey.io/@ai'
+  }
+}
+```
+
+または
+
+```js
+{
+  type: 'url',
+  props: {
+    url: 'https://misskey.io/@ai',
+    brackets: false
+  }
+}
+```
+
+構文2:
+```js
+{
+  type: 'url',
+  props: {
+    url: 'https://misskey.io/@ai',
+    brackets: true
   }
 }
 ```

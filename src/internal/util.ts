@@ -79,7 +79,12 @@ export function stringifyNode(node: MfmNode): string {
 			return `#${ node.props.hashtag }`;
 		}
 		case 'url': {
-			return node.props.url;
+			if (node.props.brackets) {
+				return `<${ node.props.url }>`;
+			}
+			else {
+				return node.props.url;
+			}
 		}
 		case 'link': {
 			const prefix = node.props.silent ? '?' : '';

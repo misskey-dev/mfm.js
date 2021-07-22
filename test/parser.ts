@@ -878,7 +878,7 @@ hoge`;
 		it('match non-ascii characters contained url with angle brackets', () => {
 			const input = '<https://大石泉すき.example.com>';
 			const output = [
-				N_URL('https://大石泉すき.example.com'),
+				N_URL('https://大石泉すき.example.com', true),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
