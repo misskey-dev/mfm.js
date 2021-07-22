@@ -362,7 +362,7 @@ hashtagChar
 url
 	= "<" url:altUrlFormat ">"
 {
-	return N_URL(url);
+	return N_URL(url, true);
 }
 	/ url:urlFormat
 {

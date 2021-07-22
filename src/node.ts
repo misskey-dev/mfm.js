@@ -143,10 +143,11 @@ export type MfmUrl = {
 	type: 'url';
 	props: {
 		url: string;
+		brackets?: boolean;
 	};
 	children?: [];
 };
-export const N_URL = (value: string): NodeType<'url'> => { return { type:'url', props: { url: value } }; };
+export const N_URL = (value: string, brackets?: boolean): NodeType<'url'> => { return { type:'url', props: { url: value, brackets } }; };
 
 export type MfmLink = {
 	type: 'link';
