@@ -21,10 +21,10 @@ after`;
 		});
 
 		it('preserve url brackets', () => {
-			const input1 = `https://github.com/syuilo/ai`;
+			const input1 = 'https://github.com/syuilo/ai';
 			assert.strictEqual(mfm.toString(mfm.parse(input1)), input1);
 
-			const input2 = `<https://github.com/syuilo/ai>`;
+			const input2 = '<https://github.com/syuilo/ai>';
 			assert.strictEqual(mfm.toString(mfm.parse(input2)), input2);
 		});
 	});

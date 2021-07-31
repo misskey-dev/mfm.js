@@ -39,8 +39,9 @@ async function entryPoint() {
 		console.log();
 	}
 }
+
 entryPoint()
-.catch(err => {
-	console.log(err);
-	process.exit(1);
-});
+	.catch(err => {
+		console.log(err);
+		process.exit(1);
+	});

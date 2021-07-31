@@ -2,6 +2,7 @@ import peg from 'peggy';
 import { MfmNode, MfmPlainNode } from './node';
 import { stringifyNode, stringifyTree, inspectOne } from './internal/util';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const parser: peg.Parser = require('./internal/parser');
 
 /**

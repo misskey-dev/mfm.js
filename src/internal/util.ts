@@ -30,7 +30,7 @@ export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
 }
 
 export function stringifyNode(node: MfmNode): string {
-	switch(node.type) {
+	switch (node.type) {
 		// block
 		case 'quote': {
 			return stringifyTree(node.children).split('\n').map(line => `> ${line}`).join('\n');
@@ -114,10 +114,10 @@ enum stringifyState {
 	none = 0,
 	inline,
 	block
-};
+}
 
 export function stringifyTree(nodes: MfmNode[]): string {
-	let dest: MfmNode[] = [];
+	const dest: MfmNode[] = [];
 	let state: stringifyState = stringifyState.none;
 
 	for (const node of nodes) {

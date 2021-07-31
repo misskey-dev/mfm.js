@@ -123,7 +123,7 @@ describe('FullParser', () => {
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('1行の引用ブロックを空行にはできない', () => {
-			const input = `> `;
+			const input = '> ';
 			const output = [
 				TEXT('> ')
 			];
