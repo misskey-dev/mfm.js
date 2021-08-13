@@ -44,9 +44,6 @@
   "dependencies": {
     "twemoji-parser": "13.1.x"
   },
-  "resolutions": {
-    "path-parse": "1.0.7"
-  },
   "files": [
     "built"
   ]
