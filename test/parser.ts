@@ -882,22 +882,6 @@ hoge`;
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
-
-		it('do not match other schemes in url withouth angle brackets', () => {
-			const input = 'oops:url';
-			const output = [
-				TEXT('oops:url'),
-			];
-			assert.deepStrictEqual(mfm.parse(input), output);
-		});
-
-		it('match other schemes in url with angle brackets', () => {
-			const input = '<gemini://example.com>';
-			const output = [
-				N_URL('gemini://example.com', true),
-			];
-			assert.deepStrictEqual(mfm.parse(input), output);
-		});
 	});
 
 	describe('link', () => {
@@ -975,16 +959,6 @@ hoge`;
 					TEXT('foo')
 				]),
 				TEXT(')'),
-			];
-			assert.deepStrictEqual(mfm.parse(input), output);
-		});
-
-		it('match other schemes without angle brackets', () => {
-			const input = '[send email](mailto:nobody@example.com?subject=test)';
-			const output = [
-				LINK(false, 'mailto:nobody@example.com?subject=test', [
-					TEXT('send email')
-				]),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
