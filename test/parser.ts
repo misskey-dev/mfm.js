@@ -716,6 +716,12 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
+		it('ignore angle bracket', () => {
+			const input = '#foo<bar>';
+			const output = [HASHTAG('foo'), TEXT('<bar>')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
 		it('allow including number', () => {
 			const input = '#foo123';
 			const output = [HASHTAG('foo123')];
