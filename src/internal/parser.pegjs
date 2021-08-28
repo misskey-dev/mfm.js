@@ -355,7 +355,7 @@ hashtagBracketPair
 	/ "「" hashtagContent* "」"
 
 hashtagChar
-	= ![ 　\t.,!?'"#:\/\[\]【】()「」] CHAR
+	= ![ 　\t.,!?'"#:\/\[\]【】()「」<>] CHAR
 
 // inline: URL
 
