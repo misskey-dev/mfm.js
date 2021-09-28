@@ -242,6 +242,10 @@ bold
 {
 	return BOLD(mergeText(content));
 }
+	/ "<b>" content:(!"</b>" i:inline { return i; })+ "</b>"
+{
+	return BOLD(mergeText(content));
+}
 	/ "__" content:$(!"__" c:([a-z0-9]i / _) { return c; })+ "__"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
@@ -284,6 +288,10 @@ italicAlt
 
 strike
 	= "~~" content:(!("~" / LF) i:inline { return i; })+ "~~"
+{
+	return STRIKE(mergeText(content));
+}
+	/ "<s>" content:(!("</s>" / LF) i:inline { return i; })+ "</s>"
 {
 	return STRIKE(mergeText(content));
 }

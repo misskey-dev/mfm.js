@@ -362,6 +362,44 @@ hoge`;
 		});
 	});
 
+	describe('bold tag', () => {
+		it('basic', () => {
+			const input = '<b>abc</b>';
+			const output = [
+				BOLD([
+					TEXT('abc')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+		it('inline syntax allowed inside', () => {
+			const input = '<b>123~~abc~~123</b>';
+			const output = [
+				BOLD([
+					TEXT('123'),
+					STRIKE([
+						TEXT('abc')
+					]),
+					TEXT('123')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+		it('line breaks', () => {
+			const input = '<b>123\n~~abc~~\n123</b>';
+			const output = [
+				BOLD([
+					TEXT('123\n'),
+					STRIKE([
+						TEXT('abc')
+					]),
+					TEXT('\n123')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
+
 	describe('bold', () => {
 		it('basic', () => {
 			const input = '**abc**';
@@ -552,6 +590,16 @@ hoge`;
 				]),
 				TEXT('えお')
 			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
+
+	describe('strike tag', () => {
+		it('basic', () => {
+			const input = '<s>foo</s>';
+			const output = [STRIKE([
+				TEXT('foo')
+			])];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
