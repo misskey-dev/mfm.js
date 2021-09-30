@@ -24,7 +24,7 @@
 npm: https://www.npmjs.com/package/mfm-js/v/0.19.0
 
 ### :sparkles: Improvements
-- Parser: Ignores a blank line after quote lines. (#61)
+- Ignores a blank line after quote lines. (#61)
 
 ## 0.18.0
 
