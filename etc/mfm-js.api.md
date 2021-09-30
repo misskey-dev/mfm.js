@@ -231,7 +231,9 @@ export const N_URL: (value: string, brackets?: boolean | undefined) => NodeType<
 export type NodeType<T extends MfmNode['type']> = T extends 'quote' ? MfmQuote : T extends 'search' ? MfmSearch : T extends 'blockCode' ? MfmCodeBlock : T extends 'mathBlock' ? MfmMathBlock : T extends 'center' ? MfmCenter : T extends 'unicodeEmoji' ? MfmUnicodeEmoji : T extends 'emojiCode' ? MfmEmojiCode : T extends 'bold' ? MfmBold : T extends 'small' ? MfmSmall : T extends 'italic' ? MfmItalic : T extends 'strike' ? MfmStrike : T extends 'inlineCode' ? MfmInlineCode : T extends 'mathInline' ? MfmMathInline : T extends 'mention' ? MfmMention : T extends 'hashtag' ? MfmHashtag : T extends 'url' ? MfmUrl : T extends 'link' ? MfmLink : T extends 'fn' ? MfmFn : T extends 'text' ? MfmText : never;
 
 // @public (undocumented)
-export function parse(input: string): MfmNode[];
+export function parse(input: string, opts?: Partial<{
+    fnNameList: string[];
+}>): MfmNode[];
 
 // Warning: (ae-forgotten-export) The symbol "MfmPlainNode" needs to be exported by the entry point index.d.ts
 //

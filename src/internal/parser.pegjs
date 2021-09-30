@@ -56,6 +56,14 @@
 
 		return false;
 	}
+
+	function ensureFnName(name) {
+		if (!options.fnNameList) return true;
+		if (!Array.isArray(options.fnNameList)) {
+			error("options.fnNameList must be an array.");
+		}
+		return options.fnNameList.includes(name);
+	}
 }
 
 //
@@ -424,14 +432,14 @@ linkUrl
 // inline: fn
 
 fnVer1
-	= "[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:fnContentPart+ "]"
+	= "[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:fnContentPart+ "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
 }
 
 fnVer2
-	= "$[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:fnContentPart+ "]"
+	= "$[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:fnContentPart+ "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
