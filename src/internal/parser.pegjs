@@ -92,9 +92,8 @@ full
 	/ mention
 	/ hashtag
 	/ url
-	/ fnVer2
+	/ fn
 	/ link
-	/ fnVer1
 	/ search // block
 	/ inlineText
 
@@ -111,9 +110,8 @@ inline
 	/ mention
 	/ hashtag
 	/ url
-	/ fnVer2
+	/ fn
 	/ link
-	/ fnVer1
 	/ inlineText
 
 plain
@@ -415,15 +413,8 @@ linkUrl
 
 // inline: fn
 
-fnVer1
-	= "[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:fnContentPart+ "]"
-{
-	args = args || {};
-	return FN(name, args, mergeText(content));
-}
-
-fnVer2
-	= "$[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:fnContentPart+ "]"
+fn
+	= "$[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:(!("]") @inline)+ "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
@@ -448,9 +439,6 @@ fnArg
 {
 	return { k: k, v: true };
 }
-
-fnContentPart
-	= !("]") @inline
 
 // inline: text
 
