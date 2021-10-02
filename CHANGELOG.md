@@ -42,9 +42,9 @@ npm: https://www.npmjs.com/package/mfm-js/v/0.18.0
 
 ## 0.17.0
 
-npm: https://www.npmjs.com/package/mfm-js/v/0.17.0 
+npm: https://www.npmjs.com/package/mfm-js/v/0.17.0
 
 ### Improvements
-- Parser: Improve syntax of inline code.
-- Parser: Improve syntax of url.
-- Parser: Improve syntax of hashtag.
+- Improves syntax of inline code.
+- Improves syntax of url.
+- Improves syntax of hashtag.
