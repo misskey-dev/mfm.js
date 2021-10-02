@@ -44,7 +44,7 @@ console.log(JSON.stringify(nodes));
 ```ts
 const nodes = mfm.parse('hello $[tada world]');
 const output = mfm.toString(nodes);
-console.log(output); // => "hello [tada world]"
+console.log(output); // => "hello $[tada world]"
 ```
 ※元の文字列とtoString APIで出力される文字列の同一性は保障されません。
 
