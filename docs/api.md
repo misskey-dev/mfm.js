@@ -13,6 +13,7 @@ console.log(JSON.stringify(nodes));
 MFM関数の名前をホワイトリストに登録して、登録されたMFM関数以外を通常のテキストノードとして解釈するように設定できます。
 デフォルトではすべてのMFM関数名を受け入れるように設定されています。
 
+例:  
 ```ts
 const nodes = mfm.parse('hello $[tada world]', { fnNameList: ['tada', 'spin'] });
 console.log(JSON.stringify(nodes));
