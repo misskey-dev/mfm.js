@@ -11,7 +11,7 @@ export function isMfmBlock(node: MfmNode): node is MfmBlock {
 
 export type MfmQuote = {
 	type: 'quote';
-	props?: { };
+	props?: Record<string, unknown>;
 	children: MfmNode[];
 };
 export const QUOTE = (children: MfmNode[]): NodeType<'quote'> => { return { type:'quote', children }; };
@@ -47,7 +47,7 @@ export const MATH_BLOCK = (formula: string): NodeType<'mathBlock'> => { return {
 
 export type MfmCenter = {
 	type: 'center';
-	props?: { };
+	props?: Record<string, unknown>;
 	children: MfmInline[];
 };
 export const CENTER = (children: MfmInline[]): NodeType<'center'> => { return { type:'center', children }; };
@@ -75,28 +75,28 @@ export const EMOJI_CODE = (name: string): NodeType<'emojiCode'> => { return { ty
 
 export type MfmBold = {
 	type: 'bold';
-	props?: { };
+	props?: Record<string, unknown>;
 	children: MfmInline[];
 };
 export const BOLD = (children: MfmInline[]): NodeType<'bold'> => { return { type:'bold', children }; };
 
 export type MfmSmall = {
 	type: 'small';
-	props?: { };
+	props?: Record<string, unknown>;
 	children: MfmInline[];
 };
 export const SMALL = (children: MfmInline[]): NodeType<'small'> => { return { type:'small', children }; };
 
 export type MfmItalic = {
 	type: 'italic';
-	props?: { };
+	props?: Record<string, unknown>;
 	children: MfmInline[];
 };
 export const ITALIC = (children: MfmInline[]): NodeType<'italic'> => { return { type:'italic', children }; };
 
 export type MfmStrike = {
 	type: 'strike';
-	props?: { };
+	props?: Record<string, unknown>;
 	children: MfmInline[];
 };
 export const STRIKE = (children: MfmInline[]): NodeType<'strike'> => { return { type:'strike', children }; };
@@ -143,10 +143,11 @@ export type MfmUrl = {
 	type: 'url';
 	props: {
 		url: string;
+		brackets?: boolean;
 	};
 	children?: [];
 };
-export const N_URL = (value: string): NodeType<'url'> => { return { type:'url', props: { url: value } }; };
+export const N_URL = (value: string, brackets?: boolean): NodeType<'url'> => { return { type:'url', props: { url: value, brackets } }; };
 
 export type MfmLink = {
 	type: 'link';

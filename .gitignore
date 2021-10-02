@@ -1,6 +1,5 @@
 # npm
 node_modules
-package-lock.json
 
 # editor
 .vscode
@@ -8,3 +7,7 @@ package-lock.json
 # app dir
 built
 temp
+
+coverage
+
+src/internal/parser.js

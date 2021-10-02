@@ -1,8 +1,8 @@
 import assert from 'assert';
-import * as mfm from '../built/index';
+import * as mfm from '../src/index';
 import {
 	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK
-} from '../built/index';
+} from '../src/index';
 
 describe('API', () => {
 	describe('toString', () => {
@@ -18,6 +18,14 @@ https://github.com/syuilo/ai
 </center>
 after`;
 			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
+		});
+
+		it('preserve url brackets', () => {
+			const input1 = 'https://github.com/syuilo/ai';
+			assert.strictEqual(mfm.toString(mfm.parse(input1)), input1);
+
+			const input2 = '<https://github.com/syuilo/ai>';
+			assert.strictEqual(mfm.toString(mfm.parse(input2)), input2);
 		});
 	});
 

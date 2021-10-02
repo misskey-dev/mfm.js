@@ -1,8 +1,8 @@
 import assert from 'assert';
-import * as mfm from '../built/index';
+import * as mfm from '../src/index';
 import {
 	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE, MATH_INLINE
-} from '../built/index';
+} from '../src/index';
 
 describe('PlainParser', () => {
 	describe('text', () => {
@@ -123,7 +123,7 @@ describe('FullParser', () => {
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		it('1行の引用ブロックを空行にはできない', () => {
-			const input = `> `;
+			const input = '> ';
 			const output = [
 				TEXT('> ')
 			];
@@ -362,6 +362,44 @@ hoge`;
 		});
 	});
 
+	describe('bold tag', () => {
+		it('basic', () => {
+			const input = '<b>abc</b>';
+			const output = [
+				BOLD([
+					TEXT('abc')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+		it('inline syntax allowed inside', () => {
+			const input = '<b>123~~abc~~123</b>';
+			const output = [
+				BOLD([
+					TEXT('123'),
+					STRIKE([
+						TEXT('abc')
+					]),
+					TEXT('123')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+		it('line breaks', () => {
+			const input = '<b>123\n~~abc~~\n123</b>';
+			const output = [
+				BOLD([
+					TEXT('123\n'),
+					STRIKE([
+						TEXT('abc')
+					]),
+					TEXT('\n123')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
+
 	describe('bold', () => {
 		it('basic', () => {
 			const input = '**abc**';
@@ -556,6 +594,16 @@ hoge`;
 		});
 	});
 
+	describe('strike tag', () => {
+		it('basic', () => {
+			const input = '<s>foo</s>';
+			const output = [STRIKE([
+				TEXT('foo')
+			])];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
+
 	describe('strike', () => {
 		it('basic', () => {
 			const input = '~~foo~~';
@@ -713,6 +761,12 @@ hoge`;
 		it('ignore slash', () => {
 			const input = '#foo/bar';
 			const output = [HASHTAG('foo'), TEXT('/bar')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('ignore angle bracket', () => {
+			const input = '#foo<bar>';
+			const output = [HASHTAG('foo'), TEXT('<bar>')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
@@ -878,7 +932,7 @@ hoge`;
 		it('match non-ascii characters contained url with angle brackets', () => {
 			const input = '<https://大石泉すき.example.com>';
 			const output = [
-				N_URL('https://大石泉すき.example.com'),
+				N_URL('https://大石泉すき.example.com', true),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
@@ -931,6 +985,16 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
+		it('do not yield mention', () => {
+			const input = '[@example](https://example.com)';
+			const output = [
+				LINK(false, 'https://example.com', [
+					TEXT('@example')
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
 		it('with brackets', () => {
 			const input = '[foo](https://example.com/foo(bar))';
 			const output = [
@@ -954,41 +1018,7 @@ hoge`;
 		});
 	});
 
-	describe('fn v1', () => {
-		it('basic', () => {
-			const input = '[tada abc]';
-			const output = [
-				FN('tada', { }, [
-					TEXT('abc')
-				])
-			];
-			assert.deepStrictEqual(mfm.parse(input), output);
-		});
-
-		it('with a string argument', () => {
-			const input = '[spin.speed=1.1s a]';
-			const output = [
-				FN('spin', { speed: '1.1s' }, [
-					TEXT('a')
-				])
-			];
-			assert.deepStrictEqual(mfm.parse(input), output);
-		});
-
-		it('nest', () => {
-			const input = '[spin.speed=1.1s [shake a]]';
-			const output = [
-				FN('spin', { speed: '1.1s' }, [
-					FN('shake', { }, [
-						TEXT('a')
-					])
-				])
-			];
-			assert.deepStrictEqual(mfm.parse(input), output);
-		});
-	});
-
-	describe('fn v2', () => {
+	describe('fn', () => {
 		it('basic', () => {
 			const input = '$[tada abc]';
 			const output = [
@@ -1020,13 +1050,31 @@ hoge`;
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		it('exists name in the fnNameList', () => {
+			const input = '$[spin.speed=1.1s text]';
+			const output = [
+				FN('spin', { speed: '1.1s' }, [
+					TEXT('text')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input, { fnNameList: ['tada', 'spin'] }), output);
+		});
+
+		it('not exists name in the fnNameList', () => {
+			const input = '$[pope.speed=1.1s text]';
+			const output = [
+				TEXT('$[pope.speed=1.1s text]')
+			];
+			assert.deepStrictEqual(mfm.parse(input, { fnNameList: ['tada', 'spin'] }), output);
+		});
 	});
 
 	it('composite', () => {
 		const input =
 `before
 <center>
-Hello [tada everynyan! 🎉]
+Hello $[tada everynyan! 🎉]
 
 I'm @ai, A bot of misskey!
 

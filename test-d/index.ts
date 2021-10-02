@@ -4,7 +4,7 @@
  */
 
 import { expectType } from 'tsd';
-import { NodeType, MfmUrl } from '../built';
+import { NodeType, MfmUrl } from '../src';
 
 describe('#NodeType', () => {
 	it('returns node that has sprcified type', () => {
