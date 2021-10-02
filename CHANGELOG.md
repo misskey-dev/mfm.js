@@ -16,7 +16,7 @@
 npm: https://www.npmjs.com/package/mfm-js/v/0.20.0
 
 ### Features
-- Add tag syntaxes of bold and strikethrough. (#76)
+- Add tag syntaxes of bold `<b></b>` and strikethrough `<s></s>`. (#76)
 - Supports whitelisting of MFM function names. (#77)
 
 ### Improvements
