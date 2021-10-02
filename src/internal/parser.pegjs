@@ -56,6 +56,14 @@
 
 		return false;
 	}
+
+	function ensureFnName(name) {
+		if (!options.fnNameList) return true;
+		if (!Array.isArray(options.fnNameList)) {
+			error("options.fnNameList must be an array.");
+		}
+		return options.fnNameList.includes(name);
+	}
 }
 
 //
@@ -414,7 +422,7 @@ linkUrl
 // inline: fn
 
 fn
-	= "$[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:(!("]") @inline)+ "]"
+	= "$[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:(!("]") @inline)+ "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
