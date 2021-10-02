@@ -11,7 +11,9 @@
 
 -->
 
-## 0.20.0 (unreleased)
+## 0.20.0
+
+npm: https://www.npmjs.com/package/mfm-js/v/0.20.0
 
 ### Features
 - Add tag syntaxes of bold and strikethrough. (#76)
