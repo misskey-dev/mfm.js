@@ -12,13 +12,17 @@
 ## 0.20.0 (unreleased)
 
 ### :sparkles: Improvements
+- Mentions in the link label are parsed as text. (#66)
 - Add a property to the URL node indicating whether it was enclosed in `<>`. (#69)
 - Disallows `<` and `>` in hashtags. (#74)
-- Mentions in the link label are parsed as text. (#66)
+- Supports whitelisting of MFM function names. (#77)
 - Improves security.
 
 ### :gem: Features
 - Add tag syntaxes of bold and strikethrough. (#76)
+
+### Changes
+- Abolished MFM function v1 syntax. (#79)
 
 ## 0.19.0
 
