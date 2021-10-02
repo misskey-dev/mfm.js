@@ -71,13 +71,13 @@
 //
 
 fullParser
-	= nodes:(&. n:full { return n; })* { return mergeText(nodes); }
+	= nodes:(&. @full)* { return mergeText(nodes); }
 
 plainParser
-	= nodes:(&. n:plain { return n; })* { return mergeText(nodes); }
+	= nodes:(&. @plain)* { return mergeText(nodes); }
 
 inlineParser
-	= nodes:(&. n:inline { return n; })* { return mergeText(nodes); }
+	= nodes:(&. @inline)* { return mergeText(nodes); }
 
 //
 // syntax list
@@ -100,9 +100,8 @@ full
 	/ mention
 	/ hashtag
 	/ url
-	/ fnVer2
+	/ fn
 	/ link
-	/ fnVer1
 	/ search // block
 	/ inlineText
 
@@ -119,9 +118,8 @@ inline
 	/ mention
 	/ hashtag
 	/ url
-	/ fnVer2
+	/ fn
 	/ link
-	/ fnVer1
 	/ inlineText
 
 plain
@@ -139,7 +137,7 @@ quote
 	= &(BEGIN ">") q:quoteInner LF? { return q; }
 
 quoteInner
-	= head:quoteMultiLine tails:quoteMultiLine+
+	= head:(quoteLine / quoteEmptyLine) tails:(quoteLine / quoteEmptyLine)+
 {
 	const children = applyParser([head, ...tails].join('\n'), 'fullParser');
 	return QUOTE(children);
@@ -150,11 +148,8 @@ quoteInner
 	return QUOTE(children);
 }
 
-quoteMultiLine
-	= quoteLine / quoteEmptyLine
-
 quoteLine
-	= BEGIN ">" _? text:$(CHAR+) END { return text; }
+	= BEGIN ">" _? text:$CHAR+ END { return text; }
 
 quoteEmptyLine
 	= BEGIN ">" _? END { return ''; }
@@ -206,7 +201,7 @@ mathBlockLine
 // block: center
 
 center
-	= BEGIN "<center>" LF? content:(!(LF? "</center>" END) i:inline { return i; })+ LF? "</center>" END
+	= BEGIN "<center>" LF? content:(!(LF? "</center>" END) @inline)+ LF? "</center>" END
 {
 	return CENTER(mergeText(content));
 }
@@ -218,13 +213,10 @@ center
 // inline: emoji code
 
 emojiCode
-	= ":" name:emojiCodeName ":"
+	= ":" name:$[a-z0-9_+-]i+ ":"
 {
 	return EMOJI_CODE(name);
 }
-
-emojiCodeName
-	= [a-z0-9_+-]i+ { return text(); }
 
 // inline: unicode emoji
 
@@ -238,7 +230,7 @@ unicodeEmoji
 // inline: big
 
 big
-	= "***" content:(!"***" i:inline { return i; })+ "***"
+	= "***" content:(!"***" @inline)+ "***"
 {
 	return FN('tada', { }, mergeText(content));
 }
@@ -246,15 +238,15 @@ big
 // inline: bold
 
 bold
-	= "**" content:(!"**" i:inline { return i; })+ "**"
+	= "**" content:(!"**" @inline)+ "**"
 {
 	return BOLD(mergeText(content));
 }
-	/ "<b>" content:(!"</b>" i:inline { return i; })+ "</b>"
+	/ "<b>" content:(!"</b>" @inline)+ "</b>"
 {
 	return BOLD(mergeText(content));
 }
-	/ "__" content:$(!"__" c:([a-z0-9]i / _) { return c; })+ "__"
+	/ "__" content:$(!"__" @([a-z0-9]i / _))+ "__"
 {
 	const parsedContent = applyParser(content, 'inlineParser');
 	return BOLD(parsedContent);
@@ -263,7 +255,7 @@ bold
 // inline: small
 
 small
-	= "<small>" content:(!"</small>" i:inline { return i; })+ "</small>"
+	= "<small>" content:(!"</small>" @inline)+ "</small>"
 {
 	return SMALL(mergeText(content));
 }
@@ -275,7 +267,7 @@ italic
 	/ italicAlt
 
 italicTag
-	= "<i>" content:(!"</i>" i:inline { return i; })+ "</i>"
+	= "<i>" content:(!"</i>" @inline)+ "</i>"
 {
 	return ITALIC(mergeText(content));
 }
@@ -295,11 +287,11 @@ italicAlt
 // inline: strike
 
 strike
-	= "~~" content:(!("~" / LF) i:inline { return i; })+ "~~"
+	= "~~" content:(!("~" / LF) @inline)+ "~~"
 {
 	return STRIKE(mergeText(content));
 }
-	/ "<s>" content:(!("</s>" / LF) i:inline { return i; })+ "</s>"
+	/ "<s>" content:(!("</s>" / LF) @inline)+ "</s>"
 {
 	return STRIKE(mergeText(content));
 }
@@ -307,7 +299,7 @@ strike
 // inline: inlineCode
 
 inlineCode
-	= "`" content:$(![`´] c:CHAR { return c; })+ "`"
+	= "`" content:$(![`´] CHAR)+ "`"
 {
 	return INLINE_CODE(content);
 }
@@ -315,7 +307,7 @@ inlineCode
 // inline: mathInline
 
 mathInline
-	= "\\(" content:$(!"\\)" c:CHAR { return c; })+ "\\)"
+	= "\\(" content:$(!"\\)" CHAR)+ "\\)"
 {
 	return MATH_INLINE(content);
 }
@@ -323,7 +315,7 @@ mathInline
 // inline: mention
 
 mention
-	= "@" name:mentionName host:("@" host:mentionHost { return host; })?
+	= "@" name:mentionName host:("@" @mentionHost)?
 {
 	return MENTION(name, host, text());
 }
@@ -363,7 +355,8 @@ invalidHashtagContent
 	= [0-9]+
 
 hashtagContentPart
-	= hashtagBracketPair / hashtagChar
+	= hashtagBracketPair
+	/ hashtagChar
 
 hashtagBracketPair
 	= "(" hashtagContent* ")"
@@ -415,38 +408,28 @@ link
 }
 
 linkLabel
-	= parts:linkLabelPart+
-{
-	return parts;
-}
+	= linkLabelPart+
 
 linkLabelPart
 	= url { return text(); /* text node */ }
 	/ link { return text(); /* text node */ }
 	/ mention { return text(); /* text node */ }
-	/ !"]" n:inline { return n; }
+	/ !"]" @inline
 
 linkUrl
 	= url { return text(); }
 
 // inline: fn
 
-fnVer1
-	= "[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:fnContentPart+ "]"
-{
-	args = args || {};
-	return FN(name, args, mergeText(content));
-}
-
-fnVer2
-	= "$[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:fnContentPart+ "]"
+fn
+	= "$[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:(!("]") @inline)+ "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
 }
 
 fnArgs
-	= "." head:fnArg tails:("," arg:fnArg { return arg; })*
+	= "." head:fnArg tails:("," @fnArg)*
 {
 	const args = { };
 	for (const pair of [head, ...tails]) {
@@ -464,9 +447,6 @@ fnArg
 {
 	return { k: k, v: true };
 }
-
-fnContentPart
-	= !("]") i:inline { return i; }
 
 // inline: text
 
