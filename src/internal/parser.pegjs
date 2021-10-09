@@ -402,9 +402,9 @@ altUrlFormat
 // inline: link
 
 link
-	= silent:"?"? "[" label:linkLabel "](" url:linkUrl ")"
+	= silent:"?"? "[" label:linkLabel "](" url:url ")"
 {
-	return LINK((silent != null), url, mergeText(label));
+	return LINK((silent != null), url.props.url, mergeText(label));
 }
 
 linkLabel
@@ -415,9 +415,6 @@ linkLabelPart
 	/ link { return text(); /* text node */ }
 	/ mention { return text(); /* text node */ }
 	/ !"]" @inline
-
-linkUrl
-	= url { return text(); }
 
 // inline: fn
 
