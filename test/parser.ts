@@ -961,6 +961,17 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
+		it('with angle brackets url', () => {
+			const input = '[official instance](<https://misskey.io/@ai>).';
+			const output = [
+				LINK(false, 'https://misskey.io/@ai', [
+					TEXT('official instance')
+				]),
+				TEXT('.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
 		it('do not yield url node even if label is recognisable as a url', () => {
 			const input = 'official instance: [https://misskey.io/@ai](https://misskey.io/@ai).';
 			const output = [
