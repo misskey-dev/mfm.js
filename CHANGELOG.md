@@ -11,6 +11,11 @@
 
 -->
 
+## 0.x.x (unreleased)
+
+### Bugfixes
+- Fix the Link node of the enclosed in `<>`. (#84)
+
 ## 0.20.0
 
 npm: https://www.npmjs.com/package/mfm-js/v/0.20.0
