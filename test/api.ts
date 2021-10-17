@@ -38,7 +38,17 @@ after`;
 
 		it('search', () => {
 			const input = 'MFM 書き方 123 Search';
-			assert.strictEqual(mfm.toString(mfm.parse(input)), 'MFM 書き方 123 Search');
+			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
+		});
+
+		it('block code', () => {
+			const input = '```\nabc\n```';
+			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
+		});
+
+		it('math block', () => {
+			const input = '\\[\ny = 2x + 1\n\\]';
+			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		});
 
 		it('center', () => {
