@@ -64,6 +64,28 @@
 		}
 		return options.fnNameList.includes(name);
 	}
+
+	// fn
+
+	const fnDepthLimit = options.fnDepthLimit || 10;
+	let fnDepth = 0;
+	function enterFn() {
+		if (fnDepth + 1 > fnDepthLimit) {
+			return false;
+		}
+		fnDepth++;
+		return true;
+	}
+
+	function leaveFn() {
+		fnDepth--;
+		return true;
+	}
+
+	function fallbackFn() {
+		fnDepth--;
+		return false;
+	}
 }
 
 //
@@ -419,11 +441,14 @@ linkLabelPart
 // inline: fn
 
 fn
-	= "$[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:(!("]") @inline)+ "]"
+	= "$[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:fnContent "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
 }
+
+fnContent
+	= &{ return enterFn(); } @(@(!("]") @inline)+ &{ return leaveFn(); } / &{ return fallbackFn(); })
 
 fnArgs
 	= "." head:fnArg tails:("," @fnArg)*
