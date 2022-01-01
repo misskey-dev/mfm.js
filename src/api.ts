@@ -8,11 +8,11 @@ const parser: peg.Parser = require('./internal/parser');
 /**
  * Generates a MfmNode tree from the MFM string.
 */
-export function parse(input: string, opts: Partial<{ fnNameList: string[]; fnDepthLimit: number; }> = {}): MfmNode[] {
+export function parse(input: string, opts: Partial<{ fnNameList: string[]; nestLimit: number; }> = {}): MfmNode[] {
 	const nodes = parser.parse(input, {
 		startRule: 'fullParser',
 		fnNameList: opts.fnNameList,
-		fnDepthLimit: opts.fnDepthLimit
+		nestLimit: opts.nestLimit
 	});
 	return nodes;
 }

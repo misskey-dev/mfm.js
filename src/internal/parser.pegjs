@@ -65,25 +65,25 @@
 		return options.fnNameList.includes(name);
 	}
 
-	// fn
+	// nesting control
 
-	const fnDepthLimit = options.fnDepthLimit || 10;
-	let fnDepth = 0;
-	function enterFn() {
-		if (fnDepth + 1 > fnDepthLimit) {
+	const nestLimit = options.nestLimit || 10;
+	let depth = 0;
+	function enterNest() {
+		if (depth + 1 > nestLimit) {
 			return false;
 		}
-		fnDepth++;
+		depth++;
 		return true;
 	}
 
-	function leaveFn() {
-		fnDepth--;
+	function leaveNest() {
+		depth--;
 		return true;
 	}
 
-	function fallbackFn() {
-		fnDepth--;
+	function fallbackNest() {
+		depth--;
 		return false;
 	}
 }
@@ -448,7 +448,7 @@ fn
 }
 
 fnContent
-	= &{ return enterFn(); } @(@(!("]") @inline)+ &{ return leaveFn(); } / &{ return fallbackFn(); })
+	= &{ return enterNest(); } @(@(!("]") @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 fnArgs
 	= "." head:fnArg tails:("," @fnArg)*
