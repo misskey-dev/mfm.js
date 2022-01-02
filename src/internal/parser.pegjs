@@ -252,19 +252,22 @@ unicodeEmoji
 // inline: big
 
 big
-	= "***" content:(!"***" @inline)+ "***"
+	= "***" content:bigContent "***"
 {
 	return FN('tada', { }, mergeText(content));
 }
 
+bigContent
+	= &{ return enterNest(); } @(@(!"***" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
 // inline: bold
 
 bold
-	= "**" content:(!"**" @inline)+ "**"
+	= "**" content:boldContent "**"
 {
 	return BOLD(mergeText(content));
 }
-	/ "<b>" content:(!"</b>" @inline)+ "</b>"
+	/ "<b>" content:boldTagContent "</b>"
 {
 	return BOLD(mergeText(content));
 }
@@ -274,13 +277,22 @@ bold
 	return BOLD(parsedContent);
 }
 
+boldContent
+	= &{ return enterNest(); } @(@(!"**" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
+boldTagContent
+	= &{ return enterNest(); } @(@(!"</b>" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
 // inline: small
 
 small
-	= "<small>" content:(!"</small>" @inline)+ "</small>"
+	= "<small>" content:smallContent "</small>"
 {
 	return SMALL(mergeText(content));
 }
+
+smallContent
+	= &{ return enterNest(); } @(@(!"</small>" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 // inline: italic
 
@@ -289,10 +301,13 @@ italic
 	/ italicAlt
 
 italicTag
-	= "<i>" content:(!"</i>" @inline)+ "</i>"
+	= "<i>" content:italicContent "</i>"
 {
 	return ITALIC(mergeText(content));
 }
+
+italicContent
+	= &{ return enterNest(); } @(@(!"</i>" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 italicAlt
 	= "*" content:$(!"*" ([a-z0-9]i / _))+ "*" &(EOF / LF / _ / ![a-z0-9]i)
@@ -309,14 +324,20 @@ italicAlt
 // inline: strike
 
 strike
-	= "~~" content:(!("~" / LF) @inline)+ "~~"
+	= "~~" content:strikeContent "~~"
 {
 	return STRIKE(mergeText(content));
 }
-	/ "<s>" content:(!("</s>" / LF) @inline)+ "</s>"
+	/ "<s>" content:strikeTagContent "</s>"
 {
 	return STRIKE(mergeText(content));
 }
+
+strikeContent
+	= &{ return enterNest(); } @(@(!("~" / LF) @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
+strikeTagContent
+	= &{ return enterNest(); } @(@(!("</s>" / LF) @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 // inline: inlineCode
 
