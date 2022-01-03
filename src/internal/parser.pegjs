@@ -436,13 +436,21 @@ link
 }
 
 linkLabel
-	= linkLabelPart+
+	= (!"]" linkLabelPart)+
 
 linkLabelPart
-	= url { return text(); /* text node */ }
-	/ link { return text(); /* text node */ }
-	/ mention { return text(); /* text node */ }
-	/ !"]" @inline
+	= emojiCode
+	/ unicodeEmoji
+	/ big
+	/ bold
+	/ small
+	/ italic
+	/ strike
+	/ inlineCode
+	/ mathInline
+	/ hashtag
+	/ fn
+	/ inlineText
 
 // inline: fn
 
