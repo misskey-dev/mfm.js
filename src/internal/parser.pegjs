@@ -364,24 +364,18 @@ mention
 }
 
 mentionName
-	= !"-" mentionNamePart+ // first char is not "-".
+	= [a-z0-9_]i (&("-"+ [a-z0-9_]i) . / [a-z0-9_]i)*
 {
 	return text();
 }
-
-mentionNamePart
-	= "-" &mentionNamePart // last char is not "-".
-	/ [a-z0-9_]i
+// NOTE: first char and last char are not "-".
 
 mentionHost
-	= ![.-] mentionHostPart+ // first char is neither "." nor "-".
+	= [a-z0-9_]i (&([.-]i+ [a-z0-9_]i) . / [a-z0-9_]i)*
 {
 	return text();
 }
-
-mentionHostPart
-	= [.-] &mentionHostPart // last char is neither "." nor "-".
-	/ [a-z0-9_]i
+// NOTE: first char and last char are neither "." nor "-".
 
 // inline: hashtag
 
