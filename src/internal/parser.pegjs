@@ -297,17 +297,11 @@ smallContent
 // inline: italic
 
 italic
-	= italicTag
-	/ italicAlt
-
-italicTag
 	= "<i>" content:italicContent "</i>"
 {
 	return ITALIC(mergeText(content));
 }
-
-italicContent
-	= &{ return enterNest(); } @(@(!"</i>" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+	/ italicAlt
 
 italicAlt
 	= "*" content:$(!"*" ([a-z0-9]i / _))+ "*" &(EOF / LF / _ / ![a-z0-9]i)
@@ -320,6 +314,9 @@ italicAlt
 	const parsedContent = applyParser(content, 'inlineParser');
 	return ITALIC(parsedContent);
 }
+
+italicContent
+	= &{ return enterNest(); } @(@(!"</i>" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 // inline: strike
 
@@ -366,45 +363,36 @@ mention
 mentionName
 	= [a-z0-9_]i (&("-"+ [a-z0-9_]i) . / [a-z0-9_]i)*
 {
+	// NOTE: first char and last char are not "-".
 	return text();
 }
-// NOTE: first char and last char are not "-".
 
 mentionHost
 	= [a-z0-9_]i (&([.-]i+ [a-z0-9_]i) . / [a-z0-9_]i)*
 {
+	// NOTE: first char and last char are neither "." nor "-".
 	return text();
 }
-// NOTE: first char and last char are neither "." nor "-".
 
 // inline: hashtag
 
 hashtag
-	= "#" !("\uFE0F"? "\u20E3") content:hashtagContent
+	= "#" !("\uFE0F"? "\u20E3") !(invalidHashtagContent !hashtagContentPart) content:$hashtagContentPart+
 {
 	return HASHTAG(content);
 }
-
-hashtagContent
-	= !(invalidHashtagContent !hashtagContentPart) hashtagContentPart+ { return text(); }
 
 invalidHashtagContent
 	= [0-9]+
 
 hashtagContentPart
-	= hashtagBracketPair
-	/ hashtagChar
-
-hashtagBracketPair
 	= "(" hashPairInner ")"
 	/ "[" hashPairInner "]"
 	/ "「" hashPairInner "」"
+	/ ![ 　\t.,!?'"#:\/\[\]【】()「」<>] CHAR
 
 hashPairInner
 	= &{ return enterNest(); } @(@hashtagContentPart* &{ return leaveNest(); } / &{ return fallbackNest(); })
-
-hashtagChar
-	= ![ 　\t.,!?'"#:\/\[\]【】()「」<>] CHAR
 
 // inline: URL
 
@@ -462,7 +450,7 @@ fn
 }
 
 fnContent
-	= &{ return enterNest(); } @(@(!("]") @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+	= &{ return enterNest(); } @(@(!"]" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 fnArgs
 	= "." head:fnArg tails:("," @fnArg)*
