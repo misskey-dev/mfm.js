@@ -396,9 +396,12 @@ hashtagContentPart
 	/ hashtagChar
 
 hashtagBracketPair
-	= "(" hashtagContentPart* ")"
-	/ "[" hashtagContentPart* "]"
-	/ "「" hashtagContentPart* "」"
+	= "(" hashPairInner ")"
+	/ "[" hashPairInner "]"
+	/ "「" hashPairInner "」"
+
+hashPairInner
+	= &{ return enterNest(); } @(@hashtagContentPart* &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 hashtagChar
 	= ![ 　\t.,!?'"#:\/\[\]【】()「」<>] CHAR
