@@ -409,35 +409,23 @@ hashtagChar
 // inline: URL
 
 url
-	= "<" url:altUrlFormat ">"
+	= "<" url:$("http" "s"? "://" (!(">" / _) CHAR)+) ">"
 {
 	return N_URL(url, true);
 }
-	/ url:urlFormat
+	/ "http" "s"? "://" (&([.,]+ urlContentPart) . / urlContentPart)+
 {
-	return N_URL(url);
-}
-
-urlFormat
-	= "http" "s"? "://" urlContentPart+
-{
-	return text();
+	// NOTE: last char is neither "." nor ",".
+	return N_URL(text());
 }
 
 urlContentPart
-	= urlBracketPair
-	/ [.,] &urlContentPart // last char is neither "." nor ",".
+	= "(" urlPairInner ")"
+	/ "[" urlPairInner "]"
 	/ [a-z0-9_/:%#@$&?!~=+-]i
 
-urlBracketPair
-	= "(" urlContentPart* ")"
-	/ "[" urlContentPart* "]"
-
-altUrlFormat
-	= "http" "s"? "://" (!(">" / _) CHAR)+
-{
-	return text();
-}
+urlPairInner
+	= &{ return enterNest(); } @(@(urlContentPart / [.,])* &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 // inline: link
 
