@@ -984,18 +984,6 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
-		it('do not yield link node even if label is recognisable as a link', () => {
-			const input = 'official instance: [[https://misskey.io/@ai](https://misskey.io/@ai)](https://misskey.io/@ai).';
-			const output = [
-				TEXT('official instance: '),
-				LINK(false, 'https://misskey.io/@ai', [
-					TEXT('[https://misskey.io/@ai](https://misskey.io/@ai)')
-				]),
-				TEXT('.')
-			];
-			assert.deepStrictEqual(mfm.parse(input), output);
-		});
-
 		it('do not yield mention', () => {
 			const input = '[@example](https://example.com)';
 			const output = [

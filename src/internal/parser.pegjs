@@ -424,7 +424,7 @@ link
 }
 
 linkLabel
-	= (!"]" linkLabelPart)+
+	= $(!"]" linkLabelPart)+
 
 linkLabelPart
 	= emojiCode
