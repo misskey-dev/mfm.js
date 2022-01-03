@@ -67,7 +67,7 @@
 
 	// nesting control
 
-	const nestLimit = options.nestLimit || 10;
+	const nestLimit = options.nestLimit || 20;
 	let depth = 0;
 	function enterNest() {
 		if (depth + 1 > nestLimit) {
