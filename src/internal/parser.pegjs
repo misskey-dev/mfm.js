@@ -396,9 +396,9 @@ hashtagContentPart
 	/ hashtagChar
 
 hashtagBracketPair
-	= "(" hashtagContent* ")"
-	/ "[" hashtagContent* "]"
-	/ "「" hashtagContent* "」"
+	= "(" hashtagContentPart* ")"
+	/ "[" hashtagContentPart* "]"
+	/ "「" hashtagContentPart* "」"
 
 hashtagChar
 	= ![ 　\t.,!?'"#:\/\[\]【】()「」<>] CHAR
