@@ -32,7 +32,11 @@
 
 	function applyParser(input, startRule, opts) {
 		const parseFunc = peg$parse;
-		const parseOpts = { ...(opts || {}) };
+		const parseOpts = {
+			fnNameList: options.fnNameList,
+			nestLimit: (nestLimit - depth),
+			...(opts || {}),
+		};
 		if (startRule) parseOpts.startRule = startRule;
 		return parseFunc(input, parseOpts);
 	}
