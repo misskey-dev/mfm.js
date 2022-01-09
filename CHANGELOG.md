@@ -16,8 +16,12 @@
 ### Features
 - Supports nestLimit option. (#87)
 
+### Improvements
+- improve generation of brackets property of url node.
+
 ### Bugfixes
 - Fix the Link node of the enclosed in `<>`. (#84)
+- Fix parsing of the link label.
 
 ## 0.20.0
 
