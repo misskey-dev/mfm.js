@@ -13,6 +13,9 @@
 
 ## 0.x.x (unreleased)
 
+### Features
+- Supports nestLimit option. (#87)
+
 ### Bugfixes
 - Fix the Link node of the enclosed in `<>`. (#84)
 
