@@ -12,7 +12,7 @@ export function parse(input: string, opts: Partial<{ fnNameList: string[]; nestL
 	const nodes = parser.parse(input, {
 		startRule: 'fullParser',
 		fnNameList: opts.fnNameList,
-		nestLimit: opts.nestLimit
+		nestLimit: opts.nestLimit,
 	});
 	return nodes;
 }

@@ -14,7 +14,7 @@ export type MfmQuote = {
 	props?: Record<string, unknown>;
 	children: MfmNode[];
 };
-export const QUOTE = (children: MfmNode[]): NodeType<'quote'> => { return { type:'quote', children }; };
+export const QUOTE = (children: MfmNode[]): NodeType<'quote'> => { return { type: 'quote', children }; };
 
 export type MfmSearch = {
 	type: 'search';
@@ -24,7 +24,7 @@ export type MfmSearch = {
 	};
 	children?: [];
 };
-export const SEARCH = (query: string, content: string): NodeType<'search'> => { return { type:'search', props: { query, content } }; };
+export const SEARCH = (query: string, content: string): NodeType<'search'> => { return { type: 'search', props: { query, content } }; };
 
 export type MfmCodeBlock = {
 	type: 'blockCode';
@@ -34,7 +34,7 @@ export type MfmCodeBlock = {
 	};
 	children?: [];
 };
-export const CODE_BLOCK = (code: string, lang: string | null): NodeType<'blockCode'> => { return { type:'blockCode', props: { code, lang } }; };
+export const CODE_BLOCK = (code: string, lang: string | null): NodeType<'blockCode'> => { return { type: 'blockCode', props: { code, lang } }; };
 
 export type MfmMathBlock = {
 	type: 'mathBlock';
@@ -43,14 +43,14 @@ export type MfmMathBlock = {
 	};
 	children?: [];
 };
-export const MATH_BLOCK = (formula: string): NodeType<'mathBlock'> => { return { type:'mathBlock', props: { formula } }; };
+export const MATH_BLOCK = (formula: string): NodeType<'mathBlock'> => { return { type: 'mathBlock', props: { formula } }; };
 
 export type MfmCenter = {
 	type: 'center';
 	props?: Record<string, unknown>;
 	children: MfmInline[];
 };
-export const CENTER = (children: MfmInline[]): NodeType<'center'> => { return { type:'center', children }; };
+export const CENTER = (children: MfmInline[]): NodeType<'center'> => { return { type: 'center', children }; };
 
 export type MfmInline = MfmUnicodeEmoji | MfmEmojiCode | MfmBold | MfmSmall | MfmItalic | MfmStrike |
 	MfmInlineCode | MfmMathInline | MfmMention | MfmHashtag | MfmUrl | MfmLink | MfmFn | MfmText;
@@ -62,7 +62,7 @@ export type MfmUnicodeEmoji = {
 	};
 	children?: [];
 };
-export const UNI_EMOJI = (value: string): NodeType<'unicodeEmoji'> => { return { type:'unicodeEmoji', props: { emoji: value } }; };
+export const UNI_EMOJI = (value: string): NodeType<'unicodeEmoji'> => { return { type: 'unicodeEmoji', props: { emoji: value } }; };
 
 export type MfmEmojiCode = {
 	type: 'emojiCode';
@@ -71,35 +71,35 @@ export type MfmEmojiCode = {
 	};
 	children?: [];
 };
-export const EMOJI_CODE = (name: string): NodeType<'emojiCode'> => { return { type:'emojiCode', props: { name: name } }; };
+export const EMOJI_CODE = (name: string): NodeType<'emojiCode'> => { return { type: 'emojiCode', props: { name: name } }; };
 
 export type MfmBold = {
 	type: 'bold';
 	props?: Record<string, unknown>;
 	children: MfmInline[];
 };
-export const BOLD = (children: MfmInline[]): NodeType<'bold'> => { return { type:'bold', children }; };
+export const BOLD = (children: MfmInline[]): NodeType<'bold'> => { return { type: 'bold', children }; };
 
 export type MfmSmall = {
 	type: 'small';
 	props?: Record<string, unknown>;
 	children: MfmInline[];
 };
-export const SMALL = (children: MfmInline[]): NodeType<'small'> => { return { type:'small', children }; };
+export const SMALL = (children: MfmInline[]): NodeType<'small'> => { return { type: 'small', children }; };
 
 export type MfmItalic = {
 	type: 'italic';
 	props?: Record<string, unknown>;
 	children: MfmInline[];
 };
-export const ITALIC = (children: MfmInline[]): NodeType<'italic'> => { return { type:'italic', children }; };
+export const ITALIC = (children: MfmInline[]): NodeType<'italic'> => { return { type: 'italic', children }; };
 
 export type MfmStrike = {
 	type: 'strike';
 	props?: Record<string, unknown>;
 	children: MfmInline[];
 };
-export const STRIKE = (children: MfmInline[]): NodeType<'strike'> => { return { type:'strike', children }; };
+export const STRIKE = (children: MfmInline[]): NodeType<'strike'> => { return { type: 'strike', children }; };
 
 export type MfmInlineCode = {
 	type: 'inlineCode';
@@ -108,7 +108,7 @@ export type MfmInlineCode = {
 	};
 	children?: [];
 };
-export const INLINE_CODE = (code: string): NodeType<'inlineCode'> => { return { type:'inlineCode', props: { code } }; };
+export const INLINE_CODE = (code: string): NodeType<'inlineCode'> => { return { type: 'inlineCode', props: { code } }; };
 
 export type MfmMathInline = {
 	type: 'mathInline';
@@ -117,7 +117,7 @@ export type MfmMathInline = {
 	};
 	children?: [];
 };
-export const MATH_INLINE = (formula: string): NodeType<'mathInline'> => { return { type:'mathInline', props: { formula } }; };
+export const MATH_INLINE = (formula: string): NodeType<'mathInline'> => { return { type: 'mathInline', props: { formula } }; };
 
 export type MfmMention = {
 	type: 'mention';
@@ -128,7 +128,7 @@ export type MfmMention = {
 	};
 	children?: [];
 };
-export const MENTION = (username: string, host: string | null, acct: string): NodeType<'mention'> => { return { type:'mention', props: { username, host, acct } }; };
+export const MENTION = (username: string, host: string | null, acct: string): NodeType<'mention'> => { return { type: 'mention', props: { username, host, acct } }; };
 
 export type MfmHashtag = {
 	type: 'hashtag';
@@ -137,7 +137,7 @@ export type MfmHashtag = {
 	};
 	children?: [];
 };
-export const HASHTAG = (value: string): NodeType<'hashtag'> => { return { type:'hashtag', props: { hashtag: value } }; };
+export const HASHTAG = (value: string): NodeType<'hashtag'> => { return { type: 'hashtag', props: { hashtag: value } }; };
 
 export type MfmUrl = {
 	type: 'url';
@@ -148,7 +148,7 @@ export type MfmUrl = {
 	children?: [];
 };
 export const N_URL = (value: string, brackets?: boolean): NodeType<'url'> => {
-	const node: MfmUrl = { type:'url', props: { url: value } };
+	const node: MfmUrl = { type: 'url', props: { url: value } };
 	if (brackets) node.props.brackets = brackets;
 	return node;
 };
@@ -161,7 +161,7 @@ export type MfmLink = {
 	};
 	children: MfmInline[];
 };
-export const LINK = (silent: boolean, url: string, children: MfmInline[]): NodeType<'link'> => { return { type:'link', props: { silent, url }, children }; };
+export const LINK = (silent: boolean, url: string, children: MfmInline[]): NodeType<'link'> => { return { type: 'link', props: { silent, url }, children }; };
 
 export type MfmFn = {
 	type: 'fn';
@@ -171,7 +171,7 @@ export type MfmFn = {
 	};
 	children: MfmInline[];
 };
-export const FN = (name: string, args: MfmFn['props']['args'], children: MfmFn['children']): NodeType<'fn'> => { return { type:'fn', props: { name, args }, children }; };
+export const FN = (name: string, args: MfmFn['props']['args'], children: MfmFn['children']): NodeType<'fn'> => { return { type: 'fn', props: { name, args }, children }; };
 
 export type MfmText = {
 	type: 'text';
@@ -180,7 +180,7 @@ export type MfmText = {
 	};
 	children?: [];
 };
-export const TEXT = (value: string): NodeType<'text'> => { return { type:'text', props: { text: value } }; };
+export const TEXT = (value: string): NodeType<'text'> => { return { type: 'text', props: { text: value } }; };
 
 export type NodeType<T extends MfmNode['type']> =
 	T extends 'quote' ? MfmQuote :
