@@ -32,16 +32,8 @@
 
 	function applyParser(input, startRule) {
 		let parseFunc = peg$parse;
-		return parseFunc(input, {
-			startRule: startRule,
-			fnNameList: options.fnNameList,
-			nestLimit: (nestLimit - depth),
-		});
+		return parseFunc(input, startRule ? { startRule } : { });
 	}
-
-	// link
-
-	let isLinkLabel = false;
 
 	// emoji
 
@@ -363,7 +355,7 @@ mathInline
 // inline: mention
 
 mention
-	= &{ return !isLinkLabel; } "@" name:mentionName host:("@" @mentionHost)?
+	= "@" name:mentionName host:("@" @mentionHost)?
 {
 	return MENTION(name, host, text());
 }
@@ -405,11 +397,11 @@ hashPairInner
 // inline: URL
 
 url
-	= &{ return !isLinkLabel; } "<" url:$("http" "s"? "://" (!(">" / _) CHAR)+) ">"
+	= "<" url:$("http" "s"? "://" (!(">" / _) CHAR)+) ">"
 {
 	return N_URL(url, true);
 }
-	/ &{ return !isLinkLabel; } "http" "s"? "://" (&([.,]+ urlContentPart) . / urlContentPart)+
+	/ "http" "s"? "://" (&([.,]+ urlContentPart) . / urlContentPart)+
 {
 	// NOTE: last char is neither "." nor ",".
 	return N_URL(text());
@@ -426,13 +418,13 @@ urlPairInner
 // inline: link
 
 link
-	= &{ return !isLinkLabel; } silent:"?"? "[" label:linkLabel "](" url:url ")"
+	= silent:"?"? "[" label:linkLabel "](" url:url ")"
 {
 	return LINK((silent != null), url.props.url, mergeText(label));
 }
 
 linkLabel
-	= &{ isLinkLabel = true; return true; } @(@(!"]" @linkLabelPart)+ &{ isLinkLabel = false; return true; } / &{ isLinkLabel = false; return false; })
+	= (!"]" @linkLabelPart)+
 
 linkLabelPart
 	= emojiCode
