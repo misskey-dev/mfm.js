@@ -972,40 +972,84 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
-		it('do not yield url node even if label is recognisable as a url', () => {
-			const input = 'official instance: [https://misskey.io/@ai](https://misskey.io/@ai).';
-			const output = [
-				TEXT('official instance: '),
-				LINK(false, 'https://misskey.io/@ai', [
-					TEXT('https://misskey.io/@ai')
-				]),
-				TEXT('.')
-			];
-			assert.deepStrictEqual(mfm.parse(input), output);
+		describe('cannot nest a url in a link label', () => {
+			it('basic', () => {
+				const input = 'official instance: [https://misskey.io/@ai](https://misskey.io/@ai).';
+				const output = [
+					TEXT('official instance: '),
+					LINK(false, 'https://misskey.io/@ai', [
+						TEXT('https://misskey.io/@ai'),
+					]),
+					TEXT('.'),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
+			it('nested', () => {
+				const input = 'official instance: [https://misskey.io/@ai**https://misskey.io/@ai**](https://misskey.io/@ai).';
+				const output = [
+					TEXT('official instance: '),
+					LINK(false, 'https://misskey.io/@ai', [
+						TEXT('https://misskey.io/@ai'),
+						BOLD([
+							TEXT('https://misskey.io/@ai'),
+						]),
+					]),
+					TEXT('.'),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
 		});
 
-		it('cannot nest a link in a link label', () => {
-			const input = 'official instance: [[https://misskey.io/@ai](https://misskey.io/@ai)](https://misskey.io/@ai).';
-			const output = [
-				TEXT('official instance: '),
-				LINK(false, 'https://misskey.io/@ai', [
-					TEXT('[https://misskey.io/@ai')
-				]),
-				TEXT(']('),
-				N_URL('https://misskey.io/@ai'),
-				TEXT(').'),
-			];
-			assert.deepStrictEqual(mfm.parse(input), output);
+		describe('cannot nest a link in a link label', () => {
+			it('basic', () => {
+				const input = 'official instance: [[https://misskey.io/@ai](https://misskey.io/@ai)](https://misskey.io/@ai).';
+				const output = [
+					TEXT('official instance: '),
+					LINK(false, 'https://misskey.io/@ai', [
+						TEXT('[https://misskey.io/@ai'),
+					]),
+					TEXT(']('),
+					N_URL('https://misskey.io/@ai'),
+					TEXT(').'),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
+			it('nested', () => {
+				const input = 'official instance: [**[https://misskey.io/@ai](https://misskey.io/@ai)**](https://misskey.io/@ai).';
+				const output = [
+					TEXT('official instance: '),
+					LINK(false, 'https://misskey.io/@ai', [
+						BOLD([
+							TEXT('[https://misskey.io/@ai](https://misskey.io/@ai)'),
+						]),
+					]),
+					TEXT('.'),
+				];
+			});
 		});
 
-		it('do not yield mention', () => {
-			const input = '[@example](https://example.com)';
-			const output = [
-				LINK(false, 'https://example.com', [
-					TEXT('@example')
-				]),
-			];
-			assert.deepStrictEqual(mfm.parse(input), output);
+		describe('cannot nest a mention in a link label', () => {
+			it('basic', () => {
+				const input = '[@example](https://example.com)';
+				const output = [
+					LINK(false, 'https://example.com', [
+						TEXT('@example'),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
+			it('nested', () => {
+				const input = '[@example**@example**](https://example.com)';
+				const output = [
+					LINK(false, 'https://example.com', [
+						TEXT('@example'),
+						BOLD([
+							TEXT('@example'),
+						]),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
 		});
 
 		it('with brackets', () => {
