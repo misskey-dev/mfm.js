@@ -30,10 +30,16 @@
 		consumeDynamically
 	} = require('./util');
 
-	function applyParser(input, startRule) {
-		let parseFunc = peg$parse;
-		return parseFunc(input, startRule ? { startRule } : { });
+	function applyParser(input, startRule, opts) {
+		const parseFunc = peg$parse;
+		const parseOpts = { ...(opts || {}) };
+		if (startRule) parseOpts.startRule = startRule;
+		return parseFunc(input, parseOpts);
 	}
+
+	// link
+
+	const linkLabel = options.linkLabel || false;
 
 	// emoji
 
@@ -355,7 +361,7 @@ mathInline
 // inline: mention
 
 mention
-	= "@" name:mentionName host:("@" @mentionHost)?
+	= &{ return !linkLabel; } "@" name:mentionName host:("@" @mentionHost)?
 {
 	return MENTION(name, host, text());
 }
@@ -397,11 +403,11 @@ hashPairInner
 // inline: URL
 
 url
-	= "<" url:$("http" "s"? "://" (!(">" / _) CHAR)+) ">"
+	= &{ return !linkLabel; } "<" url:$("http" "s"? "://" (!(">" / _) CHAR)+) ">"
 {
 	return N_URL(url, true);
 }
-	/ "http" "s"? "://" (&([.,]+ urlContentPart) . / urlContentPart)+
+	/ &{ return !linkLabel; } "http" "s"? "://" (&([.,]+ urlContentPart) . / urlContentPart)+
 {
 	// NOTE: last char is neither "." nor ",".
 	return N_URL(text());
@@ -418,27 +424,19 @@ urlPairInner
 // inline: link
 
 link
-	= silent:"?"? "[" label:linkLabel "](" url:url ")"
+	= &{ return !linkLabel; } silent:"?"? "[" label:linkLabel "](" url:url ")"
 {
 	return LINK((silent != null), url.props.url, mergeText(label));
 }
 
 linkLabel
-	= (!"]" @linkLabelPart)+
-
-linkLabelPart
-	= emojiCode
-	/ unicodeEmoji
-	/ big
-	/ bold
-	/ small
-	/ italic
-	/ strike
-	/ inlineCode
-	/ mathInline
-	/ hashtag
-	/ fn
-	/ inlineText
+	= (!"](" CHAR)+
+{
+	const label = applyParser(text(), 'inlineParser', {
+		linkLabel: true
+	});
+	return label;
+}
 
 // inline: fn
 
