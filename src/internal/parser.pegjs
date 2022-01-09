@@ -77,7 +77,7 @@
 
 	// nesting control
 
-	const nestLimit = options.nestLimit || 20;
+	const nestLimit = (options.nestLimit != null ? options.nestLimit : 20);
 	let depth = 0;
 	function enterNest() {
 		if (depth + 1 > nestLimit) {
@@ -166,17 +166,21 @@ plain
 // block: quote
 
 quote
-	= &(BEGIN ">") @quoteInner LF?
+	= &(BEGIN ">") &{ return (depth + 1 <= nestLimit); } @quoteInner LF?
 
 quoteInner
 	= head:(quoteLine / quoteEmptyLine) tails:(quoteLine / quoteEmptyLine)+
 {
+	depth++;
 	const children = applyParser([head, ...tails].join('\n'), 'fullParser');
+	depth--;
 	return QUOTE(children);
 }
 	/ line:quoteLine
 {
+	depth++;
 	const children = applyParser(line, 'fullParser');
+	depth--;
 	return QUOTE(children);
 }
 
