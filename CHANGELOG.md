@@ -17,7 +17,7 @@
 - Supports nestLimit option. (#87)
 
 ### Improvements
-- improve generation of brackets property of url node.
+- Improve generation of brackets property of url node.
 
 ### Bugfixes
 - Fix the Link node of the enclosed in `<>`. (#84)
