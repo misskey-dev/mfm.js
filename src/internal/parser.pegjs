@@ -166,7 +166,7 @@ plain
 // block: quote
 
 quote
-	= &(BEGIN ">") q:quoteInner LF? { return q; }
+	= &(BEGIN ">") @quoteInner LF?
 
 quoteInner
 	= head:(quoteLine / quoteEmptyLine) tails:(quoteLine / quoteEmptyLine)+
@@ -181,10 +181,13 @@ quoteInner
 }
 
 quoteLine
-	= BEGIN ">" _? text:$CHAR+ END { return text; }
+	= BEGIN ">" _? @$CHAR+ END
 
 quoteEmptyLine
-	= BEGIN ">" _? END { return ''; }
+	= BEGIN ">" _? END
+{
+	return '';
+}
 
 // block: search
 
