@@ -1128,6 +1128,36 @@ hoge`;
 	});
 
 	describe('nesting limit', () => {
+		describe('quote', () => {
+			it('basic', () => {
+				const input = '>>> abc';
+				const output = [
+					QUOTE([
+						QUOTE([
+							TEXT('> abc'),
+						]),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+			});
+
+			it('basic 2', () => {
+				const input = '>> **abc**';
+				const output = [
+					QUOTE([
+						QUOTE([
+							TEXT('*'),
+							ITALIC([
+								TEXT('abc'),
+							]),
+							TEXT('*'),
+						]),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+			});
+		});
+
 		it('big', () => {
 			const input = '<b><b>***abc***</b></b>';
 			const output = [
