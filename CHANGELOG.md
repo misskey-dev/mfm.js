@@ -14,7 +14,7 @@
 ## 0.x.x (unreleased)
 
 ### Features
-- Supports nestLimit option. (#87)
+- Supports nestLimit option. (#87, #91)
 
 ### Improvements
 - Improve generation of brackets property of url node.
