@@ -11,7 +11,9 @@
 
 -->
 
-## 0.21.0 (unreleased)
+## 0.21.0
+
+npm: https://www.npmjs.com/package/mfm-js/v/0.21.0
 
 ### Features
 - Supports nestLimit option. (#87, #91)
