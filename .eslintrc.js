@@ -1,6 +1,10 @@
 module.exports = {
 	root: true,
 	parser: '@typescript-eslint/parser',
+	parserOptions: {
+		tsconfigRootDir: __dirname,
+		project: ['./tsconfig.json'],
+	},
 	plugins: [
 		'@typescript-eslint',
 	],
@@ -11,15 +15,28 @@ module.exports = {
 	rules: {
 		'indent': ['error', 'tab', {
 			'SwitchCase': 1,
+			'MemberExpression': 'off',
 			'flatTernaryExpressions': true,
+			'ArrayExpression': 'first',
+			'ObjectExpression': 'first',
 		}],
 		'eol-last': ['error', 'always'],
 		'semi': ['error', 'always'],
 		'quotes': ['error', 'single'],
+		'comma-dangle': ['error', 'always-multiline'],
 		'keyword-spacing': ['error', {
 			'before': true,
 			'after': true,
 		}],
+		'key-spacing': ['error', {
+			'beforeColon': false,
+			'afterColon': true,
+		}],
+		'space-infix-ops': ['error'],
+		'space-before-blocks': ['error', 'always'],
+		'object-curly-spacing': ['error', 'always'],
+		'nonblock-statement-body-position': ['error', 'beside'],
+		'no-multiple-empty-lines': ['error', { 'max': 1 }],
 		'no-multi-spaces': ['error'],
 		'no-var': ['error'],
 		'prefer-arrow-callback': ['error'],
@@ -27,6 +44,12 @@ module.exports = {
 		'no-param-reassign': ['warn'],
 		'no-constant-condition': ['warn'],
 		'no-empty-pattern': ['warn'],
+		'@typescript-eslint/no-unnecessary-condition': ['error'],
 		'@typescript-eslint/no-inferrable-types': ['warn'],
+		'@typescript-eslint/no-non-null-assertion': ['warn'],
+		'@typescript-eslint/explicit-function-return-type': ['warn'],
+		'@typescript-eslint/no-misused-promises': ['error', {
+			'checksVoidReturn': false,
+		}],
 	},
 };

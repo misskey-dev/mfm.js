@@ -6,7 +6,7 @@
 ```ts
 const nodes = mfm.parse('hello $[tada world]');
 console.log(JSON.stringify(nodes));
-// => "[{"type":"text","props":{"text":"hello "}},{"type":"fn","props":{"name":"tada","args":{}},"children":[{"type":"text","props":{"text":"world"}}]}]"
+// => [{"type":"text","props":{"text":"hello "}},{"type":"fn","props":{"name":"tada","args":{}},"children":[{"type":"text","props":{"text":"world"}}]}]
 ```
 
 ### 利用可能なMFM関数のリストを設定する
@@ -17,13 +17,23 @@ MFM関数の名前をホワイトリストに登録して、登録されたMFM�
 ```ts
 const nodes = mfm.parse('hello $[tada world]', { fnNameList: ['tada', 'spin'] });
 console.log(JSON.stringify(nodes));
-// => "[{"type":"text","props":{"text":"hello "}},{"type":"fn","props":{"name":"tada","args":{}},"children":[{"type":"text","props":{"text":"world"}}]}]"
+// => [{"type":"text","props":{"text":"hello "}},{"type":"fn","props":{"name":"tada","args":{}},"children":[{"type":"text","props":{"text":"world"}}]}]
 ```
 
 ```ts
 const nodes = mfm.parse('hello $[pope world]', { fnNameList: ['tada', 'spin'] });
 console.log(JSON.stringify(nodes));
-// => "[{"type":"text","props":{"text":"hello $[pope world]"}}]"
+// => [{"type":"text","props":{"text":"hello $[pope world]"}}]
+```
+
+### 最大のネストの深さを変更する
+デフォルトで20に設定されています。  
+
+例:  
+```ts
+const nodes = mfm.parse('**<s>cannot nest</s>**', { nestLimit: 1 });
+console.log(JSON.stringify(nodes));
+// => [{"type":"bold","children":[{"type":"text","props":{"text":"<s>cannot nest</s>"}}]}]
 ```
 
 ## parsePlain API
@@ -34,7 +44,7 @@ console.log(JSON.stringify(nodes));
 ```ts
 const nodes = mfm.parsePlain('Hello :surprised_ai:');
 console.log(JSON.stringify(nodes));
-// => "[{"type":"text","props":{"text":"Hello "}},{"type":"emojiCode","props":{"name":"surprised_ai"}}]"
+// => [{"type":"text","props":{"text":"Hello "}},{"type":"emojiCode","props":{"name":"surprised_ai"}}]
 ```
 
 ## toString API
@@ -44,7 +54,7 @@ console.log(JSON.stringify(nodes));
 ```ts
 const nodes = mfm.parse('hello $[tada world]');
 const output = mfm.toString(nodes);
-console.log(output); // => "hello [tada world]"
+console.log(output); // => "hello $[tada world]"
 ```
 ※元の文字列とtoString APIで出力される文字列の同一性は保障されません。
 

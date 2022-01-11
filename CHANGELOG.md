@@ -11,12 +11,24 @@
 
 -->
 
+## 0.x.x (unreleased)
+
+### Features
+- Supports nestLimit option. (#87, #91)
+
+### Improvements
+- Improve generation of brackets property of url node.
+
+### Bugfixes
+- Fix the Link node of the enclosed in `<>`. (#84)
+- Fix parsing of the link label.
+
 ## 0.20.0
 
 npm: https://www.npmjs.com/package/mfm-js/v/0.20.0
 
 ### Features
-- Add tag syntaxes of bold and strikethrough. (#76)
+- Add tag syntaxes of bold `<b></b>` and strikethrough `<s></s>`. (#76)
 - Supports whitelisting of MFM function names. (#77)
 
 ### Improvements

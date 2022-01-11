@@ -961,38 +961,95 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
-		it('do not yield url node even if label is recognisable as a url', () => {
-			const input = 'official instance: [https://misskey.io/@ai](https://misskey.io/@ai).';
+		it('with angle brackets url', () => {
+			const input = '[official instance](<https://misskey.io/@ai>).';
 			const output = [
-				TEXT('official instance: '),
 				LINK(false, 'https://misskey.io/@ai', [
-					TEXT('https://misskey.io/@ai')
+					TEXT('official instance')
 				]),
 				TEXT('.')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
-		it('do not yield link node even if label is recognisable as a link', () => {
-			const input = 'official instance: [[https://misskey.io/@ai](https://misskey.io/@ai)](https://misskey.io/@ai).';
-			const output = [
-				TEXT('official instance: '),
-				LINK(false, 'https://misskey.io/@ai', [
-					TEXT('[https://misskey.io/@ai](https://misskey.io/@ai)')
-				]),
-				TEXT('.')
-			];
-			assert.deepStrictEqual(mfm.parse(input), output);
+		describe('cannot nest a url in a link label', () => {
+			it('basic', () => {
+				const input = 'official instance: [https://misskey.io/@ai](https://misskey.io/@ai).';
+				const output = [
+					TEXT('official instance: '),
+					LINK(false, 'https://misskey.io/@ai', [
+						TEXT('https://misskey.io/@ai'),
+					]),
+					TEXT('.'),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
+			it('nested', () => {
+				const input = 'official instance: [https://misskey.io/@ai**https://misskey.io/@ai**](https://misskey.io/@ai).';
+				const output = [
+					TEXT('official instance: '),
+					LINK(false, 'https://misskey.io/@ai', [
+						TEXT('https://misskey.io/@ai'),
+						BOLD([
+							TEXT('https://misskey.io/@ai'),
+						]),
+					]),
+					TEXT('.'),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
 		});
 
-		it('do not yield mention', () => {
-			const input = '[@example](https://example.com)';
-			const output = [
-				LINK(false, 'https://example.com', [
-					TEXT('@example')
-				]),
-			];
-			assert.deepStrictEqual(mfm.parse(input), output);
+		describe('cannot nest a link in a link label', () => {
+			it('basic', () => {
+				const input = 'official instance: [[https://misskey.io/@ai](https://misskey.io/@ai)](https://misskey.io/@ai).';
+				const output = [
+					TEXT('official instance: '),
+					LINK(false, 'https://misskey.io/@ai', [
+						TEXT('[https://misskey.io/@ai'),
+					]),
+					TEXT(']('),
+					N_URL('https://misskey.io/@ai'),
+					TEXT(').'),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
+			it('nested', () => {
+				const input = 'official instance: [**[https://misskey.io/@ai](https://misskey.io/@ai)**](https://misskey.io/@ai).';
+				const output = [
+					TEXT('official instance: '),
+					LINK(false, 'https://misskey.io/@ai', [
+						BOLD([
+							TEXT('[https://misskey.io/@ai](https://misskey.io/@ai)'),
+						]),
+					]),
+					TEXT('.'),
+				];
+			});
+		});
+
+		describe('cannot nest a mention in a link label', () => {
+			it('basic', () => {
+				const input = '[@example](https://example.com)';
+				const output = [
+					LINK(false, 'https://example.com', [
+						TEXT('@example'),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
+			it('nested', () => {
+				const input = '[@example**@example**](https://example.com)';
+				const output = [
+					LINK(false, 'https://example.com', [
+						TEXT('@example'),
+						BOLD([
+							TEXT('@example'),
+						]),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
 		});
 
 		it('with brackets', () => {
@@ -1067,6 +1124,172 @@ hoge`;
 				TEXT('$[pope.speed=1.1s text]')
 			];
 			assert.deepStrictEqual(mfm.parse(input, { fnNameList: ['tada', 'spin'] }), output);
+		});
+	});
+
+	describe('nesting limit', () => {
+		describe('quote', () => {
+			it('basic', () => {
+				const input = '>>> abc';
+				const output = [
+					QUOTE([
+						QUOTE([
+							TEXT('> abc'),
+						]),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+			});
+
+			it('basic 2', () => {
+				const input = '>> **abc**';
+				const output = [
+					QUOTE([
+						QUOTE([
+							TEXT('*'),
+							ITALIC([
+								TEXT('abc'),
+							]),
+							TEXT('*'),
+						]),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+			});
+		});
+
+		it('big', () => {
+			const input = '<b><b>***abc***</b></b>';
+			const output = [
+				BOLD([
+					BOLD([
+						TEXT('**'),
+						ITALIC([
+							TEXT('abc'),
+						]),
+						TEXT('**'),
+					]),
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+		});
+
+		describe('bold', () => {
+			it('basic', () => {
+				const input = '<i><i>**abc**</i></i>';
+				const output = [
+					ITALIC([
+						ITALIC([
+							TEXT('*'),
+							ITALIC([
+								TEXT('abc'),
+							]),
+							TEXT('*'),
+						]),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+			});
+
+			it('tag', () => {
+				const input = '<i><i><b>abc</b></i></i>';
+				const output = [
+					ITALIC([
+						ITALIC([
+							TEXT('<b>abc</b>'),
+						]),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+			});
+		});
+
+		it('small', () => {
+			const input = '<i><i><small>abc</small></i></i>';
+			const output = [
+				ITALIC([
+					ITALIC([
+						TEXT('<small>abc</small>'),
+					]),
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+		});
+
+		it('italic', () => {
+			const input = '<b><b><i>abc</i></b></b>';
+			const output = [
+				BOLD([
+					BOLD([
+						TEXT('<i>abc</i>'),
+					]),
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+		});
+
+		describe('strike', () => {
+			it('basic', () => {
+				const input = '<b><b>~~abc~~</b></b>';
+				const output = [
+					BOLD([
+						BOLD([
+							TEXT('~~abc~~'),
+						]),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+			});
+	
+			it('tag', () => {
+				const input = '<b><b><s>abc</s></b></b>';
+				const output = [
+					BOLD([
+						BOLD([
+							TEXT('<s>abc</s>'),
+						]),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+			});
+		});
+
+		it('hashtag', () => {
+			const input = '<b><b>#abc(xyz)</b></b>';
+			const output = [
+				BOLD([
+					BOLD([
+						HASHTAG('abc'),
+						TEXT('(xyz)'),
+					]),
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+		});
+
+		it('url', () => {
+			const input = '<b><b>https://example.com/abc(xyz)</b></b>';
+			const output = [
+				BOLD([
+					BOLD([
+						N_URL('https://example.com/abc'),
+						TEXT('(xyz)'),
+					]),
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+		});
+
+		it('fn', () => {
+			const input = '<b><b>$[a b]</b></b>';
+			const output = [
+				BOLD([
+					BOLD([
+						TEXT('$[a b]'),
+					]),
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
 		});
 	});
 

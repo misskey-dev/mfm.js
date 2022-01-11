@@ -30,10 +30,20 @@
 		consumeDynamically
 	} = require('./util');
 
-	function applyParser(input, startRule) {
-		let parseFunc = peg$parse;
-		return parseFunc(input, startRule ? { startRule } : { });
+	function applyParser(input, startRule, opts) {
+		const parseFunc = peg$parse;
+		const parseOpts = {
+			fnNameList: options.fnNameList,
+			nestLimit: (nestLimit - depth),
+			...(opts || {}),
+		};
+		if (startRule) parseOpts.startRule = startRule;
+		return parseFunc(input, parseOpts);
 	}
+
+	// link
+
+	const linkLabel = options.linkLabel || false;
 
 	// emoji
 
@@ -63,6 +73,28 @@
 			error("options.fnNameList must be an array.");
 		}
 		return options.fnNameList.includes(name);
+	}
+
+	// nesting control
+
+	const nestLimit = (options.nestLimit != null ? options.nestLimit : 20);
+	let depth = 0;
+	function enterNest() {
+		if (depth + 1 > nestLimit) {
+			return false;
+		}
+		depth++;
+		return true;
+	}
+
+	function leaveNest() {
+		depth--;
+		return true;
+	}
+
+	function fallbackNest() {
+		depth--;
+		return false;
 	}
 }
 
@@ -134,25 +166,32 @@ plain
 // block: quote
 
 quote
-	= &(BEGIN ">") q:quoteInner LF? { return q; }
+	= &(BEGIN ">") &{ return (depth + 1 <= nestLimit); } @quoteInner LF?
 
 quoteInner
 	= head:(quoteLine / quoteEmptyLine) tails:(quoteLine / quoteEmptyLine)+
 {
+	depth++;
 	const children = applyParser([head, ...tails].join('\n'), 'fullParser');
+	depth--;
 	return QUOTE(children);
 }
 	/ line:quoteLine
 {
+	depth++;
 	const children = applyParser(line, 'fullParser');
+	depth--;
 	return QUOTE(children);
 }
 
 quoteLine
-	= BEGIN ">" _? text:$CHAR+ END { return text; }
+	= BEGIN ">" _? @$CHAR+ END
 
 quoteEmptyLine
-	= BEGIN ">" _? END { return ''; }
+	= BEGIN ">" _? END
+{
+	return '';
+}
 
 // block: search
 
@@ -230,19 +269,22 @@ unicodeEmoji
 // inline: big
 
 big
-	= "***" content:(!"***" @inline)+ "***"
+	= "***" content:bigContent "***"
 {
 	return FN('tada', { }, mergeText(content));
 }
 
+bigContent
+	= &{ return enterNest(); } @(@(!"***" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
 // inline: bold
 
 bold
-	= "**" content:(!"**" @inline)+ "**"
+	= "**" content:boldContent "**"
 {
 	return BOLD(mergeText(content));
 }
-	/ "<b>" content:(!"</b>" @inline)+ "</b>"
+	/ "<b>" content:boldTagContent "</b>"
 {
 	return BOLD(mergeText(content));
 }
@@ -252,25 +294,31 @@ bold
 	return BOLD(parsedContent);
 }
 
+boldContent
+	= &{ return enterNest(); } @(@(!"**" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
+boldTagContent
+	= &{ return enterNest(); } @(@(!"</b>" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
 // inline: small
 
 small
-	= "<small>" content:(!"</small>" @inline)+ "</small>"
+	= "<small>" content:smallContent "</small>"
 {
 	return SMALL(mergeText(content));
 }
 
+smallContent
+	= &{ return enterNest(); } @(@(!"</small>" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
 // inline: italic
 
 italic
-	= italicTag
-	/ italicAlt
-
-italicTag
-	= "<i>" content:(!"</i>" @inline)+ "</i>"
+	= "<i>" content:italicContent "</i>"
 {
 	return ITALIC(mergeText(content));
 }
+	/ italicAlt
 
 italicAlt
 	= "*" content:$(!"*" ([a-z0-9]i / _))+ "*" &(EOF / LF / _ / ![a-z0-9]i)
@@ -284,17 +332,26 @@ italicAlt
 	return ITALIC(parsedContent);
 }
 
+italicContent
+	= &{ return enterNest(); } @(@(!"</i>" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
 // inline: strike
 
 strike
-	= "~~" content:(!("~" / LF) @inline)+ "~~"
+	= "~~" content:strikeContent "~~"
 {
 	return STRIKE(mergeText(content));
 }
-	/ "<s>" content:(!("</s>" / LF) @inline)+ "</s>"
+	/ "<s>" content:strikeTagContent "</s>"
 {
 	return STRIKE(mergeText(content));
 }
+
+strikeContent
+	= &{ return enterNest(); } @(@(!("~" / LF) @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
+strikeTagContent
+	= &{ return enterNest(); } @(@(!("</s>" / LF) @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 // inline: inlineCode
 
@@ -315,118 +372,94 @@ mathInline
 // inline: mention
 
 mention
-	= "@" name:mentionName host:("@" @mentionHost)?
+	= &{ return !linkLabel; } "@" name:mentionName host:("@" @mentionHost)?
 {
 	return MENTION(name, host, text());
 }
 
 mentionName
-	= !"-" mentionNamePart+ // first char is not "-".
+	= [a-z0-9_]i (&("-"+ [a-z0-9_]i) . / [a-z0-9_]i)*
 {
+	// NOTE: first char and last char are not "-".
 	return text();
 }
-
-mentionNamePart
-	= "-" &mentionNamePart // last char is not "-".
-	/ [a-z0-9_]i
 
 mentionHost
-	= ![.-] mentionHostPart+ // first char is neither "." nor "-".
+	= [a-z0-9_]i (&([.-]i+ [a-z0-9_]i) . / [a-z0-9_]i)*
 {
+	// NOTE: first char and last char are neither "." nor "-".
 	return text();
 }
-
-mentionHostPart
-	= [.-] &mentionHostPart // last char is neither "." nor "-".
-	/ [a-z0-9_]i
 
 // inline: hashtag
 
 hashtag
-	= "#" !("\uFE0F"? "\u20E3") content:hashtagContent
+	= "#" !("\uFE0F"? "\u20E3") !(invalidHashtagContent !hashtagContentPart) content:$hashtagContentPart+
 {
 	return HASHTAG(content);
 }
-
-hashtagContent
-	= !(invalidHashtagContent !hashtagContentPart) hashtagContentPart+ { return text(); }
 
 invalidHashtagContent
 	= [0-9]+
 
 hashtagContentPart
-	= hashtagBracketPair
-	/ hashtagChar
+	= "(" hashPairInner ")"
+	/ "[" hashPairInner "]"
+	/ "「" hashPairInner "」"
+	/ ![ 　\t.,!?'"#:\/\[\]【】()「」<>] CHAR
 
-hashtagBracketPair
-	= "(" hashtagContent* ")"
-	/ "[" hashtagContent* "]"
-	/ "「" hashtagContent* "」"
-
-hashtagChar
-	= ![ 　\t.,!?'"#:\/\[\]【】()「」<>] CHAR
+hashPairInner
+	= &{ return enterNest(); } @(@hashtagContentPart* &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 // inline: URL
 
 url
-	= "<" url:altUrlFormat ">"
+	= &{ return !linkLabel; } "<" url:$("http" "s"? "://" (!(">" / _) CHAR)+) ">"
 {
 	return N_URL(url, true);
 }
-	/ url:urlFormat
+	/ &{ return !linkLabel; } "http" "s"? "://" (&([.,]+ urlContentPart) . / urlContentPart)+
 {
-	return N_URL(url);
-}
-
-urlFormat
-	= "http" "s"? "://" urlContentPart+
-{
-	return text();
+	// NOTE: last char is neither "." nor ",".
+	return N_URL(text());
 }
 
 urlContentPart
-	= urlBracketPair
-	/ [.,] &urlContentPart // last char is neither "." nor ",".
+	= "(" urlPairInner ")"
+	/ "[" urlPairInner "]"
 	/ [a-z0-9_/:%#@$&?!~=+-]i
 
-urlBracketPair
-	= "(" urlContentPart* ")"
-	/ "[" urlContentPart* "]"
-
-altUrlFormat
-	= "http" "s"? "://" (!(">" / _) CHAR)+
-{
-	return text();
-}
+urlPairInner
+	= &{ return enterNest(); } @(@(urlContentPart / [.,])* &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 // inline: link
 
 link
-	= silent:"?"? "[" label:linkLabel "](" url:linkUrl ")"
+	= &{ return !linkLabel; } silent:"?"? "[" label:linkLabel "](" url:url ")"
 {
-	return LINK((silent != null), url, mergeText(label));
+	return LINK((silent != null), url.props.url, mergeText(label));
 }
 
 linkLabel
-	= linkLabelPart+
-
-linkLabelPart
-	= url { return text(); /* text node */ }
-	/ link { return text(); /* text node */ }
-	/ mention { return text(); /* text node */ }
-	/ !"]" @inline
-
-linkUrl
-	= url { return text(); }
+	= (!"](" CHAR)+
+{
+	const label = applyParser(text(), 'inlineParser', {
+		linkLabel: true
+	});
+	return label;
+}
 
 // inline: fn
 
 fn
-	= "$[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:(!("]") @inline)+ "]"
+	= "$[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:fnContent "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
 }
+
+fnContent
+	= &{ return enterNest(); } @(@(!"]" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 fnArgs
 	= "." head:fnArg tails:("," @fnArg)*

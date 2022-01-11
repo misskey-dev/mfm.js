@@ -4,3 +4,5 @@ node_modules
 /.eslintrc.js
 /jest.config.ts
 parser.js
+/test
+/test-d
