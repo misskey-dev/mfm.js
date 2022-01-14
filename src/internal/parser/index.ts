@@ -1,137 +1,158 @@
+import { MfmNode, TEXT } from '../../node';
+import { Matcher, MatcherContext, MatcherResult } from './matcher';
 
-class ParserContext {
-	public input: string;
-	public locStack: number[] = [];
+function createSyntaxMatcher(inlineOnly: boolean): Matcher {
+	return function(ctx: MatcherContext): MatcherResult {
+		if (ctx.eof()) {
+			return ctx.fail();
+		}
 
-	constructor(input: string) {
-		this.input = input;
-		this.locStack = [0];
-	}
+		let input = ctx.getText();
 
-	public current() {
-		return this.input.substr(this.locStack[0]);
-	}
+		switch (input[0]) {
 
-	public push() {
-		this.locStack.unshift(this.locStack[0]);
-	}
+			case '*': {
+				if (input.startsWith('***')) {
+					// ***big***
+					console.log('big');
+				}
+				else if (input.startsWith('**')) {
+					// **bold**
+					console.log('bold');
+				}
+				else {
+					// *italic*
+					console.log('italic');
+				}
+				break;
+			}
 
-	public pop() {
-		this.locStack.shift();
+			case '$': {
+				// $[fn ]
+				console.log('fn');
+				break;
+			}
+
+			case '?': {
+				// ?[silent link]()
+				console.log('silent link');
+				break;
+			}
+
+			case '<': {
+				if (input.startsWith('<s>')) {
+					// <s>
+				}
+				else if (input.startsWith('<i>')) {
+					// <i>
+				}
+				else if (input.startsWith('<b>')) {
+					// <b>
+				}
+				else if (input.startsWith('<small>')) {
+					// <small>
+				}
+				else if (input.startsWith('<center>')) {
+					if (inlineOnly) break;
+					// <center>
+				}
+				else if (input.startsWith('<https://') || input.startsWith('<http://')) {
+					// <https://example.com>
+				}
+				break;
+			}
+
+			case '>': {
+				// > quote
+				if (inlineOnly) break;
+				break;
+			}
+
+			case '[': {
+				// [link]()
+				break;
+			}
+
+			case '`': {
+				// ```code block```
+				// `inline code`
+				break;
+			}
+
+			case '\\': {
+				// \(math inline\)
+				// \[math block\]
+				break;
+			}
+
+			case '~': {
+				// ~~strike~~
+				break;
+			}
+
+			case ':': {
+				// :emojiCode:
+				break;
+			}
+
+			case '_': {
+				// __bold__
+				// _italic_
+				break;
+			}
+
+			case '@': {
+				// @mention
+				break;
+			}
+
+			case '#': {
+				// #hashtag
+				break;
+			}
+
+			case 'h': {
+				// https://example.com
+				break;
+			}
+		}
+
+		// search
+		// unicode emoji
+
+		return ctx.fail();
 	}
 }
 
-export function parseFull(ctx: ParserContext)
-{
-	const input = ctx.current();
+export function matchMfm(ctx: MatcherContext): MatcherResult {
+	let matched: MatcherResult;
+	let input: string;
+	const result: MfmNode[] = [];
 
-	if (input.length == 0) {
-		// EOF
-		return;
+	const syntaxMatcher = createSyntaxMatcher(false);
+
+	while (true) {
+		if (ctx.eof()) break;
+
+		matched = ctx.tryConsume(syntaxMatcher);
+		if (matched.ok) {
+			result.push(matched.data);
+			continue;
+		}
+
+		input = ctx.getText();
+
+		// text
+		const lastNode = result[result.length-1];
+		if (lastNode != null && lastNode.type == 'text') {
+			lastNode.props.text += input[0];
+			ctx.pos++;
+		}
+		else {
+			result.push(TEXT(input[0]));
+			ctx.pos++;
+		}
 	}
 
-	switch (input[0]) {
-
-		case '*': {
-			if (input.startsWith('***')) {
-				// ***big***
-				console.log('big');
-			}
-			else if (input.startsWith('**')) {
-				// **bold**
-				console.log('bold');
-			}
-			else {
-				// *italic*
-				console.log('italic');
-			}
-			break;
-		}
-
-		case '$': {
-			// $[fn ]
-			console.log('fn');
-			break;
-		}
-
-		case '?': {
-			// ?[silent link]()
-			console.log('silent link');
-			break;
-		}
-
-		case '<': {
-			if (input.startsWith('<s>')) {
-				// <s>
-			}
-			else if (input.startsWith('<i>')) {
-				// <i>
-			}
-			else if (input.startsWith('<b>')) {
-				// <b>
-			}
-			else if (input.startsWith('<small>')) {
-				// <small>
-			}
-			else if (input.startsWith('<center>')) {
-				// <center>
-			}
-			else if (input.startsWith('<https://') || input.startsWith('<http://')) {
-				// <https://example.com>
-			}
-		}
-
-		case '>': {
-			// > quote
-			break;
-		}
-
-		case '[': {
-			// [link]()
-			break;
-		}
-
-		case '`': {
-			// ```code block```
-			// `inline code`
-		}
-
-		case '\\': {
-			// \(math inline\)
-			// \[math block\]
-		}
-
-		case '~': {
-			// ~~strike~~
-		}
-
-		case ':': {
-			// :emojiCode:
-		}
-
-		case '_': {
-			// __bold__
-			// _italic_
-		}
-
-		case '@': {
-			// @mention
-		}
-
-		case '#': {
-			// #hashtag
-		}
-
-		case 'h': {
-			// https://example.com
-		}
-
-		default:
-			// search
-			// unicode emoji
-			// text
-			break;
-
-	}
-
+	return ctx.ok(result);
 }

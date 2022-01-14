@@ -1,6 +1,8 @@
 import peg from 'peggy';
 import { MfmNode, MfmPlainNode } from './node';
 import { stringifyNode, stringifyTree, inspectOne } from './internal/util';
+import { matchMfm } from './internal/parser/index';
+import { MatcherContext } from './internal/parser/matcher';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const parser: peg.Parser = require('./internal/parser');
@@ -9,12 +11,11 @@ const parser: peg.Parser = require('./internal/parser');
  * Generates a MfmNode tree from the MFM string.
 */
 export function parse(input: string, opts: Partial<{ fnNameList: string[]; nestLimit: number; }> = {}): MfmNode[] {
-	const nodes = parser.parse(input, {
-		startRule: 'fullParser',
-		fnNameList: opts.fnNameList,
-		nestLimit: opts.nestLimit,
-	});
-	return nodes;
+	// TODO: opts.fnNameList
+	// TODO: opts.nestLimit
+	const ctx = new MatcherContext(input);
+	const matched = matchMfm(ctx);
+	return matched.ok ? matched.data : [];
 }
 
 /**
