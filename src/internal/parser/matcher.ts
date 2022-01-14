@@ -11,11 +11,11 @@ export class MatcherContext {
 		return this.locStack[0];
 	}
 
-	public set pos(value) {
+	public set pos(value: number) {
 		this.locStack[0] = value;
 	}
 
-	public getText() {
+	public getText(): string {
 		return this.input.substr(this.locStack[0]);
 	}
 
@@ -23,24 +23,24 @@ export class MatcherContext {
 		this.locStack.unshift(this.locStack[0]);
 	}
 
-	public pop() {
+	public pop(): number {
 		return this.locStack.shift()!;
 	}
 
-	public eof() {
+	public eof(): boolean {
 		return this.locStack[0] >= this.input.length;
 	}
 
 	public ok(data: any): MatcherResult {
 		return {
 			ok: true,
-			data: data
+			data: data,
 		};
 	}
 
 	public fail(): MatcherResult {
 		return {
-			ok: false
+			ok: false,
 		};
 	}
 

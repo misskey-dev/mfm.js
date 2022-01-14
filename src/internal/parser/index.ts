@@ -124,32 +124,28 @@ function createSyntaxMatcher(inlineOnly: boolean): Matcher {
 	}
 }
 
+const syntaxMatcher = createSyntaxMatcher(false);
+
 export function matchMfm(ctx: MatcherContext): MatcherResult {
 	let matched: MatcherResult;
-	let input: string;
 	const result: MfmNode[] = [];
 
-	const syntaxMatcher = createSyntaxMatcher(false);
-
 	while (true) {
-		if (ctx.eof()) break;
-
 		matched = ctx.tryConsume(syntaxMatcher);
 		if (matched.ok) {
 			result.push(matched.data);
 			continue;
 		}
 
-		input = ctx.getText();
+		if (ctx.eof()) break;
 
 		// text
-		const lastNode = result[result.length-1];
-		if (lastNode != null && lastNode.type == 'text') {
-			lastNode.props.text += input[0];
+		const lastNode = result[result.length - 1];
+		if (result.length > 0 && lastNode.type == 'text') {
+			lastNode.props.text += ctx.input[ctx.pos];
 			ctx.pos++;
-		}
-		else {
-			result.push(TEXT(input[0]));
+		} else {
+			result.push(TEXT(ctx.input[ctx.pos]));
 			ctx.pos++;
 		}
 	}
