@@ -1,8 +1,34 @@
-import { MfmNode, TEXT } from '../../node';
+import { EMOJI_CODE, MfmNode, TEXT } from '../../node';
 import { Matcher, MatcherContext, MatcherResult } from './matcher';
+
+function emojiCodeMatcher(ctx: MatcherContext): MatcherResult {
+	// :
+	if (!ctx.input.startsWith(':', ctx.pos)) {
+		return ctx.fail();
+	}
+	ctx.pos++;
+
+	// name
+	const matched = /^[a-z0-9_+-]+/i.exec(ctx.getText());
+	if (matched == null) {
+		return ctx.fail();
+	}
+	const name = matched[0];
+	ctx.pos += name.length;
+
+	// :
+	if (!ctx.input.startsWith(':', ctx.pos)) {
+		return ctx.fail();
+	}
+	ctx.pos++;
+
+	return ctx.ok(EMOJI_CODE(name));
+}
 
 function createSyntaxMatcher(inlineOnly: boolean): Matcher {
 	return function(ctx: MatcherContext): MatcherResult {
+		let matched;
+
 		if (ctx.eof()) {
 			return ctx.fail();
 		}
@@ -91,7 +117,10 @@ function createSyntaxMatcher(inlineOnly: boolean): Matcher {
 			}
 
 			case ':': {
-				// :emojiCode:
+				matched = ctx.tryConsume(emojiCodeMatcher);
+				if (matched.ok) {
+					return matched;
+				}
 				break;
 			}
 
@@ -121,32 +150,31 @@ function createSyntaxMatcher(inlineOnly: boolean): Matcher {
 		// unicode emoji
 
 		return ctx.fail();
-	}
+	};
 }
 
 const syntaxMatcher = createSyntaxMatcher(false);
 
 export function matchMfm(ctx: MatcherContext): MatcherResult {
 	let matched: MatcherResult;
-	const result: MfmNode[] = [];
 
+	const result: MfmNode[] = [];
 	while (true) {
+		if (ctx.eof()) break;
+
 		matched = ctx.tryConsume(syntaxMatcher);
 		if (matched.ok) {
 			result.push(matched.data);
-			continue;
-		}
-
-		if (ctx.eof()) break;
-
-		// text
-		const lastNode = result[result.length - 1];
-		if (result.length > 0 && lastNode.type == 'text') {
-			lastNode.props.text += ctx.input[ctx.pos];
-			ctx.pos++;
 		} else {
-			result.push(TEXT(ctx.input[ctx.pos]));
-			ctx.pos++;
+			// text
+			const lastNode = result[result.length - 1];
+			if (result.length > 0 && lastNode.type == 'text') {
+				lastNode.props.text += ctx.input[ctx.pos];
+				ctx.pos++;
+			} else {
+				result.push(TEXT(ctx.input[ctx.pos]));
+				ctx.pos++;
+			}
 		}
 	}
 

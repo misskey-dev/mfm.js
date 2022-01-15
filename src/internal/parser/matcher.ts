@@ -16,19 +16,19 @@ export class MatcherContext {
 	}
 
 	public getText(): string {
-		return this.input.substr(this.locStack[0]);
+		return this.input.substr(this.pos);
 	}
 
-	public push() {
-		this.locStack.unshift(this.locStack[0]);
+	public storePos() {
+		this.locStack.unshift(this.pos);
 	}
 
-	public pop(): number {
+	public restorePos(): number {
 		return this.locStack.shift()!;
 	}
 
 	public eof(): boolean {
-		return this.locStack[0] >= this.input.length;
+		return this.pos >= this.input.length;
 	}
 
 	public ok(data: any): MatcherResult {
@@ -45,11 +45,13 @@ export class MatcherContext {
 	}
 
 	public tryConsume(matcher: Matcher): MatcherResult {
-		this.push();
+		// TODO: fix pos
+		this.storePos();
 		const matched = matcher(this);
-		const length = this.pop();
 		if (matched.ok) {
-			this.pos += length;
+			this.pos += this.restorePos();
+		} else {
+			this.restorePos();
 		}
 		return matched;
 	}
