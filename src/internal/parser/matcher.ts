@@ -6,6 +6,7 @@ export class MatcherContext {
 	public cache: Record<string, any> = {};
 	public fnNameList: string[] | undefined;
 	public nestLimit: number;
+	public depth: number = 0;
 	public plainMatcher: ReturnType<typeof createSyntaxMatcher>;
 	public inlineMatcher: ReturnType<typeof createSyntaxMatcher>;
 	public fullMatcher: ReturnType<typeof createSyntaxMatcher>;

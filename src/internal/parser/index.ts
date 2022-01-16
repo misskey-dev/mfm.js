@@ -26,7 +26,7 @@ export enum SyntaxLevel {
 }
 
 export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
-	return function(ctx: MatcherContext) {
+	return function (ctx: MatcherContext) {
 		let matched;
 
 		if (ctx.eof()) {
@@ -35,182 +35,191 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 
 		let input = ctx.input.substr(ctx.pos);
 
-		switch (ctx.input[ctx.pos]) {
+		if (ctx.depth < ctx.nestLimit) {
+			ctx.depth++;
 
-			case '*': {
-				let fallback;
-				if (syntaxLevel < SyntaxLevel.inline) break;
+			switch (ctx.input[ctx.pos]) {
 
-				// ***big***
-				fallback = ctx.pos;
-				matched = bigMatcher(ctx);
-				if (matched.ok) {
-					return matched;
-				}
-				ctx.pos = fallback;
-
-				// **bold**
-				fallback = ctx.pos;
-				matched = boldAstaMatcher(ctx);
-				if (matched.ok) {
-					return matched;
-				}
-				ctx.pos = fallback;
-
-				// *italic*
-				fallback = ctx.pos;
-				matched = italicAstaMatcher(ctx);
-				if (matched.ok) {
-					return matched;
-				}
-				ctx.pos = fallback;
-				break;
-			}
-
-			case '$': {
-				if (syntaxLevel < SyntaxLevel.inline) break;
-
-				// $[fn ]
-				break;
-			}
-
-			case '?': {
-				if (syntaxLevel < SyntaxLevel.inline) break;
-
-				// ?[silent link]()
-				break;
-			}
-
-			case '<': {
-				if (input.startsWith('<s>')) {
-					// <s>
+				case '*': {
+					let fallback;
 					if (syntaxLevel < SyntaxLevel.inline) break;
-				}
-				else if (input.startsWith('<i>')) {
-					// <i>
-					if (syntaxLevel < SyntaxLevel.inline) break;
-					const fallback = ctx.pos;
-					matched = italicTagMatcher(ctx);
+
+					// ***big***
+					fallback = ctx.pos;
+					matched = bigMatcher(ctx);
 					if (matched.ok) {
+						ctx.depth--;
 						return matched;
 					}
 					ctx.pos = fallback;
-				}
-				else if (input.startsWith('<b>')) {
-					// <b>
-					if (syntaxLevel < SyntaxLevel.inline) break;
-					const fallback = ctx.pos;
-					matched = boldTagMatcher(ctx);
+
+					// **bold**
+					fallback = ctx.pos;
+					matched = boldAstaMatcher(ctx);
 					if (matched.ok) {
+						ctx.depth--;
 						return matched;
 					}
 					ctx.pos = fallback;
+
+					// *italic*
+					fallback = ctx.pos;
+					matched = italicAstaMatcher(ctx);
+					if (matched.ok) {
+						ctx.depth--;
+						return matched;
+					}
+					ctx.pos = fallback;
+					break;
 				}
-				else if (input.startsWith('<small>')) {
-					// <small>
+
+				case '$': {
 					if (syntaxLevel < SyntaxLevel.inline) break;
+
+					// $[fn ]
+					break;
 				}
-				else if (input.startsWith('<center>')) {
-					// <center>
+
+				case '?': {
+					if (syntaxLevel < SyntaxLevel.inline) break;
+
+					// ?[silent link]()
+					break;
+				}
+
+				case '<': {
+					if (input.startsWith('<s>')) {
+						// <s>
+						if (syntaxLevel < SyntaxLevel.inline) break;
+					} else if (input.startsWith('<i>')) {
+						// <i>
+						if (syntaxLevel < SyntaxLevel.inline) break;
+						const fallback = ctx.pos;
+						matched = italicTagMatcher(ctx);
+						if (matched.ok) {
+							ctx.depth--;
+							return matched;
+						}
+						ctx.pos = fallback;
+					} else if (input.startsWith('<b>')) {
+						// <b>
+						if (syntaxLevel < SyntaxLevel.inline) break;
+						const fallback = ctx.pos;
+						matched = boldTagMatcher(ctx);
+						if (matched.ok) {
+							ctx.depth--;
+							return matched;
+						}
+						ctx.pos = fallback;
+					} else if (input.startsWith('<small>')) {
+						// <small>
+						if (syntaxLevel < SyntaxLevel.inline) break;
+					} else if (input.startsWith('<center>')) {
+						// <center>
+						if (syntaxLevel < SyntaxLevel.full) break;
+					} else if (input.startsWith('<https://') || input.startsWith('<http://')) {
+						// <https://example.com>
+						if (syntaxLevel < SyntaxLevel.inline) break;
+					}
+					break;
+				}
+
+				case '>': {
 					if (syntaxLevel < SyntaxLevel.full) break;
+
+					// > quote
+					break;
 				}
-				else if (input.startsWith('<https://') || input.startsWith('<http://')) {
-					// <https://example.com>
+
+				case '[': {
 					if (syntaxLevel < SyntaxLevel.inline) break;
+
+					// [link]()
+					break;
 				}
-				break;
-			}
 
-			case '>': {
-				if (syntaxLevel < SyntaxLevel.full) break;
-
-				// > quote
-				break;
-			}
-
-			case '[': {
-				if (syntaxLevel < SyntaxLevel.inline) break;
-
-				// [link]()
-				break;
-			}
-
-			case '`': {
-				// ```code block```
-				// `inline code`
-				break;
-			}
-
-			case '\\': {
-				// \(math inline\)
-				// \[math block\]
-				break;
-			}
-
-			case '~': {
-				if (syntaxLevel < SyntaxLevel.inline) break;
-				// ~~strike~~
-				break;
-			}
-
-			case ':': {
-				if (syntaxLevel < SyntaxLevel.plain) break;
-
-				// :emojiCode:
-				const fallback = ctx.pos;
-				matched = emojiCodeMatcher(ctx);
-				if (matched.ok) {
-					return matched;
+				case '`': {
+					// ```code block```
+					// `inline code`
+					break;
 				}
-				ctx.pos = fallback;
 
-				break;
-			}
-
-			case '_': {
-				let fallback;
-				if (syntaxLevel < SyntaxLevel.inline) break;
-
-				// __bold__
-				fallback = ctx.pos;
-				matched = boldUnderMatcher(ctx);
-				if (matched.ok) {
-					return matched;
+				case '\\': {
+					// \(math inline\)
+					// \[math block\]
+					break;
 				}
-				ctx.pos = fallback;
 
-				// _italic_
-				fallback = ctx.pos;
-				matched = italicUnderMatcher(ctx);
-				if (matched.ok) {
-					return matched;
+				case '~': {
+					if (syntaxLevel < SyntaxLevel.inline) break;
+					// ~~strike~~
+					break;
 				}
-				ctx.pos = fallback;
 
-				break;
+				case ':': {
+					if (syntaxLevel < SyntaxLevel.plain) break;
+
+					// :emojiCode:
+					const fallback = ctx.pos;
+					matched = emojiCodeMatcher(ctx);
+					if (matched.ok) {
+						ctx.depth--;
+						return matched;
+					}
+					ctx.pos = fallback;
+
+					break;
+				}
+
+				case '_': {
+					let fallback;
+					if (syntaxLevel < SyntaxLevel.inline) break;
+
+					// __bold__
+					fallback = ctx.pos;
+					matched = boldUnderMatcher(ctx);
+					if (matched.ok) {
+						ctx.depth--;
+						return matched;
+					}
+					ctx.pos = fallback;
+
+					// _italic_
+					fallback = ctx.pos;
+					matched = italicUnderMatcher(ctx);
+					if (matched.ok) {
+						ctx.depth--;
+						return matched;
+					}
+					ctx.pos = fallback;
+
+					break;
+				}
+
+				case '@': {
+					// @mention
+					if (syntaxLevel < SyntaxLevel.inline) break;
+					break;
+				}
+
+				case '#': {
+					// #hashtag
+					if (syntaxLevel < SyntaxLevel.inline) break;
+					break;
+				}
+
+				case 'h': {
+					// https://example.com
+					if (syntaxLevel < SyntaxLevel.inline) break;
+					break;
+				}
 			}
 
-			case '@': {
-				// @mention
-				if (syntaxLevel < SyntaxLevel.inline) break;
-				break;
-			}
+			// search
+			// unicode emoji
 
-			case '#': {
-				// #hashtag
-				if (syntaxLevel < SyntaxLevel.inline) break;
-				break;
-			}
-
-			case 'h': {
-				// https://example.com
-				if (syntaxLevel < SyntaxLevel.inline) break;
-				break;
-			}
+			ctx.depth--;
 		}
-
-		// search
-		// unicode emoji
 
 		// text node
 		const text = ctx.input[ctx.pos];
