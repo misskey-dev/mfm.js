@@ -1,6 +1,5 @@
 import { BOLD, MfmInline } from '../../../node';
-import { MatcherContext } from '../matcher';
-import { pushNode } from '../util';
+import { MatcherContext, pushNode } from '../util';
 
 export function boldAstaMatcher(ctx: MatcherContext) {
 	let matched;

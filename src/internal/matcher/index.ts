@@ -1,6 +1,5 @@
 import { MfmNode, MfmPlainNode } from '../../node';
-import { MatcherContext } from './matcher';
-import { pushNode } from './util';
+import { MatcherContext, pushNode, SyntaxLevel } from './util';
 import { bigMatcher } from './syntax/big';
 import { boldAstaMatcher, boldTagMatcher, boldUnderMatcher } from './syntax/bold';
 import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from './syntax/italic';
@@ -18,12 +17,6 @@ import { emojiCodeMatcher } from './syntax/emojiCode';
 
 // NOTE: 構文要素のマッチ試行の処理は、どの構文にもマッチしなかった場合に長さ1のstring型のノードを生成します。
 // MFM文字列を処理するために構文のマッチ試行が繰り返し実行された際は、連続するstring型ノードを1つのtextノードとして連結する必要があります。
-
-export enum SyntaxLevel {
-	plain = 0,
-	inline,
-	full,
-}
 
 export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 	return function (ctx: MatcherContext) {

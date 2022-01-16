@@ -1,6 +1,5 @@
 import { FN, MfmInline } from '../../../node';
-import { MatcherContext } from '../matcher';
-import { pushNode } from '../util';
+import { MatcherContext, pushNode } from '../util';
 
 export function bigMatcher(ctx: MatcherContext) {
 	let matched;

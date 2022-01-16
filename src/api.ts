@@ -1,7 +1,7 @@
 import { MfmNode, MfmPlainNode } from './node';
 import { stringifyNode, stringifyTree, inspectOne } from './internal/util';
-import { fullMfmMatcher, plainMfmMatcher } from './internal/parser';
-import { MatcherContext } from './internal/parser/matcher';
+import { fullMfmMatcher, plainMfmMatcher } from './internal/matcher';
+import { MatcherContext } from './internal/matcher/util';
 
 /**
  * Generates a MfmNode tree from the MFM string.
