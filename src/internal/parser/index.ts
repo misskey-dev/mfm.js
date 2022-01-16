@@ -22,7 +22,7 @@ import { emojiCodeMatcher } from './syntax/emojiCode';
 export enum SyntaxLevel {
 	plain = 0,
 	inline,
-	full
+	full,
 }
 
 export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
@@ -33,7 +33,7 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 			return ctx.fail();
 		}
 
-		let input = ctx.input.substr(ctx.pos);
+		const input = ctx.input.substr(ctx.pos);
 
 		if (ctx.depth < ctx.nestLimit) {
 			ctx.depth++;
