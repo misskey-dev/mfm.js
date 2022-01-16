@@ -1,20 +1,22 @@
-import { createSyntaxMatcher, SyntaxLevel } from './index';
+import { createSyntaxMatcher, SyntaxLevel } from '.';
 
 export class MatcherContext {
 	public input: string;
-	public pos: number;
-	public state: {
-		fnNameList: string[] | undefined;
-		nestLimit: number;
-		plainMatcher: ReturnType<typeof createSyntaxMatcher>;
-		inlineMatcher: ReturnType<typeof createSyntaxMatcher>;
-		fullMatcher: ReturnType<typeof createSyntaxMatcher>;
-	};
+	public pos: number = 0;
+	public cache: Record<string, any> = {};
+	public fnNameList: string[] | undefined;
+	public nestLimit: number;
+	public plainMatcher: ReturnType<typeof createSyntaxMatcher>;
+	public inlineMatcher: ReturnType<typeof createSyntaxMatcher>;
+	public fullMatcher: ReturnType<typeof createSyntaxMatcher>;
 
-	constructor(input: string, state: MatcherContext['state']) {
+	constructor(input: string, opts: Partial<{ fnNameList: string[]; nestLimit: number; }>) {
 		this.input = input;
-		this.state = state;
-		this.pos = 0;
+		this.fnNameList = opts.fnNameList;
+		this.nestLimit = opts.nestLimit || 20;
+		this.plainMatcher = createSyntaxMatcher(SyntaxLevel.plain);
+		this.inlineMatcher = createSyntaxMatcher(SyntaxLevel.inline);
+		this.fullMatcher = createSyntaxMatcher(SyntaxLevel.full);
 	}
 
 	public ok<T>(resultData: T): MatcherSuccess<T> {
@@ -51,13 +53,3 @@ export type MatcherFailure = {
 export type MatcherResult<T> = MatcherSuccess<T> | MatcherFailure;
 
 export type Matcher<T> = (ctx: MatcherContext) => MatcherResult<T>;
-
-export function createContext(input: string, opts: Partial<{ fnNameList: string[]; nestLimit: number; }>) {
-	return new MatcherContext(input, {
-		fnNameList: opts.fnNameList,
-		nestLimit: opts.nestLimit || 20,
-		plainMatcher: createSyntaxMatcher(SyntaxLevel.plain),
-		inlineMatcher: createSyntaxMatcher(SyntaxLevel.inline),
-		fullMatcher: createSyntaxMatcher(SyntaxLevel.full),
-	});
-}

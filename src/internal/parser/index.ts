@@ -196,7 +196,7 @@ export function fullMfmMatcher(ctx: MatcherContext) {
 
 	const result: MfmNode[] = [];
 	while (true) {
-		matched = ctx.state.fullMatcher(ctx);
+		matched = ctx.fullMatcher(ctx);
 		if (!matched.ok) break;
 		pushNode(matched.resultData, result);
 	}

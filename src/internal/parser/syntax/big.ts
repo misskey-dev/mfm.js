@@ -16,11 +16,14 @@ export function bigMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		matched = ctx.state.inlineMatcher(ctx);
+		matched = ctx.inlineMatcher(ctx);
 		if (!matched.ok) {
 			return ctx.fail();
 		}
 		pushNode(matched.resultData, children);
+	}
+	if (children.length < 1) {
+		return ctx.fail();
 	}
 
 	if (ctx.input.substr(ctx.pos, 3) != '***') {
