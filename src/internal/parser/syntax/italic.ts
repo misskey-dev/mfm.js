@@ -1,20 +1,20 @@
-import { BOLD, MfmInline } from '../../../node';
+import { ITALIC, MfmInline } from '../../../node';
 import { MatcherContext } from '../matcher';
 import { pushNode } from '../util';
 
-export function boldAstaMatcher(ctx: MatcherContext) {
+export function italicAstaMatcher(ctx: MatcherContext) {
 	let matched;
 
-	// "**"
-	if (ctx.input.substr(ctx.pos, 2) != '**') {
+	// "*"
+	if (ctx.input[ctx.pos] != '*') {
 		return ctx.fail();
 	}
-	ctx.pos += 2;
+	ctx.pos++;
 
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input.substr(ctx.pos, 2) == '**') {
+		if (ctx.input[ctx.pos] == '*') {
 			break;
 		}
 
@@ -28,41 +28,48 @@ export function boldAstaMatcher(ctx: MatcherContext) {
 		return ctx.fail();
 	}
 
-	// "**"
-	if (ctx.input.substr(ctx.pos, 2) != '**') {
+	// "*"
+	if (ctx.input[ctx.pos] != '*') {
 		return ctx.fail();
 	}
-	ctx.pos += 2;
+	ctx.pos++;
 
-	return ctx.ok(BOLD(children));
+	return ctx.ok(ITALIC(children));
 }
 
-export function boldUnderMatcher(ctx: MatcherContext) {
+export function italicUnderMatcher(ctx: MatcherContext) {
 	let matched;
 
-	// "__"
+	// TODO: 前の文字の判定
+
+	// "_"
 	if (ctx.input.substr(ctx.pos, 2) != '__') {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
 
 	// children
-	// TODO
 
-	// "__"
+	// TODO
+	// /^[a-z0-9]/i
+	// spacing
+
+	// "_"
 	if (ctx.input.substr(ctx.pos, 2) != '__') {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
 
-	return ctx.ok(BOLD([]));
+	// TODO: 後ろの文字の判定
+
+	return ctx.ok(ITALIC([]));
 }
 
-export function boldTagMatcher(ctx: MatcherContext) {
+export function italicTagMatcher(ctx: MatcherContext) {
 	let matched;
 
-	// "<b>"
-	if (ctx.input.substr(ctx.pos, 3) != '<b>') {
+	// "<i>"
+	if (ctx.input.substr(ctx.pos, 3) != '<i>') {
 		return ctx.fail();
 	}
 	ctx.pos += 3;
@@ -70,7 +77,7 @@ export function boldTagMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input.substr(ctx.pos, 4) == '</b>') {
+		if (ctx.input.substr(ctx.pos, 4) == '</i>') {
 			break;
 		}
 
@@ -84,11 +91,11 @@ export function boldTagMatcher(ctx: MatcherContext) {
 		return ctx.fail();
 	}
 
-	// "</b>"
-	if (ctx.input.substr(ctx.pos, 4) != '</b>') {
+	// "</i>"
+	if (ctx.input.substr(ctx.pos, 4) != '</i>') {
 		return ctx.fail();
 	}
 	ctx.pos += 4;
 
-	return ctx.ok(BOLD(children));
+	return ctx.ok(ITALIC(children));
 }

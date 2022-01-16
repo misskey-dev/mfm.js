@@ -5,11 +5,13 @@ import { pushNode } from '../util';
 export function bigMatcher(ctx: MatcherContext) {
 	let matched;
 
+	// "***"
 	if (ctx.input.substr(ctx.pos, 3) != '***') {
 		return ctx.fail();
 	}
 	ctx.pos += 3;
 
+	// children
 	const children: MfmInline[] = [];
 	while (true) {
 		if (ctx.input.substr(ctx.pos, 3) == '***') {
@@ -26,6 +28,7 @@ export function bigMatcher(ctx: MatcherContext) {
 		return ctx.fail();
 	}
 
+	// "***"
 	if (ctx.input.substr(ctx.pos, 3) != '***') {
 		return ctx.fail();
 	}

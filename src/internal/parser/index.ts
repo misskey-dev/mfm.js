@@ -2,7 +2,8 @@ import { MfmNode } from '../../node';
 import { MatcherContext } from './matcher';
 import { pushNode } from './util';
 import { bigMatcher } from './syntax/big';
-import { boldMatcher, boldTagMatcher } from './syntax/bold';
+import { boldAstaMatcher, boldTagMatcher, boldUnderMatcher } from './syntax/bold';
+import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from './syntax/italic';
 import { emojiCodeMatcher } from './syntax/emojiCode';
 
 // consume and fallback:
@@ -15,7 +16,7 @@ import { emojiCodeMatcher } from './syntax/emojiCode';
 // 	ctx.pos = fallback;
 // }
 
-// NOTE: 構文要素のマッチ試行の処理では、どの構文にもマッチしなかった場合に長さ1のstring型のノードが生成されます。
+// NOTE: 構文要素のマッチ試行の処理は、どの構文にもマッチしなかった場合に長さ1のstring型のノードを生成します。
 // MFM文字列を処理するために構文のマッチ試行が繰り返し実行された際は、連続するstring型ノードを1つのtextノードとして連結する必要があります。
 
 export enum SyntaxLevel {
@@ -37,44 +38,46 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 		switch (ctx.input[ctx.pos]) {
 
 			case '*': {
-				if (input.startsWith('***')) {
-					// ***big***
-					if (syntaxLevel < SyntaxLevel.inline) break;
-					const fallback = ctx.pos;
-					matched = bigMatcher(ctx);
-					if (matched.ok) {
-						return matched;
-					} else {
-						ctx.pos = fallback;
-					}
+				let fallback;
+				if (syntaxLevel < SyntaxLevel.inline) break;
+
+				// ***big***
+				fallback = ctx.pos;
+				matched = bigMatcher(ctx);
+				if (matched.ok) {
+					return matched;
 				}
-				else if (input.startsWith('**')) {
-					// **bold**
-					if (syntaxLevel < SyntaxLevel.inline) break;
-					const fallback = ctx.pos;
-					matched = boldMatcher(ctx);
-					if (matched.ok) {
-						return matched;
-					} else {
-						ctx.pos = fallback;
-					}
+				ctx.pos = fallback;
+
+				// **bold**
+				fallback = ctx.pos;
+				matched = boldAstaMatcher(ctx);
+				if (matched.ok) {
+					return matched;
 				}
-				else {
-					// *italic*
-					if (syntaxLevel < SyntaxLevel.inline) break;
+				ctx.pos = fallback;
+
+				// *italic*
+				fallback = ctx.pos;
+				matched = italicAstaMatcher(ctx);
+				if (matched.ok) {
+					return matched;
 				}
+				ctx.pos = fallback;
 				break;
 			}
 
 			case '$': {
-				// $[fn ]
 				if (syntaxLevel < SyntaxLevel.inline) break;
+
+				// $[fn ]
 				break;
 			}
 
 			case '?': {
-				// ?[silent link]()
 				if (syntaxLevel < SyntaxLevel.inline) break;
+
+				// ?[silent link]()
 				break;
 			}
 
@@ -86,6 +89,12 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 				else if (input.startsWith('<i>')) {
 					// <i>
 					if (syntaxLevel < SyntaxLevel.inline) break;
+					const fallback = ctx.pos;
+					matched = italicTagMatcher(ctx);
+					if (matched.ok) {
+						return matched;
+					}
+					ctx.pos = fallback;
 				}
 				else if (input.startsWith('<b>')) {
 					// <b>
@@ -94,17 +103,16 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					matched = boldTagMatcher(ctx);
 					if (matched.ok) {
 						return matched;
-					} else {
-						ctx.pos = fallback;
 					}
+					ctx.pos = fallback;
 				}
 				else if (input.startsWith('<small>')) {
 					// <small>
 					if (syntaxLevel < SyntaxLevel.inline) break;
 				}
 				else if (input.startsWith('<center>')) {
-					if (syntaxLevel < SyntaxLevel.full) break;
 					// <center>
+					if (syntaxLevel < SyntaxLevel.full) break;
 				}
 				else if (input.startsWith('<https://') || input.startsWith('<http://')) {
 					// <https://example.com>
@@ -114,14 +122,16 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 			}
 
 			case '>': {
-				// > quote
 				if (syntaxLevel < SyntaxLevel.full) break;
+
+				// > quote
 				break;
 			}
 
 			case '[': {
-				// [link]()
 				if (syntaxLevel < SyntaxLevel.inline) break;
+
+				// [link]()
 				break;
 			}
 
@@ -138,26 +148,45 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 			}
 
 			case '~': {
-				// ~~strike~~
 				if (syntaxLevel < SyntaxLevel.inline) break;
+				// ~~strike~~
 				break;
 			}
 
 			case ':': {
 				if (syntaxLevel < SyntaxLevel.plain) break;
+
+				// :emojiCode:
 				const fallback = ctx.pos;
 				matched = emojiCodeMatcher(ctx);
 				if (matched.ok) {
 					return matched;
-				} else {
-					ctx.pos = fallback;
 				}
+				ctx.pos = fallback;
+
 				break;
 			}
 
 			case '_': {
+				let fallback;
+				if (syntaxLevel < SyntaxLevel.inline) break;
+
 				// __bold__
+				fallback = ctx.pos;
+				matched = boldUnderMatcher(ctx);
+				if (matched.ok) {
+					return matched;
+				}
+				ctx.pos = fallback;
+
 				// _italic_
+				fallback = ctx.pos;
+				matched = italicUnderMatcher(ctx);
+				if (matched.ok) {
+					return matched;
+				}
+				ctx.pos = fallback;
+
 				break;
 			}
 
