@@ -1,11 +1,8 @@
-export class MatcherContext {
+export class MatcherContext<T> {
 	public input: string;
 	private locStack: number[] = [];
 
-	constructor(input: string) {
-		this.input = input;
-		this.locStack = [0];
-	}
+	public state: T;
 
 	public get pos() {
 		return this.locStack[0];
@@ -15,12 +12,10 @@ export class MatcherContext {
 		this.locStack[0] = value;
 	}
 
-	public getText(): string {
-		return this.input.substr(this.pos);
-	}
-
-	public eof(): boolean {
-		return this.pos >= this.input.length;
+	constructor(input: string, state: T) {
+		this.input = input;
+		this.locStack = [0];
+		this.state = state;
 	}
 
 	public ok(resultData: any): MatcherResult {
@@ -35,6 +30,14 @@ export class MatcherContext {
 			ok: false,
 		};
 	}
+
+	public eof(): boolean {
+		return this.pos >= this.input.length;
+	}
+
+	public getText(): string {
+		return this.input.substr(this.pos);
+	}
 }
 
 export type MatcherResult = {
@@ -44,4 +47,4 @@ export type MatcherResult = {
 	ok: false;
 };
 
-export type Matcher = (ctx: MatcherContext) => MatcherResult;
+export type Matcher<T> = (ctx: MatcherContext<T>) => MatcherResult;

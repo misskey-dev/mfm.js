@@ -1,8 +1,8 @@
 import { MfmNode, TEXT } from '../../node';
-import { emojiCodeMatcher } from './emojiCode';
+import { emojiCodeMatcher } from './syntax/emojiCode';
 import { Matcher, MatcherContext, MatcherResult } from './matcher';
 
-// match and consume:
+// consume and fallback:
 // 
 // const fallback = ctx.pos;
 // const matched = matcher(ctx);
@@ -12,8 +12,10 @@ import { Matcher, MatcherContext, MatcherResult } from './matcher';
 // 	ctx.pos = fallback;
 // }
 
-function createSyntaxMatcher(inlineOnly: boolean): Matcher {
-	return function(ctx: MatcherContext): MatcherResult {
+type MfmState = {};
+
+function createSyntaxMatcher<T>(inlineOnly: boolean): Matcher<T> {
+	return function(ctx: MatcherContext<T>): MatcherResult {
 		let matched;
 
 		if (ctx.eof()) {
@@ -143,9 +145,10 @@ function createSyntaxMatcher(inlineOnly: boolean): Matcher {
 	};
 }
 
-const syntaxMatcher = createSyntaxMatcher(false);
+export const syntaxMatcher = createSyntaxMatcher<MfmState>(false);
+export const inlineSyntaxMatcher = createSyntaxMatcher<MfmState>(true);
 
-export function matchMfm(ctx: MatcherContext): MatcherResult {
+export function fullMfmMatcher(ctx: MatcherContext<MfmState>): MatcherResult {
 	let matched: MatcherResult;
 
 	const result: MfmNode[] = [];
@@ -176,4 +179,8 @@ export function matchMfm(ctx: MatcherContext): MatcherResult {
 	}
 
 	return ctx.ok(result);
+}
+
+export function plainMfmMatcher(ctx: MatcherContext<{}>): MatcherResult {
+	return ctx.ok([]);
 }

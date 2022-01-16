@@ -1,20 +1,17 @@
-import peg from 'peggy';
 import { MfmNode, MfmPlainNode } from './node';
 import { stringifyNode, stringifyTree, inspectOne } from './internal/util';
-import { matchMfm } from './internal/parser/index';
+import { fullMfmMatcher, plainMfmMatcher } from './internal/parser';
 import { MatcherContext } from './internal/parser/matcher';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const parser: peg.Parser = require('./internal/parser');
 
 /**
  * Generates a MfmNode tree from the MFM string.
 */
 export function parse(input: string, opts: Partial<{ fnNameList: string[]; nestLimit: number; }> = {}): MfmNode[] {
-	// TODO: opts.fnNameList
-	// TODO: opts.nestLimit
-	const ctx = new MatcherContext(input);
-	const matched = matchMfm(ctx);
+	const ctx = new MatcherContext(input, {
+		fnNameList: opts.fnNameList,
+		nestLimit: opts.nestLimit || 20,
+	});
+	const matched = fullMfmMatcher(ctx);
 	return matched.ok ? matched.resultData : [];
 }
 
@@ -22,8 +19,9 @@ export function parse(input: string, opts: Partial<{ fnNameList: string[]; nestL
  * Generates a MfmNode tree of plain from the MFM string.
 */
 export function parsePlain(input: string): MfmPlainNode[] {
-	const nodes = parser.parse(input, { startRule: 'plainParser' });
-	return nodes;
+	const ctx = new MatcherContext(input, {});
+	const matched = plainMfmMatcher(ctx);
+	return matched.ok ? matched.resultData : [];
 }
 
 /**
