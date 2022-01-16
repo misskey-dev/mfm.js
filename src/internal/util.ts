@@ -1,34 +1,5 @@
 import { isMfmBlock, MfmNode, TEXT } from '../node';
 
-export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
-	const dest: MfmNode[] = [];
-	const storedChars: string[] = [];
-
-	/**
-	 * Generate a text node from the stored chars, And push it.
-	*/
-	function generateText() {
-		if (storedChars.length > 0) {
-			dest.push(TEXT(storedChars.join('')));
-			storedChars.length = 0;
-		}
-	}
-
-	for (const node of nodes) {
-		if (typeof node == 'string') {
-			// Store the char.
-			storedChars.push(node);
-		}
-		else {
-			generateText();
-			dest.push(node);
-		}
-	}
-	generateText();
-
-	return dest;
-}
-
 export function stringifyNode(node: MfmNode): string {
 	switch (node.type) {
 		// block
@@ -159,40 +130,4 @@ export function inspectOne(node: MfmNode, action: (node: MfmNode) => void) {
 			inspectOne(child, action);
 		}
 	}
-}
-
-//
-// dynamic consuming
-//
-
-/*
-	1. If you want to consume 3 chars, call the setConsumeCount.
-	```
-	setConsumeCount(3);
-	```
-
-	2. And the rule to consume the input is as below:
-	```
-	rule = (&{ return consumeDynamically(); } .)+
-	```
-*/
-
-let consumeCount = 0;
-
-/**
- * set the length of dynamic consuming.
-*/
-export function setConsumeCount(count: number) {
-	consumeCount = count;
-}
-
-/**
- * consume the input and returns matching result.
-*/
-export function consumeDynamically() {
-	const matched = (consumeCount > 0);
-	if (matched) {
-		consumeCount--;
-	}
-	return matched;
 }
