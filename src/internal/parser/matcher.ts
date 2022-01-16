@@ -1,8 +1,13 @@
-export class MatcherContext<T> {
+export class MatcherContext {
 	public input: string;
 	private locStack: number[] = [];
 
-	public state: T;
+	public state: {
+		fnNameList: string[] | undefined;
+		nestLimit: number;
+		syntaxMatcher: Matcher;
+		inlineSyntaxMatcher: Matcher;
+	};
 
 	public get pos() {
 		return this.locStack[0];
@@ -12,7 +17,7 @@ export class MatcherContext<T> {
 		this.locStack[0] = value;
 	}
 
-	constructor(input: string, state: T) {
+	constructor(input: string, state: MatcherContext['state']) {
 		this.input = input;
 		this.locStack = [0];
 		this.state = state;
@@ -47,4 +52,4 @@ export type MatcherResult = {
 	ok: false;
 };
 
-export type Matcher<T> = (ctx: MatcherContext<T>) => MatcherResult;
+export type Matcher = (ctx: MatcherContext) => MatcherResult;

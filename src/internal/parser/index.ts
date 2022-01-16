@@ -1,6 +1,7 @@
 import { MfmNode, TEXT } from '../../node';
 import { emojiCodeMatcher } from './syntax/emojiCode';
 import { Matcher, MatcherContext, MatcherResult } from './matcher';
+import { boldMatcher } from './syntax/bold';
 
 // consume and fallback:
 // 
@@ -12,45 +13,54 @@ import { Matcher, MatcherContext, MatcherResult } from './matcher';
 // 	ctx.pos = fallback;
 // }
 
-type MfmState = {};
+export function createContext(input: string, opts: Partial<{ fnNameList: string[]; nestLimit: number; }>) {
+	return new MatcherContext(input, {
+		fnNameList: opts.fnNameList,
+		nestLimit: opts.nestLimit || 20,
+		syntaxMatcher: createSyntaxMatcher(false),
+		inlineSyntaxMatcher: createSyntaxMatcher(true),
+	});
+}
 
-function createSyntaxMatcher<T>(inlineOnly: boolean): Matcher<T> {
-	return function(ctx: MatcherContext<T>): MatcherResult {
+export function createSyntaxMatcher(inlineOnly: boolean): Matcher {
+	return function(ctx) {
 		let matched;
 
 		if (ctx.eof()) {
 			return ctx.fail();
 		}
 
-		let input = ctx.input[ctx.pos];
+		let input = ctx.input.substr(ctx.pos);
 
-		switch (input[0]) {
+		switch (ctx.input[ctx.pos]) {
 
 			case '*': {
 				if (input.startsWith('***')) {
 					// ***big***
-					console.log('big');
 				}
 				else if (input.startsWith('**')) {
 					// **bold**
-					console.log('bold');
+					const fallback = ctx.pos;
+					matched = boldMatcher(ctx);
+					if (matched.ok) {
+						return matched;
+					} else {
+						ctx.pos = fallback;
+					}
 				}
 				else {
 					// *italic*
-					console.log('italic');
 				}
 				break;
 			}
 
 			case '$': {
 				// $[fn ]
-				console.log('fn');
 				break;
 			}
 
 			case '?': {
 				// ?[silent link]()
-				console.log('silent link');
 				break;
 			}
 
@@ -145,10 +155,7 @@ function createSyntaxMatcher<T>(inlineOnly: boolean): Matcher<T> {
 	};
 }
 
-export const syntaxMatcher = createSyntaxMatcher<MfmState>(false);
-export const inlineSyntaxMatcher = createSyntaxMatcher<MfmState>(true);
-
-export function fullMfmMatcher(ctx: MatcherContext<MfmState>): MatcherResult {
+export function fullMfmMatcher(ctx: MatcherContext): MatcherResult {
 	let matched: MatcherResult;
 
 	const result: MfmNode[] = [];
@@ -156,7 +163,7 @@ export function fullMfmMatcher(ctx: MatcherContext<MfmState>): MatcherResult {
 		if (ctx.eof()) break;
 
 		const fallback = ctx.pos;
-		matched = syntaxMatcher(ctx);
+		matched = ctx.state.syntaxMatcher(ctx);
 		if (matched.ok) {
 			result.push(matched.resultData);
 		} else {
@@ -181,6 +188,6 @@ export function fullMfmMatcher(ctx: MatcherContext<MfmState>): MatcherResult {
 	return ctx.ok(result);
 }
 
-export function plainMfmMatcher(ctx: MatcherContext<{}>): MatcherResult {
+export function plainMfmMatcher(ctx: MatcherContext): MatcherResult {
 	return ctx.ok([]);
 }

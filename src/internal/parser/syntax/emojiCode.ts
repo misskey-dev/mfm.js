@@ -1,9 +1,7 @@
 import { EMOJI_CODE } from '../../../node';
 import { MatcherContext, MatcherResult } from '../matcher';
 
-type State = {};
-
-export function emojiCodeMatcher(ctx: MatcherContext<State>): MatcherResult {
+export function emojiCodeMatcher(ctx: MatcherContext): MatcherResult {
 	// :
 	if (ctx.input[ctx.pos] != ':') {
 		return ctx.fail();
