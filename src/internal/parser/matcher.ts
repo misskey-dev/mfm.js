@@ -31,10 +31,10 @@ export class MatcherContext {
 		return this.pos >= this.input.length;
 	}
 
-	public ok(data: any): MatcherResult {
+	public ok(resultData: any): MatcherResult {
 		return {
 			ok: true,
-			data: data,
+			resultData: resultData,
 		};
 	}
 
@@ -43,23 +43,11 @@ export class MatcherContext {
 			ok: false,
 		};
 	}
-
-	public tryConsume(matcher: Matcher): MatcherResult {
-		// TODO: fix pos
-		this.storePos();
-		const matched = matcher(this);
-		if (matched.ok) {
-			this.pos += this.restorePos();
-		} else {
-			this.restorePos();
-		}
-		return matched;
-	}
 }
 
 export type MatcherResult = {
 	ok: true;
-	data: any;
+	resultData: any;
 } | {
 	ok: false;
 };

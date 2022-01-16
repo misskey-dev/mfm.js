@@ -1,9 +1,19 @@
 import { EMOJI_CODE, MfmNode, TEXT } from '../../node';
 import { Matcher, MatcherContext, MatcherResult } from './matcher';
 
+// match and consume:
+// 
+// const fallback = ctx.pos;
+// const matched = matcher(ctx);
+// if (matched.ok) {
+// 	matched.resultData;
+// } else {
+// 	ctx.pos = fallback;
+// }
+
 function emojiCodeMatcher(ctx: MatcherContext): MatcherResult {
 	// :
-	if (!ctx.input.startsWith(':', ctx.pos)) {
+	if (ctx.input[ctx.pos] != ':') {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -17,7 +27,7 @@ function emojiCodeMatcher(ctx: MatcherContext): MatcherResult {
 	ctx.pos += name.length;
 
 	// :
-	if (!ctx.input.startsWith(':', ctx.pos)) {
+	if (ctx.input[ctx.pos] != ':') {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -117,9 +127,12 @@ function createSyntaxMatcher(inlineOnly: boolean): Matcher {
 			}
 
 			case ':': {
-				matched = ctx.tryConsume(emojiCodeMatcher);
+				const fallback = ctx.pos;
+				matched = emojiCodeMatcher(ctx);
 				if (matched.ok) {
 					return matched;
+				} else {
+					ctx.pos = fallback;
 				}
 				break;
 			}
@@ -162,16 +175,23 @@ export function matchMfm(ctx: MatcherContext): MatcherResult {
 	while (true) {
 		if (ctx.eof()) break;
 
-		matched = ctx.tryConsume(syntaxMatcher);
+		const fallback = ctx.pos;
+		matched = syntaxMatcher(ctx);
 		if (matched.ok) {
-			result.push(matched.data);
+			result.push(matched.resultData);
 		} else {
+			ctx.pos = fallback;
 			// text
-			const lastNode = result[result.length - 1];
-			if (result.length > 0 && lastNode.type == 'text') {
-				lastNode.props.text += ctx.input[ctx.pos];
-				ctx.pos++;
-			} else {
+			let genText = true;
+			if (result.length > 0) {
+				const lastNode = result[result.length - 1];
+				if (lastNode.type == 'text') {
+					lastNode.props.text += ctx.input[ctx.pos];
+					ctx.pos++;
+					genText = false;
+				}
+			}
+			if (genText) {
 				result.push(TEXT(ctx.input[ctx.pos]));
 				ctx.pos++;
 			}

@@ -15,7 +15,7 @@ export function parse(input: string, opts: Partial<{ fnNameList: string[]; nestL
 	// TODO: opts.nestLimit
 	const ctx = new MatcherContext(input);
 	const matched = matchMfm(ctx);
-	return matched.ok ? matched.data : [];
+	return matched.ok ? matched.resultData : [];
 }
 
 /**
