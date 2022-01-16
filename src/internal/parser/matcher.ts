@@ -1,11 +1,14 @@
+import { createSyntaxMatcher, SyntaxLevel } from './index';
+
 export class MatcherContext {
 	public input: string;
 	public pos: number;
 	public state: {
 		fnNameList: string[] | undefined;
 		nestLimit: number;
-		syntaxMatcher: Matcher;
-		inlineSyntaxMatcher: Matcher;
+		plainMatcher: ReturnType<typeof createSyntaxMatcher>;
+		inlineMatcher: ReturnType<typeof createSyntaxMatcher>;
+		fullMatcher: ReturnType<typeof createSyntaxMatcher>;
 	};
 
 	constructor(input: string, state: MatcherContext['state']) {
@@ -14,14 +17,14 @@ export class MatcherContext {
 		this.pos = 0;
 	}
 
-	public ok(resultData: any): MatcherResult {
+	public ok<T>(resultData: T): MatcherSuccess<T> {
 		return {
 			ok: true,
 			resultData: resultData,
 		};
 	}
 
-	public fail(): MatcherResult {
+	public fail(): MatcherFailure {
 		return {
 			ok: false,
 		};
@@ -36,11 +39,25 @@ export class MatcherContext {
 	}
 }
 
-export type MatcherResult = {
+export type MatcherSuccess<T> = {
 	ok: true;
-	resultData: any;
-} | {
+	resultData: T;
+};
+
+export type MatcherFailure = {
 	ok: false;
 };
 
-export type Matcher = (ctx: MatcherContext) => MatcherResult;
+export type MatcherResult<T> = MatcherSuccess<T> | MatcherFailure;
+
+export type Matcher<T> = (ctx: MatcherContext) => MatcherResult<T>;
+
+export function createContext(input: string, opts: Partial<{ fnNameList: string[]; nestLimit: number; }>) {
+	return new MatcherContext(input, {
+		fnNameList: opts.fnNameList,
+		nestLimit: opts.nestLimit || 20,
+		plainMatcher: createSyntaxMatcher(SyntaxLevel.plain),
+		inlineMatcher: createSyntaxMatcher(SyntaxLevel.inline),
+		fullMatcher: createSyntaxMatcher(SyntaxLevel.full),
+	});
+}
