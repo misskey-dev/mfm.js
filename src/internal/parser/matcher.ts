@@ -19,14 +19,6 @@ export class MatcherContext {
 		return this.input.substr(this.pos);
 	}
 
-	public storePos() {
-		this.locStack.unshift(this.pos);
-	}
-
-	public restorePos(): number {
-		return this.locStack.shift()!;
-	}
-
 	public eof(): boolean {
 		return this.pos >= this.input.length;
 	}

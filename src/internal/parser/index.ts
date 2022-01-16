@@ -1,4 +1,5 @@
-import { EMOJI_CODE, MfmNode, TEXT } from '../../node';
+import { MfmNode, TEXT } from '../../node';
+import { emojiCodeMatcher } from './emojiCode';
 import { Matcher, MatcherContext, MatcherResult } from './matcher';
 
 // match and consume:
@@ -11,30 +12,6 @@ import { Matcher, MatcherContext, MatcherResult } from './matcher';
 // 	ctx.pos = fallback;
 // }
 
-function emojiCodeMatcher(ctx: MatcherContext): MatcherResult {
-	// :
-	if (ctx.input[ctx.pos] != ':') {
-		return ctx.fail();
-	}
-	ctx.pos++;
-
-	// name
-	const matched = /^[a-z0-9_+-]+/i.exec(ctx.getText());
-	if (matched == null) {
-		return ctx.fail();
-	}
-	const name = matched[0];
-	ctx.pos += name.length;
-
-	// :
-	if (ctx.input[ctx.pos] != ':') {
-		return ctx.fail();
-	}
-	ctx.pos++;
-
-	return ctx.ok(EMOJI_CODE(name));
-}
-
 function createSyntaxMatcher(inlineOnly: boolean): Matcher {
 	return function(ctx: MatcherContext): MatcherResult {
 		let matched;
@@ -43,7 +20,7 @@ function createSyntaxMatcher(inlineOnly: boolean): Matcher {
 			return ctx.fail();
 		}
 
-		let input = ctx.getText();
+		let input = ctx.input[ctx.pos];
 
 		switch (input[0]) {
 
