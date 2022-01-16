@@ -1,4 +1,4 @@
-import { MfmNode } from '../../node';
+import { MfmNode, MfmPlainNode } from '../../node';
 import { MatcherContext } from './matcher';
 import { pushNode } from './util';
 import { bigMatcher } from './syntax/big';
@@ -243,5 +243,14 @@ export function fullMfmMatcher(ctx: MatcherContext) {
 }
 
 export function plainMfmMatcher(ctx: MatcherContext) {
-	return ctx.ok([]);
+	let matched;
+
+	const result: MfmPlainNode[] = [];
+	while (true) {
+		matched = ctx.plainMatcher(ctx);
+		if (!matched.ok) break;
+		pushNode(matched.resultData, result);
+	}
+
+	return ctx.ok(result);
 }

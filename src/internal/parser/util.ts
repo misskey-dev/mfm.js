@@ -1,4 +1,4 @@
-import { MfmInline, MfmNode, TEXT } from '../../node';
+import { MfmInline, MfmNode, MfmPlainNode, TEXT } from '../../node';
 
 /**
  * push a node to a node array.
@@ -6,6 +6,7 @@ import { MfmInline, MfmNode, TEXT } from '../../node';
 */
 export function pushNode(node: MfmNode | string, nodes: MfmNode[]): void
 export function pushNode(node: MfmInline | string, nodes: MfmInline[]): void
+export function pushNode(node: MfmPlainNode | string, nodes: MfmPlainNode[]): void
 export function pushNode(node: MfmNode | string, nodes: MfmNode[]): void {
 	if (typeof node == 'string') {
 		// store text node
