@@ -1,7 +1,6 @@
 export class MatcherContext {
 	public input: string;
-	private locStack: number[] = [];
-
+	public pos: number;
 	public state: {
 		fnNameList: string[] | undefined;
 		nestLimit: number;
@@ -9,18 +8,10 @@ export class MatcherContext {
 		inlineSyntaxMatcher: Matcher;
 	};
 
-	public get pos() {
-		return this.locStack[0];
-	}
-
-	public set pos(value: number) {
-		this.locStack[0] = value;
-	}
-
 	constructor(input: string, state: MatcherContext['state']) {
 		this.input = input;
-		this.locStack = [0];
 		this.state = state;
+		this.pos = 0;
 	}
 
 	public ok(resultData: any): MatcherResult {
