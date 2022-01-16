@@ -1,8 +1,9 @@
 import { MfmNode } from '../../node';
-import { emojiCodeMatcher } from './syntax/emojiCode';
-import { MatcherContext, MatcherResult } from './matcher';
-import { boldMatcher } from './syntax/bold';
+import { MatcherContext } from './matcher';
 import { pushNode } from './util';
+import { bigMatcher } from './syntax/big';
+import { boldMatcher, boldTagMatcher } from './syntax/bold';
+import { emojiCodeMatcher } from './syntax/emojiCode';
 
 // consume and fallback:
 // 
@@ -39,6 +40,13 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 				if (input.startsWith('***')) {
 					// ***big***
 					if (syntaxLevel < SyntaxLevel.inline) break;
+					const fallback = ctx.pos;
+					matched = bigMatcher(ctx);
+					if (matched.ok) {
+						return matched;
+					} else {
+						ctx.pos = fallback;
+					}
 				}
 				else if (input.startsWith('**')) {
 					// **bold**
@@ -82,6 +90,13 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 				else if (input.startsWith('<b>')) {
 					// <b>
 					if (syntaxLevel < SyntaxLevel.inline) break;
+					const fallback = ctx.pos;
+					matched = boldTagMatcher(ctx);
+					if (matched.ok) {
+						return matched;
+					} else {
+						ctx.pos = fallback;
+					}
 				}
 				else if (input.startsWith('<small>')) {
 					// <small>
