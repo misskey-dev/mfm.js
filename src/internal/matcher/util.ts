@@ -9,6 +9,15 @@ export enum SyntaxLevel {
 
 type MatcherResultData<T> = T extends (ctx: MatcherContext) => MatcherResult<infer R> ? R : any;
 
+export type ConsumeOpts = Partial<{
+
+}>;
+
+export type MatcherContextOpts = Partial<{
+	fnNameList: string[];
+	nestLimit: number;
+}>;
+
 export class MatcherContext {
 	public input: string;
 	public pos: number = 0;
@@ -20,7 +29,7 @@ export class MatcherContext {
 	public inlineMatcher: ReturnType<typeof createSyntaxMatcher>;
 	public fullMatcher: ReturnType<typeof createSyntaxMatcher>;
 
-	constructor(input: string, opts: Partial<{ fnNameList: string[]; nestLimit: number; }>) {
+	constructor(input: string, opts: MatcherContextOpts) {
 		this.input = input;
 		this.fnNameList = opts.fnNameList;
 		this.nestLimit = opts.nestLimit || 20;
@@ -50,7 +59,15 @@ export class MatcherContext {
 		return this.input.substr(this.pos);
 	}
 
-	public consume<T extends (ctx: MatcherContext) => MatcherResult<MatcherResultData<T>>>(matcher: T) {
+	public consume<T extends (ctx: MatcherContext) => MatcherResult<MatcherResultData<T>>>(matcher: T, opts?: ConsumeOpts) {
+		opts = opts || {};
+		const matched = matcher(this);
+		return matched;
+	}
+
+	// fallback
+	public tryConsume<T extends (ctx: MatcherContext) => MatcherResult<MatcherResultData<T>>>(matcher: T, opts?: ConsumeOpts) {
+		opts = opts || {};
 		const fallback = this.pos;
 		const matched = matcher(this);
 		if (!matched.ok) {

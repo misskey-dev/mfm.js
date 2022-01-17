@@ -1,16 +1,9 @@
 import { MfmNode, MfmPlainNode } from '../../node';
-import { MatcherContext, pushNode, SyntaxLevel } from './util';
+import { MatcherContext, MatcherContextOpts, pushNode, SyntaxLevel } from './util';
 import { bigMatcher } from './syntax/big';
 import { boldAstaMatcher, boldTagMatcher, boldUnderMatcher } from './syntax/bold';
 import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from './syntax/italic';
 import { emojiCodeMatcher } from './syntax/emojiCode';
-
-// consume and fallback:
-//
-// const matched = ctx.consume(matcher);
-// if (matched.ok) {
-// 	matched.resultData;
-// }
 
 // NOTE: 構文要素のマッチ試行の処理は、どの構文にもマッチしなかった場合に長さ1のstring型のノードを生成します。
 // MFM文字列を処理するために構文のマッチ試行が繰り返し実行された際は、連続するstring型ノードを1つのtextノードとして連結する必要があります。
@@ -34,21 +27,21 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					if (syntaxLevel < SyntaxLevel.inline) break;
 
 					// ***big***
-					matched = ctx.consume(bigMatcher);
+					matched = ctx.tryConsume(bigMatcher);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
 					}
 
 					// **bold**
-					matched = ctx.consume(boldAstaMatcher);
+					matched = ctx.tryConsume(boldAstaMatcher);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
 					}
 
 					// *italic*
-					matched = ctx.consume(italicAstaMatcher);
+					matched = ctx.tryConsume(italicAstaMatcher);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
@@ -77,7 +70,7 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					} else if (input.startsWith('<i>')) {
 						// <i>
 						if (syntaxLevel < SyntaxLevel.inline) break;
-						matched = ctx.consume(italicTagMatcher);
+						matched = ctx.tryConsume(italicTagMatcher);
 						if (matched.ok) {
 							ctx.depth--;
 							return matched;
@@ -85,7 +78,7 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					} else if (input.startsWith('<b>')) {
 						// <b>
 						if (syntaxLevel < SyntaxLevel.inline) break;
-						matched = ctx.consume(boldTagMatcher);
+						matched = ctx.tryConsume(boldTagMatcher);
 						if (matched.ok) {
 							ctx.depth--;
 							return matched;
@@ -152,14 +145,14 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					if (syntaxLevel < SyntaxLevel.inline) break;
 
 					// __bold__
-					matched = ctx.consume(boldUnderMatcher);
+					matched = ctx.tryConsume(boldUnderMatcher);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
 					}
 
 					// _italic_
-					matched = ctx.consume(italicUnderMatcher);
+					matched = ctx.tryConsume(italicUnderMatcher);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
@@ -201,28 +194,30 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 	};
 }
 
-export function fullMfmMatcher(ctx: MatcherContext) {
+export function fullParser(input: string, opts: MatcherContextOpts) {
+	const ctx = new MatcherContext(input, opts);
+	const result: MfmNode[] = [];
 	let matched;
 
-	const result: MfmNode[] = [];
 	while (true) {
 		matched = ctx.consume(ctx.fullMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.resultData, result);
 	}
 
-	return ctx.ok(result);
+	return result;
 }
 
-export function plainMfmMatcher(ctx: MatcherContext) {
+export function plainParser(input: string) {
+	const ctx = new MatcherContext(input, {});
+	const result: MfmPlainNode[] = [];
 	let matched;
 
-	const result: MfmPlainNode[] = [];
 	while (true) {
 		matched = ctx.consume(ctx.plainMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.resultData, result);
 	}
 
-	return ctx.ok(result);
+	return result;
 }

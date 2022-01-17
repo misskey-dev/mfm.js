@@ -1,24 +1,20 @@
 import { MfmNode, MfmPlainNode } from './node';
 import { stringifyNode, stringifyTree, inspectOne } from './internal/util';
-import { fullMfmMatcher, plainMfmMatcher } from './internal/matcher';
-import { MatcherContext } from './internal/matcher/util';
+import { fullParser, plainParser } from './internal/matcher';
+import { MatcherContextOpts } from './internal/matcher/util';
 
 /**
  * Generates a MfmNode tree from the MFM string.
 */
-export function parse(input: string, opts: Partial<{ fnNameList: string[]; nestLimit: number; }> = {}): MfmNode[] {
-	const ctx = new MatcherContext(input, opts);
-	const matched = fullMfmMatcher(ctx);
-	return matched.ok ? matched.resultData : [];
+export function parse(input: string, opts: MatcherContextOpts = {}): MfmNode[] {
+	return fullParser(input, opts);
 }
 
 /**
  * Generates a MfmNode tree of plain from the MFM string.
 */
 export function parsePlain(input: string): MfmPlainNode[] {
-	const ctx = new MatcherContext(input, {});
-	const matched = plainMfmMatcher(ctx);
-	return matched.ok ? matched.resultData : [];
+	return plainParser(input);
 }
 
 /**
