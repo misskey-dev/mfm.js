@@ -50,7 +50,7 @@ export class MatcherContext {
 		return this.input.substr(this.pos);
 	}
 
-	public match<T extends (ctx: MatcherContext) => MatcherResult<MatcherResultData<T>>>(matcher: T) {
+	public consume<T extends (ctx: MatcherContext) => MatcherResult<MatcherResultData<T>>>(matcher: T) {
 		const fallback = this.pos;
 		const matched = matcher(this);
 		if (!matched.ok) {

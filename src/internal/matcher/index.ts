@@ -6,13 +6,10 @@ import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from './synta
 import { emojiCodeMatcher } from './syntax/emojiCode';
 
 // consume and fallback:
-// 
-// const fallback = ctx.pos;
-// const matched = matcher(ctx);
+//
+// const matched = ctx.consume(matcher);
 // if (matched.ok) {
 // 	matched.resultData;
-// } else {
-// 	ctx.pos = fallback;
 // }
 
 // NOTE: 構文要素のマッチ試行の処理は、どの構文にもマッチしなかった場合に長さ1のstring型のノードを生成します。
@@ -34,35 +31,28 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 			switch (ctx.input[ctx.pos]) {
 
 				case '*': {
-					let fallback;
 					if (syntaxLevel < SyntaxLevel.inline) break;
 
 					// ***big***
-					fallback = ctx.pos;
-					matched = bigMatcher(ctx);
+					matched = ctx.consume(bigMatcher);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
 					}
-					ctx.pos = fallback;
 
 					// **bold**
-					fallback = ctx.pos;
-					matched = boldAstaMatcher(ctx);
+					matched = ctx.consume(boldAstaMatcher);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
 					}
-					ctx.pos = fallback;
 
 					// *italic*
-					fallback = ctx.pos;
-					matched = italicAstaMatcher(ctx);
+					matched = ctx.consume(italicAstaMatcher);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
 					}
-					ctx.pos = fallback;
 					break;
 				}
 
@@ -87,23 +77,19 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					} else if (input.startsWith('<i>')) {
 						// <i>
 						if (syntaxLevel < SyntaxLevel.inline) break;
-						const fallback = ctx.pos;
-						matched = italicTagMatcher(ctx);
+						matched = ctx.consume(italicTagMatcher);
 						if (matched.ok) {
 							ctx.depth--;
 							return matched;
 						}
-						ctx.pos = fallback;
 					} else if (input.startsWith('<b>')) {
 						// <b>
 						if (syntaxLevel < SyntaxLevel.inline) break;
-						const fallback = ctx.pos;
-						matched = boldTagMatcher(ctx);
+						matched = ctx.consume(boldTagMatcher);
 						if (matched.ok) {
 							ctx.depth--;
 							return matched;
 						}
-						ctx.pos = fallback;
 					} else if (input.startsWith('<small>')) {
 						// <small>
 						if (syntaxLevel < SyntaxLevel.inline) break;
@@ -153,38 +139,31 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					if (syntaxLevel < SyntaxLevel.plain) break;
 
 					// :emojiCode:
-					const fallback = ctx.pos;
-					matched = emojiCodeMatcher(ctx);
+					matched = ctx.consume(emojiCodeMatcher);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
 					}
-					ctx.pos = fallback;
 
 					break;
 				}
 
 				case '_': {
-					let fallback;
 					if (syntaxLevel < SyntaxLevel.inline) break;
 
 					// __bold__
-					fallback = ctx.pos;
-					matched = boldUnderMatcher(ctx);
+					matched = ctx.consume(boldUnderMatcher);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
 					}
-					ctx.pos = fallback;
 
 					// _italic_
-					fallback = ctx.pos;
-					matched = italicUnderMatcher(ctx);
+					matched = ctx.consume(italicUnderMatcher);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
 					}
-					ctx.pos = fallback;
 
 					break;
 				}
@@ -227,7 +206,7 @@ export function fullMfmMatcher(ctx: MatcherContext) {
 
 	const result: MfmNode[] = [];
 	while (true) {
-		matched = ctx.fullMatcher(ctx);
+		matched = ctx.consume(ctx.fullMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.resultData, result);
 	}
@@ -240,7 +219,7 @@ export function plainMfmMatcher(ctx: MatcherContext) {
 
 	const result: MfmPlainNode[] = [];
 	while (true) {
-		matched = ctx.plainMatcher(ctx);
+		matched = ctx.consume(ctx.plainMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.resultData, result);
 	}
