@@ -65,7 +65,6 @@ export class MatcherContext {
 		return matched;
 	}
 
-	// fallback
 	public tryConsume<T extends (ctx: MatcherContext) => MatcherResult<MatcherResultData<T>>>(matcher: T, opts?: ConsumeOpts) {
 		opts = opts || {};
 		const fallback = this.pos;
@@ -74,6 +73,13 @@ export class MatcherContext {
 			this.pos = fallback;
 		}
 		return matched;
+	}
+
+	public match<T extends (ctx: MatcherContext) => MatcherResult<MatcherResultData<T>>>(matcher: T) {
+		const pos = this.pos;
+		const matched = matcher(this);
+		this.pos = pos;
+		return matched.ok;
 	}
 }
 
