@@ -7,6 +7,8 @@ export enum SyntaxLevel {
 	full,
 }
 
+type MatcherResultData<T> = T extends (ctx: MatcherContext) => MatcherResult<infer R> ? R : any;
+
 export class MatcherContext {
 	public input: string;
 	public pos: number = 0;
@@ -46,6 +48,15 @@ export class MatcherContext {
 
 	public getText(): string {
 		return this.input.substr(this.pos);
+	}
+
+	public match<T extends (ctx: MatcherContext) => MatcherResult<MatcherResultData<T>>>(matcher: T) {
+		const fallback = this.pos;
+		const matched = matcher(this);
+		if (!matched.ok) {
+			this.pos = fallback;
+		}
+		return matched;
 	}
 }
 
