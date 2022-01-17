@@ -16,7 +16,7 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 			return ctx.fail();
 		}
 
-		const input = ctx.input.substr(ctx.pos);
+		const input = ctx.getText();
 
 		if (ctx.depth < ctx.nestLimit) {
 			ctx.depth++;

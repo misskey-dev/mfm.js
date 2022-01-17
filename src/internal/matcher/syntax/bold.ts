@@ -5,7 +5,7 @@ export function boldAstaMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "**"
-	if (ctx.input.substr(ctx.pos, 2) != '**') {
+	if (!ctx.input.startsWith('**', ctx.pos)) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
@@ -13,11 +13,11 @@ export function boldAstaMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input.substr(ctx.pos, 2) == '**') {
+		if (ctx.input.startsWith('**', ctx.pos)) {
 			break;
 		}
 
-		matched = ctx.inlineMatcher(ctx);
+		matched = ctx.consume(ctx.inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}
@@ -28,7 +28,7 @@ export function boldAstaMatcher(ctx: MatcherContext) {
 	}
 
 	// "**"
-	if (ctx.input.substr(ctx.pos, 2) != '**') {
+	if (!ctx.input.startsWith('**', ctx.pos)) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
@@ -40,7 +40,7 @@ export function boldUnderMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "__"
-	if (ctx.input.substr(ctx.pos, 2) != '__') {
+	if (!ctx.input.startsWith('__', ctx.pos)) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
@@ -49,7 +49,7 @@ export function boldUnderMatcher(ctx: MatcherContext) {
 	// TODO
 
 	// "__"
-	if (ctx.input.substr(ctx.pos, 2) != '__') {
+	if (!ctx.input.startsWith('__', ctx.pos)) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
@@ -61,7 +61,7 @@ export function boldTagMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "<b>"
-	if (ctx.input.substr(ctx.pos, 3) != '<b>') {
+	if (!ctx.input.startsWith('<b>', ctx.pos)) {
 		return ctx.fail();
 	}
 	ctx.pos += 3;
@@ -69,11 +69,11 @@ export function boldTagMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input.substr(ctx.pos, 4) == '</b>') {
+		if (ctx.input.startsWith('</b>', ctx.pos)) {
 			break;
 		}
 
-		matched = ctx.inlineMatcher(ctx);
+		matched = ctx.consume(ctx.inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}
@@ -84,7 +84,7 @@ export function boldTagMatcher(ctx: MatcherContext) {
 	}
 
 	// "</b>"
-	if (ctx.input.substr(ctx.pos, 4) != '</b>') {
+	if (!ctx.input.startsWith('</b>', ctx.pos)) {
 		return ctx.fail();
 	}
 	ctx.pos += 4;

@@ -5,7 +5,7 @@ export function bigMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "***"
-	if (ctx.input.substr(ctx.pos, 3) != '***') {
+	if (!ctx.input.startsWith('***', ctx.pos)) {
 		return ctx.fail();
 	}
 	ctx.pos += 3;
@@ -13,11 +13,11 @@ export function bigMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input.substr(ctx.pos, 3) == '***') {
+		if (ctx.input.startsWith('***', ctx.pos)) {
 			break;
 		}
 
-		matched = ctx.inlineMatcher(ctx);
+		matched = ctx.consume(ctx.inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}
@@ -28,7 +28,7 @@ export function bigMatcher(ctx: MatcherContext) {
 	}
 
 	// "***"
-	if (ctx.input.substr(ctx.pos, 3) != '***') {
+	if (!ctx.input.startsWith('***', ctx.pos)) {
 		return ctx.fail();
 	}
 	ctx.pos += 3;

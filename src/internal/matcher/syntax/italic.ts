@@ -17,7 +17,7 @@ export function italicAstaMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		matched = ctx.inlineMatcher(ctx);
+		matched = ctx.consume(ctx.inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}
@@ -42,10 +42,10 @@ export function italicUnderMatcher(ctx: MatcherContext) {
 	// TODO: 前の文字の判定
 
 	// "_"
-	if (ctx.input.substr(ctx.pos, 2) != '__') {
+	if (ctx.input[ctx.pos] != '_') {
 		return ctx.fail();
 	}
-	ctx.pos += 2;
+	ctx.pos++;
 
 	// children
 
@@ -54,10 +54,10 @@ export function italicUnderMatcher(ctx: MatcherContext) {
 	// spacing
 
 	// "_"
-	if (ctx.input.substr(ctx.pos, 2) != '__') {
+	if (ctx.input[ctx.pos] != '_') {
 		return ctx.fail();
 	}
-	ctx.pos += 2;
+	ctx.pos++;
 
 	// TODO: 後ろの文字の判定
 
@@ -68,7 +68,7 @@ export function italicTagMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "<i>"
-	if (ctx.input.substr(ctx.pos, 3) != '<i>') {
+	if (!ctx.input.startsWith('<i>', ctx.pos)) {
 		return ctx.fail();
 	}
 	ctx.pos += 3;
@@ -76,11 +76,11 @@ export function italicTagMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input.substr(ctx.pos, 4) == '</i>') {
+		if (ctx.input.startsWith('</i>', ctx.pos)) {
 			break;
 		}
 
-		matched = ctx.inlineMatcher(ctx);
+		matched = ctx.consume(ctx.inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}
@@ -91,7 +91,7 @@ export function italicTagMatcher(ctx: MatcherContext) {
 	}
 
 	// "</i>"
-	if (ctx.input.substr(ctx.pos, 4) != '</i>') {
+	if (!ctx.input.startsWith('</i>', ctx.pos)) {
 		return ctx.fail();
 	}
 	ctx.pos += 4;
