@@ -5,7 +5,7 @@ import { boldAstaMatcher, boldTagMatcher, boldUnderMatcher } from './syntax/bold
 import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from './syntax/italic';
 import { emojiCodeMatcher } from './syntax/emojiCode';
 import { fnMatcher } from './syntax/fn';
-import { MentionMatcher } from './syntax/mention';
+import { mentionMatcher } from './syntax/mention';
 
 // NOTE: 構文要素のマッチ試行の処理は、どの構文にもマッチしなかった場合に長さ1のstring型のノードを生成します。
 // MFM文字列を処理するために構文のマッチ試行が繰り返し実行された際は、連続するstring型ノードを1つのtextノードとして連結する必要があります。
@@ -172,7 +172,7 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					if (syntaxLevel < SyntaxLevel.inline) break;
 
 					// @mention
-					matched = ctx.tryConsume(MentionMatcher);
+					matched = ctx.tryConsume(mentionMatcher);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
