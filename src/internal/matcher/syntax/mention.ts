@@ -26,7 +26,7 @@ export function mentionMatcher(ctx: MatcherContext) {
 
 	// host
 	let host: string | null = null;
-	matched = ctx.consume(hostMatcher);
+	matched = ctx.tryConsume(hostMatcher);
 	if (matched.ok) {
 		host = matched.resultData;
 	}
