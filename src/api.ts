@@ -1,12 +1,11 @@
 import { MfmNode, MfmPlainNode } from './node';
 import { stringifyNode, stringifyTree, inspectOne } from './internal/util';
 import { fullParser, plainParser } from './internal/matcher';
-import { MatcherContextOpts } from './internal/matcher/util';
 
 /**
  * Generates a MfmNode tree from the MFM string.
 */
-export function parse(input: string, opts: MatcherContextOpts = {}): MfmNode[] {
+export function parse(input: string, opts: Partial<{ fnNameList: string[]; nestLimit: number; }> = {}): MfmNode[] {
 	return fullParser(input, opts);
 }
 
