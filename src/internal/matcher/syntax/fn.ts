@@ -23,7 +23,7 @@ export function fnMatcher(ctx: MatcherContext) {
 	const params = {};
 
 	// spacing
-	matched = /^[ 　\t\u00a0]/.exec(ctx.getText());
+	matched = /^[ \u3000\t\u00a0]/.exec(ctx.getText());
 	if (matched == null) {
 		return ctx.fail();
 	}
