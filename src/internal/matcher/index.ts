@@ -6,6 +6,8 @@ import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from './synta
 import { emojiCodeMatcher } from './syntax/emojiCode';
 import { fnMatcher } from './syntax/fn';
 import { mentionMatcher } from './syntax/mention';
+import { strikeTagMatcher } from './syntax/strike';
+import { smallTagMatcher } from './syntax/small';
 
 // NOTE: 構文要素のマッチ試行の処理は、どの構文にもマッチしなかった場合に長さ1のstring型のノードを生成します。
 // MFM文字列を処理するために構文のマッチ試行が繰り返し実行された際は、連続するstring型ノードを1つのtextノードとして連結する必要があります。
@@ -71,34 +73,41 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 				}
 
 				case '<': {
-					if (input.startsWith('<s>')) {
+					if (syntaxLevel >= SyntaxLevel.inline) {
 						// <s>
-						if (syntaxLevel < SyntaxLevel.inline) break;
-					} else if (input.startsWith('<i>')) {
+						matched = ctx.tryConsume(strikeTagMatcher);
+						if (matched.ok) {
+							ctx.depth--;
+							return matched;
+						}
+
 						// <i>
-						if (syntaxLevel < SyntaxLevel.inline) break;
 						matched = ctx.tryConsume(italicTagMatcher);
 						if (matched.ok) {
 							ctx.depth--;
 							return matched;
 						}
-					} else if (input.startsWith('<b>')) {
+
 						// <b>
-						if (syntaxLevel < SyntaxLevel.inline) break;
 						matched = ctx.tryConsume(boldTagMatcher);
 						if (matched.ok) {
 							ctx.depth--;
 							return matched;
 						}
-					} else if (input.startsWith('<small>')) {
+
 						// <small>
-						if (syntaxLevel < SyntaxLevel.inline) break;
-					} else if (input.startsWith('<center>')) {
-						// <center>
-						if (syntaxLevel < SyntaxLevel.full) break;
-					} else if (input.startsWith('<https://') || input.startsWith('<http://')) {
+						matched = ctx.tryConsume(smallTagMatcher);
+						if (matched.ok) {
+							ctx.depth--;
+							return matched;
+						}
+
+						if (syntaxLevel >= SyntaxLevel.full) {
+							// <center>
+						}
+
 						// <https://example.com>
-						if (syntaxLevel < SyntaxLevel.inline) break;
+
 					}
 					break;
 				}
