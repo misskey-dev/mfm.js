@@ -10,8 +10,6 @@ function hostMatcher(ctx: MatcherContext) {
 }
 
 export function mentionMatcher(ctx: MatcherContext) {
-	let matched;
-
 	const headPos = ctx.pos;
 
 	// "@"
@@ -26,7 +24,7 @@ export function mentionMatcher(ctx: MatcherContext) {
 
 	// host
 	let host: string | null = null;
-	matched = ctx.tryConsume(hostMatcher);
+	const matched = ctx.tryConsume(hostMatcher);
 	if (matched.ok) {
 		host = matched.result;
 	}
