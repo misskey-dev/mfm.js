@@ -1,4 +1,4 @@
-import { MatcherContext } from '../matcher';
+import { CharCode, MatcherContext } from '../matcher';
 import { pushNode } from '../../util';
 import { FN, MfmInline } from '../../../node';
 
@@ -33,7 +33,7 @@ export function fnMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input[ctx.pos] == ']') {
+		if (ctx.input.charCodeAt(ctx.pos) == CharCode.closeBracket) {
 			break;
 		}
 
@@ -48,7 +48,7 @@ export function fnMatcher(ctx: MatcherContext) {
 	}
 
 	// "]"
-	if (ctx.input[ctx.pos] != ']') {
+	if (ctx.input.charCodeAt(ctx.pos) != CharCode.closeBracket) {
 		return ctx.fail();
 	}
 	ctx.pos++;

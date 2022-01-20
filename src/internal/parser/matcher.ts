@@ -10,6 +10,31 @@ import { strikeTagMatcher } from './syntax/strike';
 // NOTE: 構文要素のマッチ試行の処理は、どの構文にもマッチしなかった場合に長さ1のstring型のノードを生成します。
 // MFM文字列を処理するために構文のマッチ試行が繰り返し実行された際は、連続するstring型ノードを1つのtextノードとして連結する必要があります。
 
+export enum CharCode {
+	lf = 0x0A,            // \n
+	cr = 0x0D,            // \r
+	exclamation = 0x21,   // !
+	hash = 0x23,          // #
+	dollar = 0x24,        // $
+	openParen = 0x28,     // (
+	closeParen = 0x29,    // )
+	asterisk = 0x2A,      // *
+	comma = 0x2C,         // ,
+	dot = 0x2E,           // .
+	colon = 0x3A,         // :
+	lessThan = 0x3C,      // <
+	equals = 0x3D,        // =
+	greaterThan = 0x3E,   // >
+	question = 0x3F,      // ?
+	at = 0x40,            // @
+	openBracket = 0x5B,   // [
+	backslash = 0x5C,     // \
+	closeBracket = 0x5D,  // ]
+	underscore = 0x5F,    // _
+	backtick = 0x60,      // `
+	tilde = 0x7E,         // ~
+}
+
 export type Matcher<T> = (ctx: MatcherContext) => Match<T>;
 
 export type Match<T> = MatchSuccess<T> | MatchFailure;
@@ -128,9 +153,9 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 		if (ctx.depth < ctx.nestLimit) {
 			ctx.depth++;
 
-			switch (ctx.input[ctx.pos]) {
+			switch (ctx.input.charCodeAt(ctx.pos)) {
 
-				case '*': {
+				case CharCode.asterisk: {
 					if (syntaxLevel < SyntaxLevel.inline) break;
 
 					// ***big***
@@ -156,7 +181,7 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					break;
 				}
 
-				case '$': {
+				case CharCode.dollar: {
 					if (syntaxLevel < SyntaxLevel.inline) break;
 
 					// $[fn ]
@@ -168,14 +193,14 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					break;
 				}
 
-				case '?': {
+				case CharCode.question: {
 					if (syntaxLevel < SyntaxLevel.inline) break;
 
 					// ?[silent link]()
 					break;
 				}
 
-				case '<': {
+				case CharCode.lessThan: {
 					if (syntaxLevel >= SyntaxLevel.inline) {
 						// <s>
 						matched = ctx.tryConsume(strikeTagMatcher);
@@ -215,39 +240,39 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					break;
 				}
 
-				case '>': {
+				case CharCode.greaterThan: {
 					if (syntaxLevel < SyntaxLevel.full) break;
 
 					// > quote
 					break;
 				}
 
-				case '[': {
+				case CharCode.openBracket: {
 					if (syntaxLevel < SyntaxLevel.inline) break;
 
 					// [link]()
 					break;
 				}
 
-				case '`': {
+				case CharCode.backtick: {
 					// ```code block```
 					// `inline code`
 					break;
 				}
 
-				case '\\': {
+				case CharCode.backslash: {
 					// \(math inline\)
 					// \[math block\]
 					break;
 				}
 
-				case '~': {
+				case CharCode.tilde: {
 					if (syntaxLevel < SyntaxLevel.inline) break;
 					// ~~strike~~
 					break;
 				}
 
-				case ':': {
+				case CharCode.colon: {
 					if (syntaxLevel < SyntaxLevel.plain) break;
 
 					// :emojiCode:
@@ -260,7 +285,7 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					break;
 				}
 
-				case '_': {
+				case CharCode.underscore: {
 					if (syntaxLevel < SyntaxLevel.inline) break;
 
 					// __bold__
@@ -280,7 +305,7 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					break;
 				}
 
-				case '@': {
+				case CharCode.at: {
 					if (syntaxLevel < SyntaxLevel.inline) break;
 
 					// @mention
@@ -293,21 +318,15 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 					break;
 				}
 
-				case '#': {
+				case CharCode.hash: {
 					if (syntaxLevel < SyntaxLevel.inline) break;
 
 					// #hashtag
 					break;
 				}
-
-				case 'h': {
-					if (syntaxLevel < SyntaxLevel.inline) break;
-
-					// https://example.com
-					break;
-				}
 			}
 
+			// https://example.com
 			// search
 			// unicode emoji
 
@@ -315,7 +334,7 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 		}
 
 		// text node
-		const text = ctx.input[ctx.pos];
+		const text = ctx.input.charAt(ctx.pos);
 		ctx.pos++;
 
 		return ctx.ok(text);

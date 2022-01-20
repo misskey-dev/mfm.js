@@ -1,4 +1,4 @@
-import { MatcherContext } from '../matcher';
+import { CharCode, MatcherContext } from '../matcher';
 import { pushNode } from '../../util';
 import { ITALIC, MfmInline } from '../../../node';
 
@@ -6,7 +6,7 @@ export function italicAstaMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "*"
-	if (ctx.input[ctx.pos] != '*') {
+	if (ctx.input.charCodeAt(ctx.pos) != CharCode.asterisk) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -14,7 +14,7 @@ export function italicAstaMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input[ctx.pos] == '*') {
+		if (ctx.input.charCodeAt(ctx.pos) == CharCode.asterisk) {
 			break;
 		}
 
@@ -29,7 +29,7 @@ export function italicAstaMatcher(ctx: MatcherContext) {
 	}
 
 	// "*"
-	if (ctx.input[ctx.pos] != '*') {
+	if (ctx.input.charCodeAt(ctx.pos) != CharCode.asterisk) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -43,7 +43,7 @@ export function italicUnderMatcher(ctx: MatcherContext) {
 	// TODO: 前の文字の判定
 
 	// "_"
-	if (ctx.input[ctx.pos] != '_') {
+	if (ctx.input.charCodeAt(ctx.pos) != CharCode.underscore) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -55,7 +55,7 @@ export function italicUnderMatcher(ctx: MatcherContext) {
 	// spacing
 
 	// "_"
-	if (ctx.input[ctx.pos] != '_') {
+	if (ctx.input.charCodeAt(ctx.pos) != CharCode.underscore) {
 		return ctx.fail();
 	}
 	ctx.pos++;

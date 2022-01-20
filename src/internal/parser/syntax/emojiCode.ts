@@ -1,9 +1,9 @@
-import { MatcherContext } from '../matcher';
+import { CharCode, MatcherContext } from '../matcher';
 import { EMOJI_CODE } from '../../../node';
 
 export function emojiCodeMatcher(ctx: MatcherContext) {
 	// ":"
-	if (ctx.input[ctx.pos] != ':') {
+	if (ctx.input.charCodeAt(ctx.pos) != CharCode.colon) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -17,7 +17,7 @@ export function emojiCodeMatcher(ctx: MatcherContext) {
 	ctx.pos += name.length;
 
 	// ":"
-	if (ctx.input[ctx.pos] != ':') {
+	if (ctx.input.charCodeAt(ctx.pos) != CharCode.colon) {
 		return ctx.fail();
 	}
 	ctx.pos++;

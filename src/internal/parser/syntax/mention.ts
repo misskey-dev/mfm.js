@@ -1,4 +1,4 @@
-import { MatcherContext } from '../matcher';
+import { CharCode, MatcherContext } from '../matcher';
 import { MENTION } from '../../../node';
 
 function hostMatcher(ctx: MatcherContext) {
@@ -15,7 +15,7 @@ export function mentionMatcher(ctx: MatcherContext) {
 	const headPos = ctx.pos;
 
 	// "@"
-	if (ctx.input[ctx.pos] != '@') {
+	if (ctx.input.charCodeAt(ctx.pos) != CharCode.at) {
 		return ctx.fail();
 	}
 	ctx.pos++;
