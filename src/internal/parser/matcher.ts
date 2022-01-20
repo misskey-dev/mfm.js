@@ -1,11 +1,12 @@
 import { bigMatcher } from './syntax/big';
 import { boldAstaMatcher, boldTagMatcher, boldUnderMatcher } from './syntax/bold';
+import { centerTagMatcher } from './syntax/center';
 import { emojiCodeMatcher } from './syntax/emojiCode';
 import { fnMatcher } from './syntax/fn';
 import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from './syntax/italic';
 import { mentionMatcher } from './syntax/mention';
 import { smallTagMatcher } from './syntax/small';
-import { strikeTagMatcher } from './syntax/strike';
+import { strikeTagMatcher, strikeTildeMatcher } from './syntax/strike';
 
 // NOTE: 構文要素のマッチ試行の処理は、どの構文にもマッチしなかった場合に長さ1のstring型のノードを生成します。
 // MFM文字列を処理するために構文のマッチ試行が繰り返し実行された際は、連続するstring型ノードを1つのtextノードとして連結する必要があります。
@@ -232,6 +233,11 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 
 						if (syntaxLevel >= SyntaxLevel.full) {
 							// <center>
+							matched = ctx.tryConsume(centerTagMatcher);
+							if (matched.ok) {
+								ctx.depth--;
+								return matched;
+							}
 						}
 
 						// <https://example.com>
@@ -268,7 +274,14 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 
 				case CharCode.tilde: {
 					if (syntaxLevel < SyntaxLevel.inline) break;
+
 					// ~~strike~~
+					matched = ctx.tryConsume(strikeTildeMatcher);
+					if (matched.ok) {
+						ctx.depth--;
+						return matched;
+					}
+
 					break;
 				}
 
