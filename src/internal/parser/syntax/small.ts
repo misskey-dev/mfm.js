@@ -1,5 +1,6 @@
+import { MatcherContext } from '../matcher';
+import { pushNode } from '../../util';
 import { MfmInline, SMALL } from '../../../node';
-import { MatcherContext, pushNode } from '../util';
 
 export function smallTagMatcher(ctx: MatcherContext) {
 	let matched;
@@ -21,7 +22,7 @@ export function smallTagMatcher(ctx: MatcherContext) {
 		if (!matched.ok) {
 			return ctx.fail();
 		}
-		pushNode(matched.resultData, children);
+		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {
 		return ctx.fail();

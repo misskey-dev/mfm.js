@@ -1,6 +1,6 @@
 import { MfmNode, MfmPlainNode } from './node';
 import { stringifyNode, stringifyTree, inspectOne } from './internal/util';
-import { fullParser, plainParser } from './internal/matcher';
+import { fullParser, plainParser } from './internal/parser';
 
 /**
  * Generates a MfmNode tree from the MFM string.

@@ -1,5 +1,5 @@
+import { MatcherContext } from '../matcher';
 import { EMOJI_CODE } from '../../../node';
-import { MatcherContext } from '../util';
 
 export function emojiCodeMatcher(ctx: MatcherContext) {
 	// ":"

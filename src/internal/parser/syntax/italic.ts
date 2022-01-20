@@ -1,5 +1,6 @@
+import { MatcherContext } from '../matcher';
+import { pushNode } from '../../util';
 import { ITALIC, MfmInline } from '../../../node';
-import { MatcherContext, pushNode } from '../util';
 
 export function italicAstaMatcher(ctx: MatcherContext) {
 	let matched;
@@ -21,7 +22,7 @@ export function italicAstaMatcher(ctx: MatcherContext) {
 		if (!matched.ok) {
 			return ctx.fail();
 		}
-		pushNode(matched.resultData, children);
+		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {
 		return ctx.fail();
@@ -84,7 +85,7 @@ export function italicTagMatcher(ctx: MatcherContext) {
 		if (!matched.ok) {
 			return ctx.fail();
 		}
-		pushNode(matched.resultData, children);
+		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {
 		return ctx.fail();

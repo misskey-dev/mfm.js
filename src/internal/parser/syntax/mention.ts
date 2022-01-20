@@ -1,5 +1,5 @@
+import { MatcherContext } from '../matcher';
 import { MENTION } from '../../../node';
-import { MatcherContext } from '../util';
 
 function hostMatcher(ctx: MatcherContext) {
 
@@ -28,7 +28,7 @@ export function mentionMatcher(ctx: MatcherContext) {
 	let host: string | null = null;
 	matched = ctx.tryConsume(hostMatcher);
 	if (matched.ok) {
-		host = matched.resultData;
+		host = matched.result;
 	}
 
 	const acct = ctx.input.substring(headPos, ctx.pos);

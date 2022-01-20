@@ -1,5 +1,6 @@
+import { LfMatcher, MatcherContext } from '../matcher';
+import { pushNode } from '../../util';
 import { MfmInline, STRIKE } from '../../../node';
-import { MatcherContext, pushNode } from '../util';
 
 export function strikeTagMatcher(ctx: MatcherContext) {
 	let matched;
@@ -17,7 +18,7 @@ export function strikeTagMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		if (/^\r\n|[\r\n]/.test(ctx.getText())) {
+		if (LfMatcher(ctx).ok) {
 			break;
 		}
 
@@ -25,7 +26,7 @@ export function strikeTagMatcher(ctx: MatcherContext) {
 		if (!matched.ok) {
 			return ctx.fail();
 		}
-		pushNode(matched.resultData, children);
+		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {
 		return ctx.fail();

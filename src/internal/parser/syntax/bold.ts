@@ -1,5 +1,6 @@
+import { MatcherContext } from '../matcher';
+import { pushNode } from '../../util';
 import { BOLD, MfmInline } from '../../../node';
-import { MatcherContext, pushNode } from '../util';
 
 export function boldAstaMatcher(ctx: MatcherContext) {
 	let matched;
@@ -21,7 +22,7 @@ export function boldAstaMatcher(ctx: MatcherContext) {
 		if (!matched.ok) {
 			return ctx.fail();
 		}
-		pushNode(matched.resultData, children);
+		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {
 		return ctx.fail();
@@ -77,7 +78,7 @@ export function boldTagMatcher(ctx: MatcherContext) {
 		if (!matched.ok) {
 			return ctx.fail();
 		}
-		pushNode(matched.resultData, children);
+		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {
 		return ctx.fail();

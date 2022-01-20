@@ -1,5 +1,6 @@
+import { MatcherContext } from '../matcher';
+import { pushNode } from '../../util';
 import { FN, MfmInline } from '../../../node';
-import { MatcherContext, pushNode } from '../util';
 
 export function bigMatcher(ctx: MatcherContext) {
 	let matched;
@@ -21,7 +22,7 @@ export function bigMatcher(ctx: MatcherContext) {
 		if (!matched.ok) {
 			return ctx.fail();
 		}
-		pushNode(matched.resultData, children);
+		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {
 		return ctx.fail();
