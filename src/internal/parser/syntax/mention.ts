@@ -1,5 +1,6 @@
-import { CharCode, MatcherContext } from '../matcher';
 import { MENTION } from '../../../node';
+import { MatcherContext } from '../services/matcher';
+import { CharCode } from '../services/string';
 
 function hostMatcher(ctx: MatcherContext) {
 

@@ -1,6 +1,7 @@
-import { LfMatcher, MatcherContext } from '../matcher';
-import { pushNode } from '../../util';
 import { CENTER, MfmInline } from '../../../node';
+import { MatcherContext } from '../services/matcher';
+import { pushNode } from '../services/nodeTree';
+import { LfMatcher } from '../services/utilMatchers';
 
 export function centerTagMatcher(ctx: MatcherContext) {
 	let matched;

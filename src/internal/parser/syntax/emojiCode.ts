@@ -1,5 +1,6 @@
-import { CharCode, MatcherContext } from '../matcher';
 import { EMOJI_CODE } from '../../../node';
+import { MatcherContext } from '../services/matcher';
+import { CharCode } from '../services/string';
 
 export function emojiCodeMatcher(ctx: MatcherContext) {
 	// ":"

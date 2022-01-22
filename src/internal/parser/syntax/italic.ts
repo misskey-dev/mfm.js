@@ -1,6 +1,7 @@
-import { CharCode, MatcherContext } from '../matcher';
-import { pushNode } from '../../util';
 import { ITALIC, MfmInline } from '../../../node';
+import { MatcherContext } from '../services/matcher';
+import { pushNode } from '../services/nodeTree';
+import { CharCode } from '../services/string';
 
 export function italicAstaMatcher(ctx: MatcherContext) {
 	let matched;

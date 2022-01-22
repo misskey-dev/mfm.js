@@ -1,8 +1,13 @@
-import { MatcherContext, MatcherContextOpts } from './matcher';
-import { pushNode } from '../util';
 import { MfmNode, MfmPlainNode } from '../../node';
+import { MatcherContext } from './services/matcher';
+import { pushNode } from './services/nodeTree';
 
-export function fullParser(input: string, opts: MatcherContextOpts) {
+export type FullParserOpts = Partial<{
+	fnNameList: string[];
+	nestLimit: number;
+}>;
+
+export function fullParser(input: string, opts: FullParserOpts) {
 	const ctx = new MatcherContext(input, opts);
 	const result: MfmNode[] = [];
 	let matched;

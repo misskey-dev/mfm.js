@@ -1,6 +1,7 @@
-import { LfMatcher, MatcherContext } from '../matcher';
-import { pushNode } from '../../util';
 import { MfmInline, STRIKE } from '../../../node';
+import { MatcherContext } from '../services/matcher';
+import { pushNode } from '../services/nodeTree';
+import { LfMatcher } from '../services/utilMatchers';
 
 export function strikeTagMatcher(ctx: MatcherContext) {
 	let matched;

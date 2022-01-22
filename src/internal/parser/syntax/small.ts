@@ -1,6 +1,6 @@
-import { MatcherContext } from '../matcher';
-import { pushNode } from '../../util';
 import { MfmInline, SMALL } from '../../../node';
+import { MatcherContext } from '../services/matcher';
+import { pushNode } from '../services/nodeTree';
 
 export function smallTagMatcher(ctx: MatcherContext) {
 	let matched;
