@@ -2,6 +2,7 @@ import { ITALIC, MfmInline } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
+import { inlineMatcher } from '../services/syntaxMatcher';
 
 export function italicAstaMatcher(ctx: MatcherContext) {
 	let matched;
@@ -19,7 +20,7 @@ export function italicAstaMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		matched = ctx.consume(ctx.inlineMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}
@@ -82,7 +83,7 @@ export function italicTagMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		matched = ctx.consume(ctx.inlineMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}

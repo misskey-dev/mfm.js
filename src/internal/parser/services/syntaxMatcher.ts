@@ -8,7 +8,6 @@ import { emojiCodeMatcher } from '../syntax/emojiCode';
 import { fnMatcher } from '../syntax/fn';
 import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from '../syntax/italic';
 import { mentionMatcher } from '../syntax/mention';
-import { quoteMatcher } from '../syntax/quote';
 import { smallTagMatcher } from '../syntax/small';
 import { strikeTagMatcher, strikeTildeMatcher } from '../syntax/strike';
 
@@ -18,6 +17,10 @@ export enum SyntaxLevel {
 	full,
 }
 
+export const plainMatcher = createSyntaxMatcher(SyntaxLevel.plain);
+export const inlineMatcher = createSyntaxMatcher(SyntaxLevel.inline);
+export const fullMatcher = createSyntaxMatcher(SyntaxLevel.full);
+
 // NOTE: SyntaxMatcherは、どの構文にもマッチしなかった場合に長さ1のstring型のノードを生成します。
 // MFM文字列を処理するために構文のマッチ試行が繰り返し実行された際は、連続するstring型ノードを1つのtextノードとして連結する必要があります。
 
@@ -25,7 +28,8 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 	return function (ctx: MatcherContext) {
 		let matched;
 
-		if (ctx.eof()) {
+		// check EOF
+		if (ctx.pos >= ctx.input.length) {
 			return ctx.fail();
 		}
 

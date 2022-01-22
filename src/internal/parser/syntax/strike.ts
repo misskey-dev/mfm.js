@@ -1,6 +1,7 @@
 import { MfmInline, STRIKE } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
+import { inlineMatcher } from '../services/syntaxMatcher';
 import { LfMatcher } from '../services/utilMatchers';
 
 export function strikeTagMatcher(ctx: MatcherContext) {
@@ -23,7 +24,7 @@ export function strikeTagMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		matched = ctx.consume(ctx.inlineMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}
@@ -62,7 +63,7 @@ export function strikeTildeMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		matched = ctx.consume(ctx.inlineMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}

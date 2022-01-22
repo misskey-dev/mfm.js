@@ -1,6 +1,7 @@
 import { BOLD, MfmInline } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
+import { inlineMatcher } from '../services/syntaxMatcher';
 
 export function boldAstaMatcher(ctx: MatcherContext) {
 	let matched;
@@ -18,7 +19,7 @@ export function boldAstaMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		matched = ctx.consume(ctx.inlineMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}
@@ -74,7 +75,7 @@ export function boldTagMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		matched = ctx.consume(ctx.inlineMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}

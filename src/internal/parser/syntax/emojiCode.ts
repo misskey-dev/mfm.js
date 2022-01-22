@@ -10,7 +10,7 @@ export function emojiCodeMatcher(ctx: MatcherContext) {
 	ctx.pos++;
 
 	// name
-	const matched = /^[a-z0-9_+-]+/i.exec(ctx.getText());
+	const matched = /^[a-z0-9_+-]+/i.exec(ctx.input.substr(ctx.pos));
 	if (matched == null) {
 		return ctx.fail();
 	}

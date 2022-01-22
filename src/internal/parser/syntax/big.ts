@@ -1,6 +1,7 @@
 import { FN, MfmInline } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
+import { inlineMatcher } from '../services/syntaxMatcher';
 
 export function bigMatcher(ctx: MatcherContext) {
 	let matched;
@@ -18,7 +19,7 @@ export function bigMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		matched = ctx.consume(ctx.inlineMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}

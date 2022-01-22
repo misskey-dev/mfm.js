@@ -1,7 +1,7 @@
 import { MatcherContext } from './matcher';
 
 export function LfMatcher(ctx: MatcherContext) {
-	const matched = /^\r\n|[\r\n]/.exec(ctx.getText());
+	const matched = /^\r\n|[\r\n]/.exec(ctx.input.substr(ctx.pos));
 	if (matched == null) {
 		return ctx.fail();
 	}

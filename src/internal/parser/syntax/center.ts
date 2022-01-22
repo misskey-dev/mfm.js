@@ -1,6 +1,7 @@
 import { CENTER, MfmInline } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
+import { inlineMatcher } from '../services/syntaxMatcher';
 import { LfMatcher } from '../services/utilMatchers';
 
 export function centerTagMatcher(ctx: MatcherContext) {
@@ -30,7 +31,7 @@ export function centerTagMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		matched = ctx.consume(ctx.inlineMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}

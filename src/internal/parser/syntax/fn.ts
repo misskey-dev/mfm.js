@@ -2,6 +2,7 @@ import { FN, MfmInline } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
+import { inlineMatcher } from '../services/syntaxMatcher';
 
 export function fnMatcher(ctx: MatcherContext) {
 	let matched;
@@ -13,7 +14,7 @@ export function fnMatcher(ctx: MatcherContext) {
 	ctx.pos += 2;
 
 	// name
-	matched = /^[a-z0-9_]+/i.exec(ctx.getText());
+	matched = /^[a-z0-9_]+/i.exec(ctx.input.substr(ctx.pos));
 	if (matched == null) {
 		return ctx.fail();
 	}
@@ -25,7 +26,7 @@ export function fnMatcher(ctx: MatcherContext) {
 	const params = {};
 
 	// spacing
-	matched = /^[ \u3000\t\u00a0]/.exec(ctx.getText());
+	matched = /^[ \u3000\t\u00a0]/.exec(ctx.input.substr(ctx.pos));
 	if (matched == null) {
 		return ctx.fail();
 	}
@@ -38,7 +39,7 @@ export function fnMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		matched = ctx.consume(ctx.inlineMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}
