@@ -75,6 +75,7 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 				case CharCode.question: {
 					if (syntaxLevel >= SyntaxLevel.inline) {
 						// ?[silent link]()
+						// silentLinkMatcher
 					}
 					break;
 				}
@@ -127,11 +128,7 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 				case CharCode.greaterThan: {
 					if (syntaxLevel >= SyntaxLevel.full) {
 						// > quote
-						matched = ctx.tryConsume(quoteMatcher);
-						if (matched.ok) {
-							ctx.depth--;
-							return matched;
-						}
+						// quoteMatcher
 					}
 					break;
 				}
@@ -139,6 +136,7 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 				case CharCode.openBracket: {
 					if (syntaxLevel >= SyntaxLevel.inline) {
 						// [link]()
+						// linkMatcher
 					}
 					break;
 				}
@@ -213,30 +211,38 @@ export function createSyntaxMatcher(syntaxLevel: SyntaxLevel) {
 				}
 
 				case CharCode.at: {
-					if (syntaxLevel < SyntaxLevel.inline) break;
-
-					// @mention
-					matched = ctx.tryConsume(mentionMatcher);
-					if (matched.ok) {
-						ctx.depth--;
-						return matched;
+					if (syntaxLevel >= SyntaxLevel.inline) {
+						// @mention
+						matched = ctx.tryConsume(mentionMatcher);
+						if (matched.ok) {
+							ctx.depth--;
+							return matched;
+						}
 					}
-
 					break;
 				}
 
 				case CharCode.hash: {
-					if (syntaxLevel < SyntaxLevel.inline) break;
-
-					// #hashtag
-					// hashtagMatcher;
+					if (syntaxLevel >= SyntaxLevel.inline) {
+						// #hashtag
+						// hashtagMatcher
+					}
 					break;
 				}
 			}
 
-			// https://example.com
-			// search
-			// unicode emoji
+			if (syntaxLevel >= SyntaxLevel.plain) {
+				// unicode emoji
+				// unicodeEmojiMatcher
+
+				if (syntaxLevel >= SyntaxLevel.inline) {
+					// https://url.com
+					// urlMatcher
+
+					// abc [search]
+					// searchMatcher
+				}
+			}
 
 			ctx.depth--;
 		}
