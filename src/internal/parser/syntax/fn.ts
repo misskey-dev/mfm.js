@@ -2,7 +2,7 @@ import { FN, MfmInline } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
-import { inlineMatcher } from '../services/syntaxMatcher';
+import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
 export function fnMatcher(ctx: MatcherContext) {
 	let matched;
@@ -39,7 +39,7 @@ export function fnMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		matched = ctx.consume(inlineMatcher);
+		matched = ctx.consume(inlineSyntaxMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}

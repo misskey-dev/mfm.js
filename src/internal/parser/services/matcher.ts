@@ -13,7 +13,7 @@ export type MatchFailure = {
 	ok: false;
 };
 
-export type MatchResult<T> = T extends (ctx: MatcherContext) => Match<infer R> ? R : any;
+export type MatchResult<T> = T extends Matcher<infer R> ? R : any;
 
 export type ConsumeOpts = Partial<{}>;
 
@@ -44,13 +44,13 @@ export class MatcherContext {
 		};
 	}
 
-	public consume<T extends (ctx: MatcherContext) => Match<MatchResult<T>>>(matcher: T, opts?: ConsumeOpts) {
+	public consume<T extends Matcher<MatchResult<T>>>(matcher: T, opts?: ConsumeOpts) {
 		opts = opts || {};
 		const matched = matcher(this);
 		return matched;
 	}
 
-	public tryConsume<T extends (ctx: MatcherContext) => Match<MatchResult<T>>>(matcher: T, opts?: ConsumeOpts) {
+	public tryConsume<T extends Matcher<MatchResult<T>>>(matcher: T, opts?: ConsumeOpts) {
 		opts = opts || {};
 		const fallback = this.pos;
 		const matched = matcher(this);
@@ -60,7 +60,7 @@ export class MatcherContext {
 		return matched;
 	}
 
-	public match<T extends (ctx: MatcherContext) => Match<MatchResult<T>>>(matcher: T) {
+	public match<T extends Matcher<MatchResult<T>>>(matcher: T) {
 		const pos = this.pos;
 		const matched = matcher(this);
 		this.pos = pos;

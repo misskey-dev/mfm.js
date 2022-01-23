@@ -1,7 +1,7 @@
 import { MfmInline, SMALL } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
-import { inlineMatcher } from '../services/syntaxMatcher';
+import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
 export function smallTagMatcher(ctx: MatcherContext) {
 	let matched;
@@ -19,7 +19,7 @@ export function smallTagMatcher(ctx: MatcherContext) {
 			break;
 		}
 
-		matched = ctx.consume(inlineMatcher);
+		matched = ctx.consume(inlineSyntaxMatcher);
 		if (!matched.ok) {
 			return ctx.fail();
 		}

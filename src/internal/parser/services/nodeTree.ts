@@ -1,9 +1,6 @@
-import { MfmInline, MfmNode, MfmPlainNode, TEXT } from '../../../node';
+import { MfmNode, MfmText, TEXT } from '../../../node';
 
-export function pushNode(node: MfmNode | string, nodes: MfmNode[]): void
-export function pushNode(node: MfmInline | string, nodes: MfmInline[]): void
-export function pushNode(node: MfmPlainNode | string, nodes: MfmPlainNode[]): void
-export function pushNode(node: MfmNode | string, nodes: MfmNode[]): void {
+export function pushNode<T extends MfmNode>(node: T | string, nodes: (T | MfmText)[]): void {
 	if (typeof node != 'string') {
 		nodes.push(node);
 		return;
@@ -12,7 +9,7 @@ export function pushNode(node: MfmNode | string, nodes: MfmNode[]): void {
 	if (nodes.length > 0) {
 		const lastNode = nodes[nodes.length - 1];
 		if (lastNode.type == 'text') {
-			lastNode.props.text += node;
+			(lastNode as MfmText).props.text += node;
 			return;
 		}
 	}
