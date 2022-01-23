@@ -16,7 +16,7 @@ function argMatcher(ctx: MatcherContext) {
 		const v = matched[2];
 		return ctx.ok({
 			k: k,
-			v: v
+			v: v,
 		});
 	}
 
@@ -27,7 +27,7 @@ function argMatcher(ctx: MatcherContext) {
 		const k = matched[1];
 		return ctx.ok<{ k: string, v: string | true }>({
 			k: k,
-			v: true
+			v: true,
 		});
 	}
 
@@ -52,7 +52,7 @@ function argsMatcher(ctx: MatcherContext) {
 	args[matched.result.k] = matched.result.v;
 
 	while (true) {
-		let fallback = ctx.pos;
+		const fallback = ctx.pos;
 		// ","
 		if (ctx.input.charCodeAt(ctx.pos) != CharCode.comma) {
 			break;
