@@ -17,6 +17,8 @@ export enum CharCode {
 	asterisk = 0x2A,
 	// ,
 	comma = 0x2C,
+	// -
+	minus = 0x2D,
 	// .
 	dot = 0x2E,
 	// :
