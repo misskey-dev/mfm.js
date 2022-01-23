@@ -16,7 +16,7 @@ export function hashtagMatcher(ctx: MatcherContext) {
 		if (ctx.eof()) {
 			break;
 		}
-		if (/^[ 　\t.,!?'"#:\/\[\]【】()「」<>]/i.test(ctx.input.substr(ctx.pos))) {
+		if (/^[ \u3000\t.,!?'"#:/[\]【】()「」<>]/i.test(ctx.input.substr(ctx.pos))) {
 			break;
 		}
 		if (ctx.match(LfMatcher).ok) {

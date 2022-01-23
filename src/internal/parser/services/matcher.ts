@@ -15,7 +15,9 @@ export type MatchFailure = {
 
 export type MatchResult<T> = T extends Matcher<infer R> ? R : any;
 
-export type ConsumeOpts = Partial<{}>;
+export type ConsumeOpts = Partial<{
+
+}>;
 
 export class MatcherContext {
 	public input: string;
