@@ -44,6 +44,10 @@ export class MatcherContext {
 		};
 	}
 
+	public eof(): boolean {
+		return this.pos >= this.input.length;
+	}
+
 	public consume<T extends Matcher<MatchResult<T>>>(matcher: T, opts?: ConsumeOpts) {
 		opts = opts || {};
 		const matched = matcher(this);
@@ -64,6 +68,6 @@ export class MatcherContext {
 		const pos = this.pos;
 		const matched = matcher(this);
 		this.pos = pos;
-		return matched.ok;
+		return matched;
 	}
 }

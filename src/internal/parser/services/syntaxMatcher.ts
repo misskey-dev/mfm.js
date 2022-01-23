@@ -10,6 +10,7 @@ import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from '../synt
 import { mentionMatcher } from '../syntax/mention';
 import { smallTagMatcher } from '../syntax/small';
 import { strikeTagMatcher, strikeTildeMatcher } from '../syntax/strike';
+import { hashtagMatcher } from '../syntax/hashtag';
 
 // NOTE: SyntaxMatcher は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。
@@ -22,7 +23,7 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// check EOF
-	if (ctx.pos >= ctx.input.length) {
+	if (ctx.eof()) {
 		return ctx.fail();
 	}
 
@@ -191,7 +192,11 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 
 			case CharCode.hash: {
 				// #hashtag
-				// hashtagMatcher
+				matched = ctx.tryConsume(hashtagMatcher);
+				if (matched.ok) {
+					ctx.depth--;
+					return matched;
+				}
 				break;
 			}
 		}
@@ -219,7 +224,7 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// check EOF
-	if (ctx.pos >= ctx.input.length) {
+	if (ctx.eof()) {
 		return ctx.fail();
 	}
 
@@ -369,7 +374,11 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 
 			case CharCode.hash: {
 				// #hashtag
-				// hashtagMatcher
+				matched = ctx.tryConsume(hashtagMatcher);
+				if (matched.ok) {
+					ctx.depth--;
+					return matched;
+				}
 				break;
 			}
 		}
@@ -397,7 +406,7 @@ export function plainSyntaxMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// check EOF
-	if (ctx.pos >= ctx.input.length) {
+	if (ctx.eof()) {
 		return ctx.fail();
 	}
 
