@@ -7,6 +7,8 @@ import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 export function italicAstaMatcher(ctx: MatcherContext) {
 	let matched;
 
+	// TODO: 前の文字の判定
+
 	// "*"
 	if (ctx.input.charCodeAt(ctx.pos) != CharCode.asterisk) {
 		return ctx.fail();
@@ -61,8 +63,6 @@ export function italicUnderMatcher(ctx: MatcherContext) {
 		return ctx.fail();
 	}
 	ctx.pos++;
-
-	// TODO: 後ろの文字の判定
 
 	return ctx.ok(ITALIC([]));
 }
