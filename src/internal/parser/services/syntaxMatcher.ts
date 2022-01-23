@@ -155,7 +155,7 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 
 			case CharCode.colon: {
 				// :emojiCode:
-				matched = ctx.consume(emojiCodeMatcher);
+				matched = ctx.tryConsume(emojiCodeMatcher);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -337,7 +337,7 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 
 			case CharCode.colon: {
 				// :emojiCode:
-				matched = ctx.consume(emojiCodeMatcher);
+				matched = ctx.tryConsume(emojiCodeMatcher);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -411,7 +411,7 @@ export function plainSyntaxMatcher(ctx: MatcherContext) {
 	}
 
 	// :emojiCode:
-	matched = ctx.consume(emojiCodeMatcher);
+	matched = ctx.tryConsume(emojiCodeMatcher);
 	if (matched.ok) {
 		return matched;
 	}
