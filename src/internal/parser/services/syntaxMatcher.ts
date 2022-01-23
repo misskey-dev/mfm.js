@@ -6,11 +6,12 @@ import { boldAstaMatcher, boldTagMatcher, boldUnderMatcher } from '../syntax/bol
 import { centerTagMatcher } from '../syntax/center';
 import { emojiCodeMatcher } from '../syntax/emojiCode';
 import { fnMatcher } from '../syntax/fn';
+import { hashtagMatcher } from '../syntax/hashtag';
 import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from '../syntax/italic';
 import { mentionMatcher } from '../syntax/mention';
 import { smallTagMatcher } from '../syntax/small';
 import { strikeTagMatcher, strikeTildeMatcher } from '../syntax/strike';
-import { hashtagMatcher } from '../syntax/hashtag';
+import { unicodeEmojiMatcher } from '../syntax/unicodeEmoji';
 
 // NOTE: SyntaxMatcher は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。
@@ -202,7 +203,11 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 		}
 
 		// unicode emoji
-		// unicodeEmojiMatcher
+		matched = ctx.tryConsume(unicodeEmojiMatcher);
+		if (matched.ok) {
+			ctx.depth--;
+			return matched;
+		}
 
 		// https://url.com
 		// urlMatcher
@@ -384,7 +389,11 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 		}
 
 		// unicode emoji
-		// unicodeEmojiMatcher
+		matched = ctx.tryConsume(unicodeEmojiMatcher);
+		if (matched.ok) {
+			ctx.depth--;
+			return matched;
+		}
 
 		// https://url.com
 		// urlMatcher
@@ -417,7 +426,10 @@ export function plainSyntaxMatcher(ctx: MatcherContext) {
 	}
 
 	// unicode emoji
-	// unicodeEmojiMatcher
+	matched = ctx.tryConsume(unicodeEmojiMatcher);
+	if (matched.ok) {
+		return matched;
+	}
 
 	// text node
 	const text = ctx.input.charAt(ctx.pos);
