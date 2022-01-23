@@ -36,6 +36,7 @@ function hostMatcher(ctx: MatcherContext) {
 	if (length != name.length) {
 		name = name.substr(0, length);
 	}
+	ctx.pos += name.length;
 
 	return ctx.ok(name);
 }
@@ -76,6 +77,7 @@ export function mentionMatcher(ctx: MatcherContext) {
 	if (length != name.length) {
 		name = name.substr(0, length);
 	}
+	ctx.pos += name.length;
 
 	// host
 	matched = ctx.tryConsume(hostMatcher);
