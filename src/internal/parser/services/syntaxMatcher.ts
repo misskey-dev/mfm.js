@@ -12,6 +12,7 @@ import { mentionMatcher } from '../syntax/mention';
 import { smallTagMatcher } from '../syntax/small';
 import { strikeTagMatcher, strikeTildeMatcher } from '../syntax/strike';
 import { unicodeEmojiMatcher } from '../syntax/unicodeEmoji';
+import { inlineCodeMatcher } from '../syntax/inlineCode';
 
 // NOTE: SyntaxMatcher は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。
@@ -131,7 +132,11 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 				// codeBlockMatcher;
 
 				// `inline code`
-				// inlineCodeMatcher
+				matched = ctx.tryConsume(inlineCodeMatcher);
+				if (matched.ok) {
+					ctx.depth--;
+					return matched;
+				}
 				break;
 			}
 
@@ -320,7 +325,11 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 
 			case CharCode.backtick: {
 				// `inline code`
-				// inlineCodeMatcher
+				matched = ctx.tryConsume(inlineCodeMatcher);
+				if (matched.ok) {
+					ctx.depth--;
+					return matched;
+				}
 				break;
 			}
 
