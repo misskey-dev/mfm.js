@@ -9,10 +9,10 @@ export type FullParserOpts = Partial<{
 }>;
 
 export function fullParser(input: string, opts: FullParserOpts) {
-	const ctx = new MatcherContext(input, opts);
 	const result: MfmNode[] = [];
-	let matched;
 
+	const ctx = new MatcherContext(input, opts);
+	let matched;
 	while (true) {
 		matched = ctx.consume(fullSyntaxMatcher);
 		if (!matched.ok) break;
@@ -23,10 +23,10 @@ export function fullParser(input: string, opts: FullParserOpts) {
 }
 
 export function plainParser(input: string) {
-	const ctx = new MatcherContext(input, {});
 	const result: MfmPlainNode[] = [];
-	let matched;
 
+	const ctx = new MatcherContext(input, {});
+	let matched;
 	while (true) {
 		matched = ctx.consume(plainSyntaxMatcher);
 		if (!matched.ok) break;
