@@ -4,6 +4,7 @@ import { isAllowedAsBackChar } from '../services/matchingUtil';
 import { CharCode } from '../services/string';
 import { LfMatcher } from '../services/utilMatchers';
 
+// TODO: 「#」がUnicode絵文字の一部である場合があるので判定する
 // TODO: 括弧は対になっている時のみ内容に含めることができる。対象: `()` `[]` `「」`
 
 export function hashtagMatcher(ctx: MatcherContext) {
