@@ -1,27 +1,15 @@
 import { HASHTAG } from '../../../node';
 import { MatcherContext } from '../services/matcher';
+import { isAllowedAsBackChar } from '../services/matchingUtil';
 import { CharCode } from '../services/string';
-import { LfMatcher, spacingMatcher } from '../services/utilMatchers';
+import { LfMatcher } from '../services/utilMatchers';
 
 // TODO: 括弧は対になっている時のみ内容に含めることができる。対象: `()` `[]` `「」`
 
-// `#`の前の文字が:
-// 無い OR 改行 OR スペース OR ![a-z0-9]i
-// の時はハッシュタグとして認識する
-
 export function hashtagMatcher(ctx: MatcherContext) {
-
-	// check a back charactor
-	if (ctx.pos > 0) {
-		ctx.pos--;
-		if (
-			ctx.match(LfMatcher).ok &&
-			!ctx.match(spacingMatcher).ok &&
-			/^[a-z0-9]/i.test(ctx.input.charAt(ctx.pos))
-		) {
-			return ctx.fail();
-		}
-		ctx.pos++;
+	// check a back char
+	if (!isAllowedAsBackChar(ctx)) {
+		return ctx.fail();
 	}
 
 	// "#"
