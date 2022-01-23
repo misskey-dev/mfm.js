@@ -13,7 +13,7 @@ export function inlineCodeMatcher(ctx: MatcherContext) {
 	// code
 	let code = '';
 	while (true) {
-		if (ctx.input.charCodeAt(ctx.pos) == CharCode.backtick) {
+		if (/^[`´]/.test(ctx.input.charAt(ctx.pos))) {
 			break;
 		}
 		if (ctx.match(LfMatcher).ok) {
