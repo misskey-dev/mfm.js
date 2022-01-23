@@ -9,3 +9,13 @@ export function LfMatcher(ctx: MatcherContext) {
 
 	return ctx.ok(matched[0]);
 }
+
+export function spacingMatcher(ctx: MatcherContext) {
+	const matched = /^[ \u3000\t\u00a0]/.exec(ctx.input.substr(ctx.pos));
+	if (matched == null) {
+		return ctx.fail();
+	}
+	ctx.pos++;
+
+	return ctx.ok(matched[0]);
+}
