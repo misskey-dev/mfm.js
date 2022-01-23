@@ -1,7 +1,8 @@
-import { BOLD, MfmInline } from '../../../node';
+import { BOLD, MfmInline, TEXT } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
+import { spacingMatcher } from '../services/utilMatchers';
 
 export function boldAstaMatcher(ctx: MatcherContext) {
 	let matched;
@@ -47,8 +48,22 @@ export function boldUnderMatcher(ctx: MatcherContext) {
 	}
 	ctx.pos += 2;
 
-	// children
-	// TODO
+	// text
+	let text = '';
+	while (true) {
+		matched = /^[a-z0-9]/i.exec(ctx.input.substr(ctx.pos));
+		if (matched != null) {
+			text += matched[0];
+			ctx.pos++;
+			continue;
+		}
+		matched = ctx.tryConsume(spacingMatcher);
+		if (matched.ok) {
+			text += matched.result;
+			continue;
+		}
+		break;
+	}
 
 	// "__"
 	if (!ctx.input.startsWith('__', ctx.pos)) {
@@ -56,7 +71,7 @@ export function boldUnderMatcher(ctx: MatcherContext) {
 	}
 	ctx.pos += 2;
 
-	return ctx.ok(BOLD([]));
+	return ctx.ok(BOLD([TEXT(text)]));
 }
 
 export function boldTagMatcher(ctx: MatcherContext) {
