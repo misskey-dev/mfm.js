@@ -1,8 +1,11 @@
 import { LINK } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { CharCode } from '../services/string';
+import { urlAltMatcher, urlMatcher } from './url';
 
 export function linkMatcher(ctx: MatcherContext) {
+	let matched;
+
 	// "["
 	if (ctx.input.charCodeAt(ctx.pos) != CharCode.openBracket) {
 		return ctx.fail();
@@ -17,7 +20,21 @@ export function linkMatcher(ctx: MatcherContext) {
 	}
 	ctx.pos += 2;
 
-	// TODO: url
+	// url
+	let url = null;
+	matched = ctx.tryConsume(urlAltMatcher);
+	if (matched.ok) {
+		url = matched.result;
+	}
+	if (url == null) {
+		matched = ctx.tryConsume(urlMatcher);
+		if (matched.ok) {
+			url = matched.result;
+		}
+	}
+	if (url == null) {
+		return ctx.fail();
+	}
 
 	// ")"
 	if (ctx.input.charCodeAt(ctx.pos) != CharCode.closeParen) {
@@ -25,7 +42,7 @@ export function linkMatcher(ctx: MatcherContext) {
 	}
 	ctx.pos++;
 
-	return ctx.ok(LINK(false, '', []));
+	return ctx.ok(LINK(false, url.props.url, []));
 }
 
 export function silentLinkMatcher(ctx: MatcherContext) {
