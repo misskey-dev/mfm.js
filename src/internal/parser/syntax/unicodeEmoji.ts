@@ -1,6 +1,6 @@
 import { UNI_EMOJI } from '../../../node';
 import { MatcherContext } from '../services/matcher';
-const emojiRegex: RegExp = require('twemoji-parser/dist/lib/regex').default;
+import emojiRegex from 'twemoji-parser/dist/lib/regex';
 const anchoredEmojiRegex = RegExp(`^(?:${emojiRegex.source})`);
 
 export function unicodeEmojiMatcher(ctx: MatcherContext) {
