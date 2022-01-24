@@ -13,6 +13,7 @@ import { smallTagMatcher } from '../syntax/small';
 import { strikeTagMatcher, strikeTildeMatcher } from '../syntax/strike';
 import { unicodeEmojiMatcher } from '../syntax/unicodeEmoji';
 import { inlineCodeMatcher } from '../syntax/inlineCode';
+import { urlAltMatcher, urlMatcher } from '../syntax/url';
 
 // NOTE: SyntaxMatcher は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。
@@ -111,7 +112,11 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 				}
 
 				// <https://example.com>
-				// urlAltMatcher
+				matched = ctx.tryConsume(urlAltMatcher);
+				if (matched.ok) {
+					ctx.depth--;
+					return matched;
+				}
 				break;
 			}
 
@@ -214,8 +219,12 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 			return matched;
 		}
 
-		// https://url.com
-		// urlMatcher
+		// https://example.com
+		matched = ctx.tryConsume(urlMatcher);
+		if (matched.ok) {
+			ctx.depth--;
+			return matched;
+		}
 
 		// abc [search]
 		// searchMatcher
@@ -313,7 +322,11 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 				}
 
 				// <https://example.com>
-				// urlAltMatcher
+				matched = ctx.tryConsume(urlAltMatcher);
+				if (matched.ok) {
+					ctx.depth--;
+					return matched;
+				}
 				break;
 			}
 
@@ -404,8 +417,12 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 			return matched;
 		}
 
-		// https://url.com
-		// urlMatcher
+		// https://example.com
+		matched = ctx.tryConsume(urlMatcher);
+		if (matched.ok) {
+			ctx.depth--;
+			return matched;
+		}
 
 		// abc [search]
 		// searchMatcher
