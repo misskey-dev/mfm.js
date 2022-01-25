@@ -365,14 +365,12 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 }
 
 export function plainSyntaxMatcher(ctx: MatcherContext) {
-	let matched;
-
 	// check EOF
 	if (ctx.eof()) {
 		return ctx.fail();
 	}
 
-	matched = ctx.tryConsumeAny([
+	const matched = ctx.tryConsumeAny([
 		// :emojiCode:
 		emojiCodeMatcher,
 		// unicode emoji
