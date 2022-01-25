@@ -1,3 +1,4 @@
+import { createContext } from 'vm';
 import { FullParserOpts } from '../index';
 
 export type Matcher<T> = (ctx: MatcherContext) => Match<T>;
@@ -66,10 +67,32 @@ export class MatcherContext {
 		return matched;
 	}
 
+	public tryConsumeAny<T extends Matcher<MatchResult<T>>>(matchers: T[]) {
+		for (const matcher of matchers) {
+			const matched = this.tryConsume(matcher);
+			if (matched.ok) {
+				return matched;
+			}
+		}
+		return this.fail();
+	}
+
 	public match<T extends Matcher<MatchResult<T>>>(matcher: T) {
 		const pos = this.pos;
 		const matched = matcher(this);
 		this.pos = pos;
 		return matched;
+	}
+
+	public matchCharCode(charCode: number) {
+		return this.input.charCodeAt(this.pos) == charCode;
+	}
+
+	public matchStr(value: string) {
+		return this.input.startsWith(value, this.pos);
+	}
+
+	public matchRegex(regex: RegExp) {
+		return regex.exec(this.input.substr(this.pos));
 	}
 }
