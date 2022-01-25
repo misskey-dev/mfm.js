@@ -4,8 +4,6 @@ import { CharCode } from '../services/string';
 import { urlAltMatcher, urlMatcher } from './url';
 
 export function linkMatcher(ctx: MatcherContext) {
-	let matched;
-
 	// "["
 	if (!ctx.matchCharCode(CharCode.openBracket)) {
 		return ctx.fail();
@@ -21,7 +19,7 @@ export function linkMatcher(ctx: MatcherContext) {
 	ctx.pos += 2;
 
 	// url
-	matched = ctx.tryConsumeAny([
+	const matched = ctx.tryConsumeAny([
 		urlAltMatcher,
 		urlMatcher,
 	]);
