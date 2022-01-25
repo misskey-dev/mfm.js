@@ -8,7 +8,7 @@ export function strikeTagMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "<s>"
-	if (!ctx.input.startsWith('<s>', ctx.pos)) {
+	if (!ctx.matchStr('<s>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 3;
@@ -16,7 +16,7 @@ export function strikeTagMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input.startsWith('</s>', ctx.pos)) {
+		if (ctx.matchStr('</s>')) {
 			break;
 		}
 
@@ -35,7 +35,7 @@ export function strikeTagMatcher(ctx: MatcherContext) {
 	}
 
 	// "</s>"
-	if (!ctx.input.startsWith('</s>', ctx.pos)) {
+	if (!ctx.matchStr('</s>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 4;
@@ -47,7 +47,7 @@ export function strikeTildeMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "~~"
-	if (!ctx.input.startsWith('~~', ctx.pos)) {
+	if (!ctx.matchStr('~~')) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
@@ -55,7 +55,7 @@ export function strikeTildeMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input.startsWith('~', ctx.pos)) {
+		if (ctx.matchStr('~')) {
 			break;
 		}
 
@@ -74,7 +74,7 @@ export function strikeTildeMatcher(ctx: MatcherContext) {
 	}
 
 	// "~~"
-	if (!ctx.input.startsWith('~~', ctx.pos)) {
+	if (!ctx.matchStr('~~')) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;

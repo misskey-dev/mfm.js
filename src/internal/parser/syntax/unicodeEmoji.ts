@@ -4,7 +4,7 @@ import emojiRegex from 'twemoji-parser/dist/lib/regex';
 const anchoredEmojiRegex = RegExp(`^(?:${emojiRegex.source})`);
 
 export function unicodeEmojiMatcher(ctx: MatcherContext) {
-	const matched = anchoredEmojiRegex.exec(ctx.input.substr(ctx.pos));
+	const matched = ctx.matchRegex(anchoredEmojiRegex);
 	if (matched == null) {
 		return ctx.fail();
 	}

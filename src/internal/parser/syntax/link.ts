@@ -7,7 +7,7 @@ export function linkMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "["
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.openBracket) {
+	if (!ctx.matchCharCode(CharCode.openBracket)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -15,29 +15,23 @@ export function linkMatcher(ctx: MatcherContext) {
 	// TODO: link label
 
 	// "]("
-	if (!ctx.input.startsWith('](', ctx.pos)) {
+	if (!ctx.matchStr('](')) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
 
 	// url
-	let url = null;
-	matched = ctx.tryConsume(urlAltMatcher);
-	if (matched.ok) {
-		url = matched.result;
-	}
-	if (url == null) {
-		matched = ctx.tryConsume(urlMatcher);
-		if (matched.ok) {
-			url = matched.result;
-		}
-	}
-	if (url == null) {
+	matched = ctx.tryConsumeAny([
+		urlAltMatcher,
+		urlMatcher,
+	]);
+	if (!matched.ok) {
 		return ctx.fail();
 	}
+	const url = matched.result;
 
 	// ")"
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.closeParen) {
+	if (!ctx.matchCharCode(CharCode.closeParen)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -47,7 +41,7 @@ export function linkMatcher(ctx: MatcherContext) {
 
 export function silentLinkMatcher(ctx: MatcherContext) {
 	// "?"
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.question) {
+	if (!ctx.matchCharCode(CharCode.question)) {
 		return ctx.fail();
 	}
 	ctx.pos++;

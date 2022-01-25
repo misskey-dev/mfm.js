@@ -9,7 +9,7 @@ function argMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// select 1: key + value
-	matched = /^([a-z0-9_]+)=([a-z0-9_.]+)/i.exec(ctx.input.substr(ctx.pos));
+	matched = ctx.matchRegex(/^([a-z0-9_]+)=([a-z0-9_.]+)/i);
 	if (matched != null) {
 		ctx.pos += matched[0].length;
 		const k = matched[1];
@@ -21,7 +21,7 @@ function argMatcher(ctx: MatcherContext) {
 	}
 
 	// select 2: key
-	matched = /^([a-z0-9_]+)/i.exec(ctx.input.substr(ctx.pos));
+	matched = ctx.matchRegex(/^([a-z0-9_]+)/i);
 	if (matched != null) {
 		ctx.pos += matched[0].length;
 		const k = matched[1];
@@ -39,7 +39,7 @@ function argsMatcher(ctx: MatcherContext) {
 	const args: Record<string, string | true> = {};
 
 	// "."
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.dot) {
+	if (!ctx.matchCharCode(CharCode.dot)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -54,7 +54,7 @@ function argsMatcher(ctx: MatcherContext) {
 	while (true) {
 		const fallback = ctx.pos;
 		// ","
-		if (ctx.input.charCodeAt(ctx.pos) != CharCode.comma) {
+		if (!ctx.matchCharCode(CharCode.comma)) {
 			break;
 		}
 		ctx.pos++;
@@ -76,13 +76,13 @@ export function fnMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "$["
-	if (!ctx.input.startsWith('$[', ctx.pos)) {
+	if (!ctx.matchStr('$[')) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
 
 	// name
-	matched = /^[a-z0-9_]+/i.exec(ctx.input.substr(ctx.pos));
+	matched = ctx.matchRegex(/^[a-z0-9_]+/i);
 	if (matched == null) {
 		return ctx.fail();
 	}
@@ -101,7 +101,7 @@ export function fnMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input.charCodeAt(ctx.pos) == CharCode.closeBracket) {
+		if (ctx.matchCharCode(CharCode.closeBracket)) {
 			break;
 		}
 
@@ -116,7 +116,7 @@ export function fnMatcher(ctx: MatcherContext) {
 	}
 
 	// "]"
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.closeBracket) {
+	if (!ctx.matchCharCode(CharCode.closeBracket)) {
 		return ctx.fail();
 	}
 	ctx.pos++;

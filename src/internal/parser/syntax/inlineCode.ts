@@ -5,7 +5,7 @@ import { LfMatcher } from '../services/utilMatchers';
 
 export function inlineCodeMatcher(ctx: MatcherContext) {
 	// "`"
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.backtick) {
+	if (!ctx.matchCharCode(CharCode.backtick)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -30,7 +30,7 @@ export function inlineCodeMatcher(ctx: MatcherContext) {
 	}
 
 	// "`"
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.backtick) {
+	if (!ctx.matchCharCode(CharCode.backtick)) {
 		return ctx.fail();
 	}
 	ctx.pos++;

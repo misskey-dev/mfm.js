@@ -13,7 +13,7 @@ export function centerTagMatcher(ctx: MatcherContext) {
 	}
 
 	// "<center>"
-	if (!ctx.input.startsWith('<center>', ctx.pos)) {
+	if (!ctx.matchStr('<center>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 8;
@@ -27,7 +27,7 @@ export function centerTagMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input.startsWith('</center>', ctx.pos)) {
+		if (ctx.matchStr('</center>')) {
 			break;
 		}
 
@@ -48,7 +48,7 @@ export function centerTagMatcher(ctx: MatcherContext) {
 	}
 
 	// "</center>"
-	if (!ctx.input.startsWith('</center>', ctx.pos)) {
+	if (!ctx.matchStr('</center>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 9;

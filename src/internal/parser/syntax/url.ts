@@ -16,7 +16,7 @@ export function urlMatcher(ctx: MatcherContext) {
 	// scheme
 	let found = false;
 	for (const sch of schemes) {
-		if (ctx.input.startsWith(sch + ':', ctx.pos)) {
+		if (ctx.matchStr(sch + ':')) {
 			found = true;
 			ctx.pos += sch.length + 1;
 			break;
@@ -26,7 +26,7 @@ export function urlMatcher(ctx: MatcherContext) {
 		return ctx.fail();
 	}
 
-	const matched = /^\/\/[.,a-z0-9_/:%#@$&?!~=+-]+/i.exec(ctx.input.substr(ctx.pos));
+	const matched = ctx.matchRegex(/^\/\/[.,a-z0-9_/:%#@$&?!~=+-]+/i);
 	if (matched == null) {
 		return ctx.fail();
 	}
@@ -39,7 +39,7 @@ export function urlMatcher(ctx: MatcherContext) {
 
 export function urlAltMatcher(ctx: MatcherContext) {
 	// "<"
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.lessThan) {
+	if (!ctx.matchCharCode(CharCode.lessThan)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -49,7 +49,7 @@ export function urlAltMatcher(ctx: MatcherContext) {
 	// scheme
 	let found = false;
 	for (const sch of schemes) {
-		if (ctx.input.startsWith(sch + ':', ctx.pos)) {
+		if (ctx.matchStr(sch + ':')) {
 			found = true;
 			ctx.pos += sch.length + 1;
 			break;
@@ -61,7 +61,7 @@ export function urlAltMatcher(ctx: MatcherContext) {
 
 	let c = '';
 	while (true) {
-		if (ctx.input.charCodeAt(ctx.pos) == CharCode.greaterThan) {
+		if (ctx.matchCharCode(CharCode.greaterThan)) {
 			break;
 		}
 		if (ctx.match(LfMatcher).ok) {
@@ -83,7 +83,7 @@ export function urlAltMatcher(ctx: MatcherContext) {
 	const urlTail = ctx.pos;
 
 	// ">"
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.greaterThan) {
+	if (!ctx.matchCharCode(CharCode.greaterThan)) {
 		return ctx.fail();
 	}
 	ctx.pos++;

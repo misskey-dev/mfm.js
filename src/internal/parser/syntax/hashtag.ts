@@ -14,7 +14,7 @@ export function hashtagMatcher(ctx: MatcherContext) {
 	}
 
 	// "#"
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.hash) {
+	if (!ctx.matchCharCode(CharCode.hash)) {
 		return ctx.fail();
 	}
 	ctx.pos++;

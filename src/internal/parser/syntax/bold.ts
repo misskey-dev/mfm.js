@@ -8,7 +8,7 @@ export function boldAstaMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "**"
-	if (!ctx.input.startsWith('**', ctx.pos)) {
+	if (!ctx.matchStr('**')) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
@@ -16,7 +16,7 @@ export function boldAstaMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input.startsWith('**', ctx.pos)) {
+		if (ctx.matchStr('**')) {
 			break;
 		}
 
@@ -31,7 +31,7 @@ export function boldAstaMatcher(ctx: MatcherContext) {
 	}
 
 	// "**"
-	if (!ctx.input.startsWith('**', ctx.pos)) {
+	if (!ctx.matchStr('**')) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
@@ -43,7 +43,7 @@ export function boldUnderMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "__"
-	if (!ctx.input.startsWith('__', ctx.pos)) {
+	if (!ctx.matchStr('__')) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
@@ -51,7 +51,7 @@ export function boldUnderMatcher(ctx: MatcherContext) {
 	// text
 	let text = '';
 	while (true) {
-		matched = /^[a-z0-9]/i.exec(ctx.input.substr(ctx.pos));
+		matched = ctx.matchRegex(/^[a-z0-9]/i);
 		if (matched != null) {
 			text += matched[0];
 			ctx.pos++;
@@ -66,7 +66,7 @@ export function boldUnderMatcher(ctx: MatcherContext) {
 	}
 
 	// "__"
-	if (!ctx.input.startsWith('__', ctx.pos)) {
+	if (!ctx.matchStr('__')) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
@@ -78,7 +78,7 @@ export function boldTagMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "<b>"
-	if (!ctx.input.startsWith('<b>', ctx.pos)) {
+	if (!ctx.matchStr('<b>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 3;
@@ -86,7 +86,7 @@ export function boldTagMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input.startsWith('</b>', ctx.pos)) {
+		if (ctx.matchStr('</b>')) {
 			break;
 		}
 
@@ -101,7 +101,7 @@ export function boldTagMatcher(ctx: MatcherContext) {
 	}
 
 	// "</b>"
-	if (!ctx.input.startsWith('</b>', ctx.pos)) {
+	if (!ctx.matchStr('</b>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 4;

@@ -7,7 +7,7 @@ export function smallTagMatcher(ctx: MatcherContext) {
 	let matched;
 
 	// "<small>"
-	if (!ctx.input.startsWith('<small>', ctx.pos)) {
+	if (!ctx.matchStr('<small>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 7;
@@ -15,7 +15,7 @@ export function smallTagMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.input.startsWith('</small>', ctx.pos)) {
+		if (ctx.matchStr('</small>')) {
 			break;
 		}
 
@@ -30,7 +30,7 @@ export function smallTagMatcher(ctx: MatcherContext) {
 	}
 
 	// "</small>"
-	if (!ctx.input.startsWith('</small>', ctx.pos)) {
+	if (!ctx.matchStr('</small>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 8;

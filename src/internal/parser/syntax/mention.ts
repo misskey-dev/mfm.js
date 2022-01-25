@@ -5,13 +5,13 @@ import { CharCode } from '../services/string';
 
 function hostMatcher(ctx: MatcherContext) {
 	// "@"
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.at) {
+	if (!ctx.matchCharCode(CharCode.at)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
 
 	// name
-	const matched = /^[a-z0-9_.-]+/.exec(ctx.input.substr(ctx.pos));
+	const matched = ctx.matchRegex(/^[a-z0-9_.-]+/);
 	if (matched == null) {
 		return ctx.fail();
 	}
@@ -51,13 +51,13 @@ export function mentionMatcher(ctx: MatcherContext) {
 	}
 
 	// "@"
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.at) {
+	if (!ctx.matchCharCode(CharCode.at)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
 
 	// name
-	matched = /^[a-z0-9_-]+/.exec(ctx.input.substr(ctx.pos));
+	matched = ctx.matchRegex(/^[a-z0-9_-]+/);
 	if (matched == null) {
 		return ctx.fail();
 	}

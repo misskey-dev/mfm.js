@@ -4,13 +4,13 @@ import { CharCode } from '../services/string';
 
 export function emojiCodeMatcher(ctx: MatcherContext) {
 	// ":"
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.colon) {
+	if (!ctx.matchCharCode(CharCode.colon)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
 
 	// name
-	const matched = /^[a-z0-9_+-]+/i.exec(ctx.input.substr(ctx.pos));
+	const matched = ctx.matchRegex(/^[a-z0-9_+-]+/i);
 	if (matched == null) {
 		return ctx.fail();
 	}
@@ -18,7 +18,7 @@ export function emojiCodeMatcher(ctx: MatcherContext) {
 	ctx.pos += name.length;
 
 	// ":"
-	if (ctx.input.charCodeAt(ctx.pos) != CharCode.colon) {
+	if (!ctx.matchCharCode(CharCode.colon)) {
 		return ctx.fail();
 	}
 	ctx.pos++;

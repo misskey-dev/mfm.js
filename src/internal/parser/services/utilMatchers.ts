@@ -1,7 +1,7 @@
 import { MatcherContext } from './matcher';
 
 export function LfMatcher(ctx: MatcherContext) {
-	const matched = /^\r\n|[\r\n]/.exec(ctx.input.substr(ctx.pos));
+	const matched = ctx.matchRegex(/^\r\n|[\r\n]/);
 	if (matched == null) {
 		return ctx.fail();
 	}
@@ -11,7 +11,7 @@ export function LfMatcher(ctx: MatcherContext) {
 }
 
 export function spacingMatcher(ctx: MatcherContext) {
-	const matched = /^[ \u3000\t\u00a0]/.exec(ctx.input.substr(ctx.pos));
+	const matched = ctx.matchRegex(/^[ \u3000\t\u00a0]/);
 	if (matched == null) {
 		return ctx.fail();
 	}
