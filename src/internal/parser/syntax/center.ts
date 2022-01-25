@@ -2,7 +2,6 @@ import { CENTER, MfmInline } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
-import { LfMatcher } from '../services/utilMatchers';
 
 export function centerTagMatcher(ctx: MatcherContext) {
 	let matched;
@@ -19,9 +18,9 @@ export function centerTagMatcher(ctx: MatcherContext) {
 	ctx.pos += 8;
 
 	// optional LF
-	matched = LfMatcher(ctx);
-	if (matched.ok) {
-		ctx.pos += matched.result.length;
+	matched = ctx.matchRegex(/^\r\n|[\r\n]/);
+	if (matched != null) {
+		ctx.pos += matched[0].length;
 	}
 
 	// children
@@ -38,9 +37,9 @@ export function centerTagMatcher(ctx: MatcherContext) {
 	}
 
 	// optional LF
-	matched = LfMatcher(ctx);
-	if (matched.ok) {
-		ctx.pos += matched.result.length;
+	matched = ctx.matchRegex(/^\r\n|[\r\n]/);
+	if (matched != null) {
+		ctx.pos += matched[0].length;
 	}
 
 	// "</center>"

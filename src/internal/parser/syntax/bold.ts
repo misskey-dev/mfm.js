@@ -2,7 +2,6 @@ import { BOLD, MfmInline, TEXT } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
-import { spacingMatcher } from '../services/utilMatchers';
 
 export function boldAstaMatcher(ctx: MatcherContext) {
 	let matched;
@@ -53,9 +52,9 @@ export function boldUnderMatcher(ctx: MatcherContext) {
 			ctx.pos++;
 			continue;
 		}
-		matched = ctx.tryConsume(spacingMatcher);
-		if (matched.ok) {
-			text += matched.result;
+		matched = ctx.matchRegex(/^[ \u3000\t\u00a0]/);
+		if (matched != null) {
+			text += matched[0];
 			continue;
 		}
 		break;

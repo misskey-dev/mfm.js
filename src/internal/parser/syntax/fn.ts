@@ -3,7 +3,6 @@ import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
-import { spacingMatcher } from '../services/utilMatchers';
 
 function argMatcher(ctx: MatcherContext) {
 	let matched;

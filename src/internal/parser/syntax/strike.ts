@@ -2,7 +2,6 @@ import { MfmInline, STRIKE } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
-import { LfMatcher } from '../services/utilMatchers';
 
 export function strikeTagMatcher(ctx: MatcherContext) {
 	let matched;
@@ -17,7 +16,7 @@ export function strikeTagMatcher(ctx: MatcherContext) {
 	const children: MfmInline[] = [];
 	while (true) {
 		if (ctx.matchStr('</s>')) break;
-		if (LfMatcher(ctx).ok) break;
+		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null) break;
 
 		matched = ctx.consume(inlineSyntaxMatcher);
 		if (!matched.ok) break;
@@ -49,7 +48,7 @@ export function strikeTildeMatcher(ctx: MatcherContext) {
 	const children: MfmInline[] = [];
 	while (true) {
 		if (ctx.matchStr('~')) break;
-		if (LfMatcher(ctx).ok) break;
+		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null) break;
 
 		matched = ctx.consume(inlineSyntaxMatcher);
 		if (!matched.ok) break;

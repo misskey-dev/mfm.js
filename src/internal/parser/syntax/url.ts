@@ -1,7 +1,6 @@
 import { N_URL } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { CharCode } from '../services/string';
-import { LfMatcher, spacingMatcher } from '../services/utilMatchers';
 
 // TODO: urlMatcher 括弧のペア
 
@@ -62,8 +61,8 @@ export function urlAltMatcher(ctx: MatcherContext) {
 	let c = '';
 	while (true) {
 		if (ctx.matchCharCode(CharCode.greaterThan)) break;
-		if (ctx.match(LfMatcher).ok) break;
-		if (ctx.match(spacingMatcher).ok) break;
+		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null) break;
+		if (ctx.matchRegex(/^[ \u3000\t\u00a0]/) != null) break;
 		if (ctx.eof()) break;
 
 		c += ctx.input.charAt(ctx.pos);

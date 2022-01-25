@@ -1,7 +1,6 @@
 import { INLINE_CODE } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { CharCode } from '../services/string';
-import { LfMatcher } from '../services/utilMatchers';
 
 export function inlineCodeMatcher(ctx: MatcherContext) {
 	// "`"
@@ -14,7 +13,7 @@ export function inlineCodeMatcher(ctx: MatcherContext) {
 	let code = '';
 	while (true) {
 		if (/^[`´]/.test(ctx.input.charAt(ctx.pos))) break;
-		if (ctx.match(LfMatcher).ok) break;
+		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null) break;
 		if (ctx.eof()) break;
 
 		code += ctx.input.charAt(ctx.pos);
