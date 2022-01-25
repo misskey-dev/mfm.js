@@ -36,22 +36,14 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 		switch (ctx.input.charCodeAt(ctx.pos)) {
 
 			case CharCode.asterisk: {
-				// ***big***
-				matched = ctx.tryConsume(bigMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// **bold**
-				matched = ctx.tryConsume(boldAstaMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// *italic*
-				matched = ctx.tryConsume(italicAstaMatcher);
+				matched = ctx.tryConsumeAny([
+					// ***big***
+					bigMatcher,
+					// **bold**
+					boldAstaMatcher,
+					// *italic*
+					italicAstaMatcher,
+				]);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -76,43 +68,20 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 			}
 
 			case CharCode.lessThan: {
-				// <s>
-				matched = ctx.tryConsume(strikeTagMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// <i>
-				matched = ctx.tryConsume(italicTagMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// <b>
-				matched = ctx.tryConsume(boldTagMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// <small>
-				matched = ctx.tryConsume(smallTagMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// <center>
-				matched = ctx.tryConsume(centerTagMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// <https://example.com>
-				matched = ctx.tryConsume(urlAltMatcher);
+				matched = ctx.tryConsumeAny([
+					// <s>
+					strikeTagMatcher,
+					// <i>
+					italicTagMatcher,
+					// <b>
+					boldTagMatcher,
+					// <small>
+					smallTagMatcher,
+					// <center>
+					centerTagMatcher,
+					// <https://example.com>
+					urlAltMatcher,
+				]);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -175,15 +144,12 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 			}
 
 			case CharCode.underscore: {
-				// __bold__
-				matched = ctx.tryConsume(boldUnderMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// _italic_
-				matched = ctx.tryConsume(italicUnderMatcher);
+				matched = ctx.tryConsumeAny([
+					// __bold__
+					boldUnderMatcher,
+					// _italic_
+					italicUnderMatcher,
+				]);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -212,22 +178,18 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 			}
 		}
 
-		// unicode emoji
-		matched = ctx.tryConsume(unicodeEmojiMatcher);
+		matched = ctx.tryConsumeAny([
+			// unicode emoji
+			unicodeEmojiMatcher,
+			// https://example.com
+			urlMatcher,
+			// abc [search]
+			// searchMatcher,
+		]);
 		if (matched.ok) {
 			ctx.depth--;
 			return matched;
 		}
-
-		// https://example.com
-		matched = ctx.tryConsume(urlMatcher);
-		if (matched.ok) {
-			ctx.depth--;
-			return matched;
-		}
-
-		// abc [search]
-		// searchMatcher
 
 		ctx.depth--;
 	}
@@ -253,22 +215,14 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 		switch (ctx.input.charCodeAt(ctx.pos)) {
 
 			case CharCode.asterisk: {
-				// ***big***
-				matched = ctx.tryConsume(bigMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// **bold**
-				matched = ctx.tryConsume(boldAstaMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// *italic*
-				matched = ctx.tryConsume(italicAstaMatcher);
+				matched = ctx.tryConsumeAny([
+					// ***big***
+					bigMatcher,
+					// **bold**
+					boldAstaMatcher,
+					// *italic*
+					italicAstaMatcher,
+				]);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -293,36 +247,18 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 			}
 
 			case CharCode.lessThan: {
-				// <s>
-				matched = ctx.tryConsume(strikeTagMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// <i>
-				matched = ctx.tryConsume(italicTagMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// <b>
-				matched = ctx.tryConsume(boldTagMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// <small>
-				matched = ctx.tryConsume(smallTagMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// <https://example.com>
-				matched = ctx.tryConsume(urlAltMatcher);
+				matched = ctx.tryConsumeAny([
+					// <s>
+					strikeTagMatcher,
+					// <i>
+					italicTagMatcher,
+					// <b>
+					boldTagMatcher,
+					// <small>
+					smallTagMatcher,
+					// <https://example.com>
+					urlAltMatcher,
+				]);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -373,15 +309,12 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 			}
 
 			case CharCode.underscore: {
-				// __bold__
-				matched = ctx.tryConsume(boldUnderMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// _italic_
-				matched = ctx.tryConsume(italicUnderMatcher);
+				matched = ctx.tryConsumeAny([
+					// __bold__
+					boldUnderMatcher,
+					// _italic_
+					italicUnderMatcher,
+				]);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -410,22 +343,16 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 			}
 		}
 
-		// unicode emoji
-		matched = ctx.tryConsume(unicodeEmojiMatcher);
+		matched = ctx.tryConsumeAny([
+			// unicode emoji
+			unicodeEmojiMatcher,
+			// https://example.com
+			urlMatcher,
+		]);
 		if (matched.ok) {
 			ctx.depth--;
 			return matched;
 		}
-
-		// https://example.com
-		matched = ctx.tryConsume(urlMatcher);
-		if (matched.ok) {
-			ctx.depth--;
-			return matched;
-		}
-
-		// abc [search]
-		// searchMatcher
 
 		ctx.depth--;
 	}
@@ -445,14 +372,12 @@ export function plainSyntaxMatcher(ctx: MatcherContext) {
 		return ctx.fail();
 	}
 
-	// :emojiCode:
-	matched = ctx.tryConsume(emojiCodeMatcher);
-	if (matched.ok) {
-		return matched;
-	}
-
-	// unicode emoji
-	matched = ctx.tryConsume(unicodeEmojiMatcher);
+	matched = ctx.tryConsumeAny([
+		// :emojiCode:
+		emojiCodeMatcher,
+		// unicode emoji
+		unicodeEmojiMatcher,
+	]);
 	if (matched.ok) {
 		return matched;
 	}
