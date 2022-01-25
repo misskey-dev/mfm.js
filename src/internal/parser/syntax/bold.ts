@@ -16,14 +16,10 @@ export function boldAstaMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchStr('**')) {
-			break;
-		}
+		if (ctx.matchStr('**')) break;
 
 		matched = ctx.consume(inlineSyntaxMatcher);
-		if (!matched.ok) {
-			return ctx.fail();
-		}
+		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {
@@ -86,14 +82,10 @@ export function boldTagMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchStr('</b>')) {
-			break;
-		}
+		if (ctx.matchStr('</b>')) break;
 
 		matched = ctx.consume(inlineSyntaxMatcher);
-		if (!matched.ok) {
-			return ctx.fail();
-		}
+		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {

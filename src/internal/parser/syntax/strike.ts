@@ -16,18 +16,11 @@ export function strikeTagMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchStr('</s>')) {
-			break;
-		}
-
-		if (LfMatcher(ctx).ok) {
-			break;
-		}
+		if (ctx.matchStr('</s>')) break;
+		if (LfMatcher(ctx).ok) break;
 
 		matched = ctx.consume(inlineSyntaxMatcher);
-		if (!matched.ok) {
-			return ctx.fail();
-		}
+		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {
@@ -55,18 +48,11 @@ export function strikeTildeMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchStr('~')) {
-			break;
-		}
-
-		if (LfMatcher(ctx).ok) {
-			break;
-		}
+		if (ctx.matchStr('~')) break;
+		if (LfMatcher(ctx).ok) break;
 
 		matched = ctx.consume(inlineSyntaxMatcher);
-		if (!matched.ok) {
-			return ctx.fail();
-		}
+		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {

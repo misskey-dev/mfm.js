@@ -15,14 +15,10 @@ export function smallTagMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchStr('</small>')) {
-			break;
-		}
+		if (ctx.matchStr('</small>')) break;
 
 		matched = ctx.consume(inlineSyntaxMatcher);
-		if (!matched.ok) {
-			return ctx.fail();
-		}
+		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {

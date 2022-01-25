@@ -22,15 +22,10 @@ export function hashtagMatcher(ctx: MatcherContext) {
 	// value
 	let value = '';
 	while (true) {
-		if (/^[ \u3000\t.,!?'"#:/[\]【】()「」<>]/i.test(ctx.input.charAt(ctx.pos))) {
-			break;
-		}
-		if (ctx.match(LfMatcher).ok) {
-			break;
-		}
-		if (ctx.eof()) {
-			break;
-		}
+		if (/^[ \u3000\t.,!?'"#:/[\]【】()「」<>]/i.test(ctx.input.charAt(ctx.pos))) break;
+		if (ctx.match(LfMatcher).ok) break;
+		if (ctx.eof()) break;
+
 		value += ctx.input.charAt(ctx.pos);
 		ctx.pos++;
 	}

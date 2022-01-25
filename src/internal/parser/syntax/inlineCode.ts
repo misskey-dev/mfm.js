@@ -13,15 +13,10 @@ export function inlineCodeMatcher(ctx: MatcherContext) {
 	// code
 	let code = '';
 	while (true) {
-		if (/^[`´]/.test(ctx.input.charAt(ctx.pos))) {
-			break;
-		}
-		if (ctx.match(LfMatcher).ok) {
-			break;
-		}
-		if (ctx.eof()) {
-			break;
-		}
+		if (/^[`´]/.test(ctx.input.charAt(ctx.pos))) break;
+		if (ctx.match(LfMatcher).ok) break;
+		if (ctx.eof()) break;
+
 		code += ctx.input.charAt(ctx.pos);
 		ctx.pos++;
 	}

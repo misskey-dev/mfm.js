@@ -61,18 +61,11 @@ export function urlAltMatcher(ctx: MatcherContext) {
 
 	let c = '';
 	while (true) {
-		if (ctx.matchCharCode(CharCode.greaterThan)) {
-			break;
-		}
-		if (ctx.match(LfMatcher).ok) {
-			break;
-		}
-		if (ctx.match(spacingMatcher).ok) {
-			break;
-		}
-		if (ctx.eof()) {
-			break;
-		}
+		if (ctx.matchCharCode(CharCode.greaterThan)) break;
+		if (ctx.match(LfMatcher).ok) break;
+		if (ctx.match(spacingMatcher).ok) break;
+		if (ctx.eof()) break;
+
 		c += ctx.input.charAt(ctx.pos);
 		ctx.pos++;
 	}

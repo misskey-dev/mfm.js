@@ -54,9 +54,7 @@ function argsMatcher(ctx: MatcherContext) {
 	while (true) {
 		const fallback = ctx.pos;
 		// ","
-		if (!ctx.matchCharCode(CharCode.comma)) {
-			break;
-		}
+		if (!ctx.matchCharCode(CharCode.comma)) break;
 		ctx.pos++;
 
 		// arg
@@ -94,21 +92,18 @@ export function fnMatcher(ctx: MatcherContext) {
 	const params = matched.ok ? matched.result : {};
 
 	// spacing
-	if (!ctx.consume(spacingMatcher).ok) {
+	if (!ctx.matchRegex(/^[ \u3000\t\u00a0]/)) {
 		return ctx.fail();
 	}
+	ctx.pos++;
 
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchCharCode(CharCode.closeBracket)) {
-			break;
-		}
+		if (ctx.matchCharCode(CharCode.closeBracket)) break;
 
 		matched = ctx.consume(inlineSyntaxMatcher);
-		if (!matched.ok) {
-			return ctx.fail();
-		}
+		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {

@@ -25,9 +25,7 @@ function hostMatcher(ctx: MatcherContext) {
 	let length = name.length;
 	while (length > 0) {
 		const lastCode = name.charCodeAt(length - 1);
-		if (lastCode != CharCode.minus && lastCode != CharCode.dot) {
-			break;
-		}
+		if (lastCode != CharCode.minus && lastCode != CharCode.dot) break;
 		length--;
 	}
 	if (length == 0) {
