@@ -86,6 +86,11 @@ export function fnMatcher(ctx: MatcherContext) {
 	const name = matched[0];
 	ctx.pos += name.length;
 
+	// (name) compare fn name
+	if (ctx.fnNameList != null && !ctx.fnNameList.includes(name)) {
+		return ctx.fail();
+	}
+
 	// args
 	matched = ctx.tryConsume(argsMatcher);
 	const params = matched.ok ? matched.result : {};
