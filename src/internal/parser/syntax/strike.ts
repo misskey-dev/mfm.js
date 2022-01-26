@@ -1,6 +1,7 @@
 import { MfmInline, STRIKE } from '../../../node';
 import { MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
+import { CharCode } from '../services/string';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
 export function strikeTagMatcher(ctx: MatcherContext) {
@@ -47,7 +48,7 @@ export function strikeTildeMatcher(ctx: MatcherContext) {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchStr('~')) break;
+		if (ctx.matchCharCode(CharCode.tilde)) break;
 		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null) break;
 
 		matched = ctx.consume(inlineSyntaxMatcher);
