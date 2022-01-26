@@ -16,11 +16,13 @@ function hostMatcher(ctx: MatcherContext) {
 		return ctx.fail();
 	}
 	let name = matched[0];
+
 	// (name) first character must not be "-" or "."
 	const firstCode = name.charCodeAt(0);
 	if (firstCode == CharCode.minus || firstCode == CharCode.dot) {
 		return ctx.fail();
 	}
+
 	// (name) last character must not be "-" or "."
 	let length = name.length;
 	while (length > 0) {

@@ -25,12 +25,30 @@ export function urlMatcher(ctx: MatcherContext) {
 		return ctx.fail();
 	}
 
-	const matched = ctx.matchRegex(/^\/\/[.,a-z0-9_/:%#@$&?!~=+-]+/i);
+	// path
+	const matched = ctx.matchRegex(/^\/\/([.,a-z0-9_/:%#@$&?!~=+-]+)/i);
 	if (matched == null) {
 		return ctx.fail();
 	}
-	ctx.pos += matched[0].length;
+	let path = matched[1];
+	ctx.pos += 2;
 
+	// (path) last character must not be "." or ","
+	let length = path.length;
+	while (length > 0) {
+		const lastCode = path.charCodeAt(length - 1);
+		if (lastCode != CharCode.dot && lastCode != CharCode.comma) break;
+		length--;
+	}
+	if (length == 0) {
+		return ctx.fail();
+	}
+	if (length != path.length) {
+		path = path.substr(0, length);
+	}
+	ctx.pos += path.length;
+
+	// url
 	const value = ctx.input.substring(urlHead, ctx.pos);
 
 	return ctx.ok(N_URL(value));
