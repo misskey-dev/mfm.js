@@ -14,6 +14,7 @@ import { strikeTagMatcher, strikeTildeMatcher } from '../syntax/strike';
 import { unicodeEmojiMatcher } from '../syntax/unicodeEmoji';
 import { inlineCodeMatcher } from '../syntax/inlineCode';
 import { urlAltMatcher, urlMatcher } from '../syntax/url';
+import { linkMatcher, silentLinkMatcher } from '../syntax/link';
 
 // NOTE: SyntaxMatcher は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。
@@ -63,7 +64,11 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 
 			case CharCode.question: {
 				// ?[silent link]()
-				// silentLinkMatcher
+				matched = ctx.tryConsume(silentLinkMatcher);
+				if (matched.ok) {
+					ctx.depth--;
+					return matched;
+				}
 				break;
 			}
 
@@ -97,7 +102,11 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 
 			case CharCode.openBracket: {
 				// [link]()
-				// linkMatcher
+				matched = ctx.tryConsume(linkMatcher);
+				if (matched.ok) {
+					ctx.depth--;
+					return matched;
+				}
 				break;
 			}
 
@@ -242,7 +251,11 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 
 			case CharCode.question: {
 				// ?[silent link]()
-				// silentLinkMatcher
+				matched = ctx.tryConsume(silentLinkMatcher);
+				if (matched.ok) {
+					ctx.depth--;
+					return matched;
+				}
 				break;
 			}
 
@@ -268,7 +281,11 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 
 			case CharCode.openBracket: {
 				// [link]()
-				// linkMatcher
+				matched = ctx.tryConsume(linkMatcher);
+				if (matched.ok) {
+					ctx.depth--;
+					return matched;
+				}
 				break;
 			}
 

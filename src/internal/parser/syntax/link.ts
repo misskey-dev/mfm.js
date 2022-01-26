@@ -1,16 +1,33 @@
-import { LINK } from '../../../node';
+import { LINK, MfmInline } from '../../../node';
 import { MatcherContext } from '../services/matcher';
+import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
+import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 import { urlAltMatcher, urlMatcher } from './url';
 
+// TODO: ラベル内で使える構文の制限
+
 export function linkMatcher(ctx: MatcherContext) {
+	let matched;
+
 	// "["
 	if (!ctx.matchCharCode(CharCode.openBracket)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
 
-	// TODO: link label
+	// link label
+	const label: MfmInline[] = [];
+	while (true) {
+		if (ctx.matchCharCode(CharCode.closeBracket)) break;
+
+		matched = ctx.consume(inlineSyntaxMatcher);
+		if (!matched.ok) break;
+		pushNode(matched.result, label);
+	}
+	if (label.length < 1) {
+		return ctx.fail();
+	}
 
 	// "]("
 	if (!ctx.matchStr('](')) {
@@ -19,7 +36,7 @@ export function linkMatcher(ctx: MatcherContext) {
 	ctx.pos += 2;
 
 	// url
-	const matched = ctx.tryConsumeAny([
+	matched = ctx.tryConsumeAny([
 		urlAltMatcher,
 		urlMatcher,
 	]);
@@ -34,7 +51,7 @@ export function linkMatcher(ctx: MatcherContext) {
 	}
 	ctx.pos++;
 
-	return ctx.ok(LINK(false, url.props.url, []));
+	return ctx.ok(LINK(false, url.props.url, label));
 }
 
 export function silentLinkMatcher(ctx: MatcherContext) {
