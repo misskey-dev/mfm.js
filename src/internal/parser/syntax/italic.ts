@@ -1,5 +1,6 @@
 import { ITALIC, MfmInline } from '../../../node';
 import { MatcherContext } from '../services/matcher';
+import { isAllowedAsBackChar } from '../services/matchingUtil';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
@@ -7,7 +8,10 @@ import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 export function italicAstaMatcher(ctx: MatcherContext) {
 	let matched;
 
-	// TODO: 前の文字の判定
+	// check a back char
+	if (!isAllowedAsBackChar(ctx)) {
+		return ctx.fail();
+	}
 
 	// "*"
 	if (!ctx.matchCharCode(CharCode.asterisk)) {
@@ -40,7 +44,10 @@ export function italicAstaMatcher(ctx: MatcherContext) {
 export function italicUnderMatcher(ctx: MatcherContext) {
 	let matched;
 
-	// TODO: 前の文字の判定
+	// check a back char
+	if (!isAllowedAsBackChar(ctx)) {
+		return ctx.fail();
+	}
 
 	// "_"
 	if (!ctx.matchCharCode(CharCode.underscore)) {
