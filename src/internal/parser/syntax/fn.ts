@@ -1,10 +1,10 @@
-import { FN, MfmInline } from '../../../node';
-import { MatcherContext } from '../services/matcher';
+import { FN, MfmFn, MfmInline } from '../../../node';
+import { Match, MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
-function argMatcher(ctx: MatcherContext) {
+function argMatcher(ctx: MatcherContext): Match<{ k: string, v: string | true }> {
 	let matched;
 
 	// select 1: key + value
@@ -33,7 +33,7 @@ function argMatcher(ctx: MatcherContext) {
 	return ctx.fail();
 }
 
-function argsMatcher(ctx: MatcherContext) {
+function argsMatcher(ctx: MatcherContext): Match<Record<string, string | true>> {
 	let matched;
 	const args: Record<string, string | true> = {};
 
@@ -69,7 +69,7 @@ function argsMatcher(ctx: MatcherContext) {
 	return ctx.ok(args);
 }
 
-export function fnMatcher(ctx: MatcherContext) {
+export function fnMatcher(ctx: MatcherContext): Match<MfmFn> {
 	let matched;
 
 	// "$["

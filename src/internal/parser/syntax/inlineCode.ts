@@ -1,8 +1,8 @@
-import { INLINE_CODE } from '../../../node';
-import { MatcherContext } from '../services/matcher';
+import { INLINE_CODE, MfmInlineCode } from '../../../node';
+import { Match, MatcherContext } from '../services/matcher';
 import { CharCode } from '../services/string';
 
-export function inlineCodeMatcher(ctx: MatcherContext) {
+export function inlineCodeMatcher(ctx: MatcherContext): Match<MfmInlineCode> {
 	// "`"
 	if (!ctx.matchCharCode(CharCode.backtick)) {
 		return ctx.fail();

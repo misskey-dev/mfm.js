@@ -1,10 +1,10 @@
-import { MfmInline, STRIKE } from '../../../node';
-import { MatcherContext } from '../services/matcher';
+import { MfmInline, MfmStrike, STRIKE } from '../../../node';
+import { Match, MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
-export function strikeTagMatcher(ctx: MatcherContext) {
+export function strikeTagMatcher(ctx: MatcherContext): Match<MfmStrike> {
 	let matched;
 
 	// "<s>"
@@ -36,7 +36,7 @@ export function strikeTagMatcher(ctx: MatcherContext) {
 	return ctx.ok(STRIKE(children));
 }
 
-export function strikeTildeMatcher(ctx: MatcherContext) {
+export function strikeTildeMatcher(ctx: MatcherContext): Match<MfmStrike> {
 	let matched;
 
 	// "~~"

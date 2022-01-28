@@ -1,9 +1,9 @@
-import { FN, MfmInline } from '../../../node';
-import { MatcherContext } from '../services/matcher';
+import { FN, MfmFn, MfmInline } from '../../../node';
+import { Match, MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
-export function bigMatcher(ctx: MatcherContext) {
+export function bigMatcher(ctx: MatcherContext): Match<MfmFn> {
 	let matched;
 
 	// "***"

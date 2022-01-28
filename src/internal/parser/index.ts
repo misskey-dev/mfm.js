@@ -8,7 +8,7 @@ export type FullParserOpts = Partial<{
 	nestLimit: number;
 }>;
 
-export function fullParser(input: string, opts: FullParserOpts) {
+export function fullParser(input: string, opts: FullParserOpts): MfmNode[] {
 	const result: MfmNode[] = [];
 
 	const ctx = new MatcherContext(input, opts);
@@ -22,7 +22,7 @@ export function fullParser(input: string, opts: FullParserOpts) {
 	return result;
 }
 
-export function plainParser(input: string) {
+export function plainParser(input: string): MfmPlainNode[] {
 	const result: MfmPlainNode[] = [];
 
 	const ctx = new MatcherContext(input, {});

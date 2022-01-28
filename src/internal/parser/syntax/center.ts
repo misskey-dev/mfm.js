@@ -1,9 +1,9 @@
-import { CENTER, MfmInline } from '../../../node';
-import { MatcherContext } from '../services/matcher';
+import { CENTER, MfmCenter, MfmInline } from '../../../node';
+import { Match, MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
-export function centerTagMatcher(ctx: MatcherContext) {
+export function centerTagMatcher(ctx: MatcherContext): Match<MfmCenter> {
 	let matched;
 
 	// line-head

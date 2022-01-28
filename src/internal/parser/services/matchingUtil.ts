@@ -3,7 +3,7 @@ import { MatcherContext } from './matcher';
 // 一つ前の文字が:
 // 無い OR 改行 OR スペース OR ![a-z0-9]i
 // の時にtrueを返します。
-export function isAllowedAsBackChar(ctx: MatcherContext) {
+export function isAllowedAsBackChar(ctx: MatcherContext): boolean {
 	if (ctx.pos > 0) {
 		const fallback = ctx.pos;
 		ctx.pos--;

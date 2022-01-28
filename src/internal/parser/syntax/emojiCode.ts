@@ -1,8 +1,8 @@
-import { EMOJI_CODE } from '../../../node';
-import { MatcherContext } from '../services/matcher';
+import { EMOJI_CODE, MfmEmojiCode } from '../../../node';
+import { Match, MatcherContext } from '../services/matcher';
 import { CharCode } from '../services/string';
 
-export function emojiCodeMatcher(ctx: MatcherContext) {
+export function emojiCodeMatcher(ctx: MatcherContext): Match<MfmEmojiCode> {
 	// ":"
 	if (!ctx.matchCharCode(CharCode.colon)) {
 		return ctx.fail();

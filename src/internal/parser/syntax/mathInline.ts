@@ -1,8 +1,8 @@
-import { MATH_BLOCK } from '../../../node';
-import { MatcherContext } from '../services/matcher';
+import { MATH_INLINE, MfmMathInline } from '../../../node';
+import { Match, MatcherContext } from '../services/matcher';
 
-export function mathInlineMatcher(ctx: MatcherContext) {
+export function mathInlineMatcher(ctx: MatcherContext): Match<MfmMathInline> {
 	// TODO
 
-	return ctx.ok(MATH_BLOCK(''));
+	return ctx.ok(MATH_INLINE(''));
 }

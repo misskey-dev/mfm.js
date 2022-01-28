@@ -1,7 +1,7 @@
-import { CODE_BLOCK } from '../../../node';
-import { MatcherContext } from '../services/matcher';
+import { CODE_BLOCK, MfmCodeBlock } from '../../../node';
+import { Match, MatcherContext } from '../services/matcher';
 
-export function codeBlockMatcher(ctx: MatcherContext) {
+export function codeBlockMatcher(ctx: MatcherContext): Match<MfmCodeBlock> {
 	let matched;
 
 	// TODO: check line-head

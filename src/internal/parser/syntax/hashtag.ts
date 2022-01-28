@@ -1,12 +1,12 @@
-import { HASHTAG } from '../../../node';
-import { MatcherContext } from '../services/matcher';
+import { HASHTAG, MfmHashtag } from '../../../node';
+import { Match, MatcherContext } from '../services/matcher';
 import { isAllowedAsBackChar } from '../services/matchingUtil';
 import { CharCode } from '../services/string';
 
 // TODO: 「#」がUnicode絵文字の一部である場合があるので判定する
 // TODO: 括弧は対になっている時のみ内容に含めることができる。対象: `()` `[]` `「」`
 
-export function hashtagMatcher(ctx: MatcherContext) {
+export function hashtagMatcher(ctx: MatcherContext): Match<MfmHashtag> {
 	// check a back char
 	if (!isAllowedAsBackChar(ctx)) {
 		return ctx.fail();

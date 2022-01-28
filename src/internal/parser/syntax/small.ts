@@ -1,9 +1,9 @@
-import { MfmInline, SMALL } from '../../../node';
-import { MatcherContext } from '../services/matcher';
+import { MfmInline, MfmSmall, SMALL } from '../../../node';
+import { Match, MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
-export function smallTagMatcher(ctx: MatcherContext) {
+export function smallTagMatcher(ctx: MatcherContext): Match<MfmSmall> {
 	let matched;
 
 	// "<small>"

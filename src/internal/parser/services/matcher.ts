@@ -13,7 +13,7 @@ export type MatchFailure = {
 	ok: false;
 };
 
-export type MatchResult<T> = T extends Matcher<infer R> ? R : any;
+export type MatchResult<T> = T extends Matcher<infer R> ? R : never;
 
 export type MatcherOpts = Partial<{
 
@@ -21,14 +21,14 @@ export type MatcherOpts = Partial<{
 
 export class MatcherContext {
 	public input: string;
-	public pos: number = 0;
+	public pos = 0;
 	public cache: Record<string, any> = {};
 	public nestLimit: number;
-	public depth: number = 0;
+	public depth = 0;
 	// fn
 	public fnNameList: string[] | undefined;
 	// link
-	public linkLabel: boolean = false;
+	public linkLabel = false;
 
 	constructor(input: string, opts: FullParserOpts) {
 		this.input = input;
@@ -53,14 +53,12 @@ export class MatcherContext {
 		return this.pos >= this.input.length;
 	}
 
-	public consume<T extends Matcher<MatchResult<T>>>(matcher: T, opts?: MatcherOpts) {
-		opts = opts || {};
+	public consume<T extends Matcher<MatchResult<T>>>(matcher: T, opts: MatcherOpts = {}): Match<MatchResult<T>> {
 		const matched = matcher(this);
 		return matched;
 	}
 
-	public tryConsume<T extends Matcher<MatchResult<T>>>(matcher: T, opts?: MatcherOpts) {
-		opts = opts || {};
+	public tryConsume<T extends Matcher<MatchResult<T>>>(matcher: T, opts: MatcherOpts = {}): Match<MatchResult<T>> {
 		const fallback = this.pos;
 		const matched = matcher(this);
 		if (!matched.ok) {
@@ -69,7 +67,7 @@ export class MatcherContext {
 		return matched;
 	}
 
-	public tryConsumeAny<T extends Matcher<MatchResult<T>>>(matchers: T[], opts?: MatcherOpts) {
+	public tryConsumeAny<T extends Matcher<MatchResult<T>>>(matchers: T[], opts: MatcherOpts = {}): Match<MatchResult<T>> {
 		for (const matcher of matchers) {
 			const matched = this.tryConsume(matcher, opts);
 			if (matched.ok) {
@@ -79,23 +77,22 @@ export class MatcherContext {
 		return this.fail();
 	}
 
-	public match<T extends Matcher<MatchResult<T>>>(matcher: T, opts?: MatcherOpts) {
-		opts = opts || {};
+	public match<T extends Matcher<MatchResult<T>>>(matcher: T, opts: MatcherOpts = {}): Match<MatchResult<T>> {
 		const pos = this.pos;
 		const matched = matcher(this);
 		this.pos = pos;
 		return matched;
 	}
 
-	public matchCharCode(charCode: number) {
+	public matchCharCode(charCode: number): boolean {
 		return this.input.charCodeAt(this.pos) == charCode;
 	}
 
-	public matchStr(value: string) {
+	public matchStr(value: string): boolean {
 		return this.input.startsWith(value, this.pos);
 	}
 
-	public matchRegex(regex: RegExp) {
+	public matchRegex(regex: RegExp): RegExpExecArray | null {
 		return regex.exec(this.input.substr(this.pos));
 	}
 }

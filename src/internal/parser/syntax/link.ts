@@ -1,11 +1,11 @@
-import { LINK, MfmInline } from '../../../node';
-import { MatcherContext } from '../services/matcher';
+import { LINK, MfmInline, MfmLink } from '../../../node';
+import { Match, MatcherContext } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 import { urlAltMatcher, urlMatcher } from './url';
 
-export function linkMatcher(ctx: MatcherContext) {
+export function linkMatcher(ctx: MatcherContext): Match<MfmLink> {
 	let matched;
 
 	// "["
@@ -54,7 +54,7 @@ export function linkMatcher(ctx: MatcherContext) {
 	return ctx.ok(LINK(false, url.props.url, label));
 }
 
-export function silentLinkMatcher(ctx: MatcherContext) {
+export function silentLinkMatcher(ctx: MatcherContext): Match<MfmLink> {
 	// "?"
 	if (!ctx.matchCharCode(CharCode.question)) {
 		return ctx.fail();

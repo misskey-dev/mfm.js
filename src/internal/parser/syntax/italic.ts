@@ -1,11 +1,11 @@
-import { ITALIC, MfmInline } from '../../../node';
-import { MatcherContext } from '../services/matcher';
+import { ITALIC, MfmInline, MfmItalic } from '../../../node';
+import { Match, MatcherContext } from '../services/matcher';
 import { isAllowedAsBackChar } from '../services/matchingUtil';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
-export function italicAstaMatcher(ctx: MatcherContext) {
+export function italicAstaMatcher(ctx: MatcherContext): Match<MfmItalic> {
 	let matched;
 
 	// check a back char
@@ -41,8 +41,8 @@ export function italicAstaMatcher(ctx: MatcherContext) {
 	return ctx.ok(ITALIC(children));
 }
 
-export function italicUnderMatcher(ctx: MatcherContext) {
-	let matched;
+export function italicUnderMatcher(ctx: MatcherContext): Match<MfmItalic> {
+	// let matched;
 
 	// check a back char
 	if (!isAllowedAsBackChar(ctx)) {
@@ -70,7 +70,7 @@ export function italicUnderMatcher(ctx: MatcherContext) {
 	return ctx.ok(ITALIC([]));
 }
 
-export function italicTagMatcher(ctx: MatcherContext) {
+export function italicTagMatcher(ctx: MatcherContext): Match<MfmItalic> {
 	let matched;
 
 	// "<i>"

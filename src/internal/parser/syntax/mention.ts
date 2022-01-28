@@ -1,9 +1,9 @@
-import { MENTION } from '../../../node';
-import { MatcherContext } from '../services/matcher';
+import { MENTION, MfmMention } from '../../../node';
+import { Match, MatcherContext } from '../services/matcher';
 import { isAllowedAsBackChar } from '../services/matchingUtil';
 import { CharCode } from '../services/string';
 
-function hostMatcher(ctx: MatcherContext) {
+function hostMatcher(ctx: MatcherContext): Match<string> {
 	// "@"
 	if (!ctx.matchCharCode(CharCode.at)) {
 		return ctx.fail();
@@ -41,7 +41,7 @@ function hostMatcher(ctx: MatcherContext) {
 	return ctx.ok(name);
 }
 
-export function mentionMatcher(ctx: MatcherContext) {
+export function mentionMatcher(ctx: MatcherContext): Match<MfmMention> {
 	let matched;
 	const headPos = ctx.pos;
 
