@@ -1,4 +1,3 @@
-import { createContext } from 'vm';
 import { FullParserOpts } from '../index';
 
 export type Matcher<T> = (ctx: MatcherContext) => Match<T>;
@@ -16,7 +15,7 @@ export type MatchFailure = {
 
 export type MatchResult<T> = T extends Matcher<infer R> ? R : any;
 
-export type ConsumeOpts = Partial<{
+export type MatcherOpts = Partial<{
 
 }>;
 
@@ -24,9 +23,12 @@ export class MatcherContext {
 	public input: string;
 	public pos: number = 0;
 	public cache: Record<string, any> = {};
-	public fnNameList: string[] | undefined;
 	public nestLimit: number;
 	public depth: number = 0;
+	// fn
+	public fnNameList: string[] | undefined;
+	// link
+	public linkLabel: boolean = false;
 
 	constructor(input: string, opts: FullParserOpts) {
 		this.input = input;
@@ -51,13 +53,13 @@ export class MatcherContext {
 		return this.pos >= this.input.length;
 	}
 
-	public consume<T extends Matcher<MatchResult<T>>>(matcher: T, opts?: ConsumeOpts) {
+	public consume<T extends Matcher<MatchResult<T>>>(matcher: T, opts?: MatcherOpts) {
 		opts = opts || {};
 		const matched = matcher(this);
 		return matched;
 	}
 
-	public tryConsume<T extends Matcher<MatchResult<T>>>(matcher: T, opts?: ConsumeOpts) {
+	public tryConsume<T extends Matcher<MatchResult<T>>>(matcher: T, opts?: MatcherOpts) {
 		opts = opts || {};
 		const fallback = this.pos;
 		const matched = matcher(this);
@@ -67,9 +69,9 @@ export class MatcherContext {
 		return matched;
 	}
 
-	public tryConsumeAny<T extends Matcher<MatchResult<T>>>(matchers: T[]) {
+	public tryConsumeAny<T extends Matcher<MatchResult<T>>>(matchers: T[], opts?: MatcherOpts) {
 		for (const matcher of matchers) {
-			const matched = this.tryConsume(matcher);
+			const matched = this.tryConsume(matcher, opts);
 			if (matched.ok) {
 				return matched;
 			}
@@ -77,7 +79,8 @@ export class MatcherContext {
 		return this.fail();
 	}
 
-	public match<T extends Matcher<MatchResult<T>>>(matcher: T) {
+	public match<T extends Matcher<MatchResult<T>>>(matcher: T, opts?: MatcherOpts) {
+		opts = opts || {};
 		const pos = this.pos;
 		const matched = matcher(this);
 		this.pos = pos;

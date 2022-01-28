@@ -5,8 +5,6 @@ import { CharCode } from '../services/string';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 import { urlAltMatcher, urlMatcher } from './url';
 
-// TODO: ラベル内で使える構文の制限
-
 export function linkMatcher(ctx: MatcherContext) {
 	let matched;
 
@@ -21,7 +19,9 @@ export function linkMatcher(ctx: MatcherContext) {
 	while (true) {
 		if (ctx.matchCharCode(CharCode.closeBracket)) break;
 
+		ctx.linkLabel = true;
 		matched = ctx.consume(inlineSyntaxMatcher);
+		ctx.linkLabel = false;
 		if (!matched.ok) break;
 		pushNode(matched.result, label);
 	}

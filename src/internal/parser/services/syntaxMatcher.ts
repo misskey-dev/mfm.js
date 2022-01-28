@@ -250,11 +250,13 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 			}
 
 			case CharCode.question: {
-				// ?[silent link]()
-				matched = ctx.tryConsume(silentLinkMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
+				if (!ctx.linkLabel) {
+					// ?[silent link]()
+					matched = ctx.tryConsume(silentLinkMatcher);
+					if (matched.ok) {
+						ctx.depth--;
+						return matched;
+					}
 				}
 				break;
 			}
@@ -269,22 +271,30 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 					boldTagMatcher,
 					// <small>
 					smallTagMatcher,
-					// <https://example.com>
-					urlAltMatcher,
 				]);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
 				}
+				if (!ctx.linkLabel) {
+					// <https://example.com>
+					matched = ctx.tryConsume(urlAltMatcher);
+					if (matched.ok) {
+						ctx.depth--;
+						return matched;
+					}
+				}
 				break;
 			}
 
 			case CharCode.openBracket: {
-				// [link]()
-				matched = ctx.tryConsume(linkMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
+				if (!ctx.linkLabel) {
+					// [link]()
+					matched = ctx.tryConsume(linkMatcher);
+					if (matched.ok) {
+						ctx.depth--;
+						return matched;
+					}
 				}
 				break;
 			}
@@ -340,11 +350,13 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 			}
 
 			case CharCode.at: {
-				// @mention
-				matched = ctx.tryConsume(mentionMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
+				if (!ctx.linkLabel) {
+					// @mention
+					matched = ctx.tryConsume(mentionMatcher);
+					if (matched.ok) {
+						ctx.depth--;
+						return matched;
+					}
 				}
 				break;
 			}
@@ -360,15 +372,19 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 			}
 		}
 
-		matched = ctx.tryConsumeAny([
-			// unicode emoji
-			unicodeEmojiMatcher,
-			// https://example.com
-			urlMatcher,
-		]);
+		// unicode emoji
+		matched = ctx.tryConsume(unicodeEmojiMatcher);
 		if (matched.ok) {
 			ctx.depth--;
 			return matched;
+		}
+		if (!ctx.linkLabel) {
+			// https://example.com
+			matched = ctx.tryConsume(urlMatcher);
+			if (matched.ok) {
+				ctx.depth--;
+				return matched;
+			}
 		}
 
 		ctx.depth--;
