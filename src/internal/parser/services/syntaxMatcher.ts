@@ -23,6 +23,12 @@ import { linkMatcher, silentLinkMatcher } from '../syntax/link';
 // 部分は複数のstring型ノードになります。 pushNode を使用すると、通常の構文ノードはツリーに追加し
 // 連続するstring型ノードは1つのtextノードとして連結してツリーに追加できます。
 
+// NOTE:
+// リンクラベル部分はinlineSyntaxMatcherが適用されます。
+// inlineSyntaxMatcherに含まれる構文でネストされた部分はinlineSyntaxMatcherが適用されることが分かっており、
+// リンクラベル部分以外のマッチではlinkLabelが常にfalseであることが分かっているため、
+// inlineSyntaxMatcherでのみlinkLabelの判定をすれば良いと分かります。
+
 export function fullSyntaxMatcher(ctx: MatcherContext) {
 	let matched;
 
