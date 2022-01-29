@@ -12,6 +12,7 @@ export function fullParser(input: string, opts: FullParserOpts): MfmNode[] {
 	const result: MfmNode[] = [];
 
 	const ctx = new MatcherContext(input, opts);
+	//ctx.debug = true;
 	let matched;
 	while (true) {
 		matched = ctx.consume(fullSyntaxMatcher);
@@ -26,6 +27,7 @@ export function plainParser(input: string): MfmPlainNode[] {
 	const result: MfmPlainNode[] = [];
 
 	const ctx = new MatcherContext(input, {});
+	//ctx.debug = true;
 	let matched;
 	while (true) {
 		matched = ctx.consume(plainSyntaxMatcher);

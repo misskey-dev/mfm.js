@@ -210,6 +210,7 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 	}
 
 	// text node
+	if (ctx.debug) console.log(`${ctx.pos}\tmatch text`);
 	const text = ctx.input.charAt(ctx.pos);
 	ctx.pos++;
 
@@ -397,6 +398,7 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 	}
 
 	// text node
+	if (ctx.debug) console.log(`${ctx.pos}\tmatch text`);
 	const text = ctx.input.charAt(ctx.pos);
 	ctx.pos++;
 
@@ -420,6 +422,7 @@ export function plainSyntaxMatcher(ctx: MatcherContext) {
 	}
 
 	// text node
+	if (ctx.debug) console.log(`${ctx.pos}\tmatch text`);
 	const text = ctx.input.charAt(ctx.pos);
 	ctx.pos++;
 
