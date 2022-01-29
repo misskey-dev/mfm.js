@@ -1,8 +1,9 @@
 import { MATH_BLOCK, MfmMathBlock } from '../../../node';
-import { Match, MatcherContext } from '../services/matcher';
+import { SyntaxMatcher } from '../services/matcher';
+import { SyntaxId } from '../services/syntax';
 
-export function mathBlockMatcher(ctx: MatcherContext): Match<MfmMathBlock> {
+export const mathBlockMatcher = new SyntaxMatcher<MfmMathBlock>(SyntaxId.MathBlock, ctx => {
 	// TODO
 
 	return ctx.ok(MATH_BLOCK(''));
-}
+});

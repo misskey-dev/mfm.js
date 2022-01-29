@@ -1,6 +1,7 @@
 import { MfmUrl, N_URL } from '../../../node';
-import { Match, MatcherContext } from '../services/matcher';
+import { Match, MatcherContext, SyntaxMatcher } from '../services/matcher';
 import { CharCode } from '../services/string';
+import { SyntaxId } from '../services/syntax';
 
 // TODO: urlMatcher 括弧のペア
 
@@ -9,7 +10,7 @@ const schemes: string[] = [
 	'http',
 ];
 
-export function urlMatcher(ctx: MatcherContext): Match<MfmUrl> {
+export const urlMatcher = new SyntaxMatcher<MfmUrl>(SyntaxId.Url, ctx => {
 	const urlHead = ctx.pos;
 
 	// scheme
@@ -52,9 +53,9 @@ export function urlMatcher(ctx: MatcherContext): Match<MfmUrl> {
 	const value = ctx.input.substring(urlHead, ctx.pos);
 
 	return ctx.ok(N_URL(value));
-}
+});
 
-export function urlAltMatcher(ctx: MatcherContext): Match<MfmUrl> {
+export const urlAltMatcher = new SyntaxMatcher<MfmUrl>(SyntaxId.UrlAlt, ctx => {
 	// "<"
 	if (!ctx.matchCharCode(CharCode.lessThan)) {
 		return ctx.fail();
@@ -101,4 +102,4 @@ export function urlAltMatcher(ctx: MatcherContext): Match<MfmUrl> {
 	const value = ctx.input.substring(urlHead, urlTail);
 
 	return ctx.ok(N_URL(value, true));
-}
+});

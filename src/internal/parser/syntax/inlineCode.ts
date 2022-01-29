@@ -1,8 +1,9 @@
 import { INLINE_CODE, MfmInlineCode } from '../../../node';
-import { Match, MatcherContext } from '../services/matcher';
+import { SyntaxMatcher } from '../services/matcher';
 import { CharCode } from '../services/string';
+import { SyntaxId } from '../services/syntax';
 
-export function inlineCodeMatcher(ctx: MatcherContext): Match<MfmInlineCode> {
+export const inlineCodeMatcher = new SyntaxMatcher<MfmInlineCode>(SyntaxId.InlineCode, ctx => {
 	// "`"
 	if (!ctx.matchCharCode(CharCode.backtick)) {
 		return ctx.fail();
@@ -30,4 +31,4 @@ export function inlineCodeMatcher(ctx: MatcherContext): Match<MfmInlineCode> {
 	ctx.pos++;
 
 	return ctx.ok(INLINE_CODE(code));
-}
+});

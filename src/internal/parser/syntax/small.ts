@@ -1,9 +1,10 @@
 import { MfmInline, MfmSmall, SMALL } from '../../../node';
-import { Match, MatcherContext } from '../services/matcher';
+import { SyntaxMatcher } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
+import { SyntaxId } from '../services/syntax';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
-export function smallTagMatcher(ctx: MatcherContext): Match<MfmSmall> {
+export const smallTagMatcher = new SyntaxMatcher<MfmSmall>(SyntaxId.Small, ctx => {
 	let matched;
 
 	// "<small>"
@@ -32,4 +33,4 @@ export function smallTagMatcher(ctx: MatcherContext): Match<MfmSmall> {
 	ctx.pos += 8;
 
 	return ctx.ok(SMALL(children));
-}
+});

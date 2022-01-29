@@ -1,11 +1,12 @@
 import { ITALIC, MfmInline, MfmItalic } from '../../../node';
-import { Match, MatcherContext } from '../services/matcher';
+import { SyntaxMatcher } from '../services/matcher';
 import { isAllowedAsBackChar } from '../services/matchingUtil';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
+import { SyntaxId } from '../services/syntax';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
-export function italicAstaMatcher(ctx: MatcherContext): Match<MfmItalic> {
+export const italicAstaMatcher = new SyntaxMatcher<MfmItalic>(SyntaxId.ItalicAsta, ctx => {
 	let matched;
 
 	// check a back char
@@ -39,9 +40,9 @@ export function italicAstaMatcher(ctx: MatcherContext): Match<MfmItalic> {
 	ctx.pos++;
 
 	return ctx.ok(ITALIC(children));
-}
+});
 
-export function italicUnderMatcher(ctx: MatcherContext): Match<MfmItalic> {
+export const italicUnderMatcher = new SyntaxMatcher<MfmItalic>(SyntaxId.ItalicUnder, ctx => {
 	// let matched;
 
 	// check a back char
@@ -68,9 +69,9 @@ export function italicUnderMatcher(ctx: MatcherContext): Match<MfmItalic> {
 	ctx.pos++;
 
 	return ctx.ok(ITALIC([]));
-}
+});
 
-export function italicTagMatcher(ctx: MatcherContext): Match<MfmItalic> {
+export const italicTagMatcher = new SyntaxMatcher<MfmItalic>(SyntaxId.ItalicTag, ctx => {
 	let matched;
 
 	// "<i>"
@@ -99,4 +100,4 @@ export function italicTagMatcher(ctx: MatcherContext): Match<MfmItalic> {
 	ctx.pos += 4;
 
 	return ctx.ok(ITALIC(children));
-}
+});

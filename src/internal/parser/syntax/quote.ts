@@ -1,8 +1,9 @@
 import { MfmQuote, QUOTE } from '../../../node';
-import { Match, MatcherContext } from '../services/matcher';
+import { SyntaxMatcher } from '../services/matcher';
+import { SyntaxId } from '../services/syntax';
 
-export function quoteMatcher(ctx: MatcherContext): Match<MfmQuote> {
+export const quoteMatcher = new SyntaxMatcher<MfmQuote>(SyntaxId.Quote, ctx => {
 	// TODO
 
 	return ctx.ok(QUOTE([]));
-}
+});

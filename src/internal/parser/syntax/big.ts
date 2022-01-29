@@ -1,9 +1,10 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
-import { Match, MatcherContext } from '../services/matcher';
+import { SyntaxMatcher } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
+import { SyntaxId } from '../services/syntax';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
-export function bigMatcher(ctx: MatcherContext): Match<MfmFn> {
+export const bigMatcher = new SyntaxMatcher<MfmFn>(SyntaxId.Big, ctx => {
 	let matched;
 
 	// "***"
@@ -32,4 +33,4 @@ export function bigMatcher(ctx: MatcherContext): Match<MfmFn> {
 	ctx.pos += 3;
 
 	return ctx.ok(FN('tada', { }, children));
-}
+});

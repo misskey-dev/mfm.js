@@ -1,9 +1,10 @@
 import { BOLD, MfmBold, MfmInline, TEXT } from '../../../node';
-import { Match, MatcherContext } from '../services/matcher';
+import { SyntaxMatcher } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
+import { SyntaxId } from '../services/syntax';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
-export function boldAstaMatcher(ctx: MatcherContext): Match<MfmBold> {
+export const boldAstaMatcher = new SyntaxMatcher<MfmBold>(SyntaxId.BoldAsta, ctx => {
 	let matched;
 
 	// "**"
@@ -32,9 +33,9 @@ export function boldAstaMatcher(ctx: MatcherContext): Match<MfmBold> {
 	ctx.pos += 2;
 
 	return ctx.ok(BOLD(children));
-}
+});
 
-export function boldUnderMatcher(ctx: MatcherContext): Match<MfmBold> {
+export const boldUnderMatcher = new SyntaxMatcher<MfmBold>(SyntaxId.BoldUnder, ctx => {
 	let matched;
 
 	// "__"
@@ -67,9 +68,9 @@ export function boldUnderMatcher(ctx: MatcherContext): Match<MfmBold> {
 	ctx.pos += 2;
 
 	return ctx.ok(BOLD([TEXT(text)]));
-}
+});
 
-export function boldTagMatcher(ctx: MatcherContext): Match<MfmBold> {
+export const boldTagMatcher = new SyntaxMatcher<MfmBold>(SyntaxId.BoldTag, ctx => {
 	let matched;
 
 	// "<b>"
@@ -98,4 +99,4 @@ export function boldTagMatcher(ctx: MatcherContext): Match<MfmBold> {
 	ctx.pos += 4;
 
 	return ctx.ok(BOLD(children));
-}
+});

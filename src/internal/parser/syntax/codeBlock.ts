@@ -1,7 +1,8 @@
 import { CODE_BLOCK, MfmCodeBlock } from '../../../node';
-import { Match, MatcherContext } from '../services/matcher';
+import { SyntaxMatcher } from '../services/matcher';
+import { SyntaxId } from '../services/syntax';
 
-export function codeBlockMatcher(ctx: MatcherContext): Match<MfmCodeBlock> {
+export const codeBlockMatcher = new SyntaxMatcher<MfmCodeBlock>(SyntaxId.CodeBlock, ctx => {
 	let matched;
 
 	// TODO: check line-head
@@ -48,4 +49,4 @@ export function codeBlockMatcher(ctx: MatcherContext): Match<MfmCodeBlock> {
 
 	lang = lang.trim();
 	return ctx.ok(CODE_BLOCK('', (lang.length > 0 ? lang : null)));
-}
+});

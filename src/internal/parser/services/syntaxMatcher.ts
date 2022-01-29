@@ -1,4 +1,4 @@
-import { MatcherContext } from './matcher';
+import { Matcher, MatcherContext } from './matcher';
 import { CharCode } from './string';
 
 import { bigMatcher } from '../syntax/big';
@@ -15,6 +15,7 @@ import { unicodeEmojiMatcher } from '../syntax/unicodeEmoji';
 import { inlineCodeMatcher } from '../syntax/inlineCode';
 import { urlAltMatcher, urlMatcher } from '../syntax/url';
 import { linkMatcher, silentLinkMatcher } from '../syntax/link';
+import { MfmInline, MfmNode, MfmPlainNode } from '../../../node';
 
 // NOTE: SyntaxMatcher は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。
@@ -29,7 +30,7 @@ import { linkMatcher, silentLinkMatcher } from '../syntax/link';
 // リンクラベル部分以外のマッチではlinkLabelが常にfalseであることが分かっているため、
 // inlineSyntaxMatcherでのみlinkLabelの判定をすれば良いと分かります。
 
-export function fullSyntaxMatcher(ctx: MatcherContext) {
+export const fullSyntaxMatcher = new Matcher<MfmNode | string>(ctx => {
 	let matched;
 
 	// check EOF
@@ -215,9 +216,9 @@ export function fullSyntaxMatcher(ctx: MatcherContext) {
 	ctx.pos++;
 
 	return ctx.ok(text);
-}
+});
 
-export function inlineSyntaxMatcher(ctx: MatcherContext) {
+export const inlineSyntaxMatcher = new Matcher<MfmInline | string>(ctx => {
 	let matched;
 
 	// check EOF
@@ -403,9 +404,9 @@ export function inlineSyntaxMatcher(ctx: MatcherContext) {
 	ctx.pos++;
 
 	return ctx.ok(text);
-}
+});
 
-export function plainSyntaxMatcher(ctx: MatcherContext) {
+export const plainSyntaxMatcher = new Matcher<MfmPlainNode | string>(ctx => {
 	// check EOF
 	if (ctx.eof()) {
 		return ctx.fail();
@@ -427,4 +428,4 @@ export function plainSyntaxMatcher(ctx: MatcherContext) {
 	ctx.pos++;
 
 	return ctx.ok(text);
-}
+});

@@ -1,10 +1,11 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
-import { Match, MatcherContext } from '../services/matcher';
+import { Matcher, SyntaxMatcher } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
+import { SyntaxId } from '../services/syntax';
 import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
 
-function argMatcher(ctx: MatcherContext): Match<{ k: string, v: string | true }> {
+const argMatcher = new Matcher<{ k: string, v: string | true }>(ctx => {
 	let matched;
 
 	// select 1: key + value
@@ -31,9 +32,9 @@ function argMatcher(ctx: MatcherContext): Match<{ k: string, v: string | true }>
 	}
 
 	return ctx.fail();
-}
+});
 
-function argsMatcher(ctx: MatcherContext): Match<Record<string, string | true>> {
+const argsMatcher = new Matcher<Record<string, string | true>>(ctx => {
 	let matched;
 	const args: Record<string, string | true> = {};
 
@@ -67,9 +68,9 @@ function argsMatcher(ctx: MatcherContext): Match<Record<string, string | true>> 
 	}
 
 	return ctx.ok(args);
-}
+});
 
-export function fnMatcher(ctx: MatcherContext): Match<MfmFn> {
+export const fnMatcher = new SyntaxMatcher<MfmFn>(SyntaxId.Fn, ctx => {
 	let matched;
 
 	// "$["
@@ -121,4 +122,4 @@ export function fnMatcher(ctx: MatcherContext): Match<MfmFn> {
 	ctx.pos++;
 
 	return ctx.ok(FN(name, params, children));
-}
+});

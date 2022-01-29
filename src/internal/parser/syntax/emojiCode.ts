@@ -1,8 +1,9 @@
 import { EMOJI_CODE, MfmEmojiCode } from '../../../node';
-import { Match, MatcherContext } from '../services/matcher';
+import { SyntaxMatcher } from '../services/matcher';
 import { CharCode } from '../services/string';
+import { SyntaxId } from '../services/syntax';
 
-export function emojiCodeMatcher(ctx: MatcherContext): Match<MfmEmojiCode> {
+export const emojiCodeMatcher = new SyntaxMatcher<MfmEmojiCode>(SyntaxId.EmojiCode, ctx => {
 	// ":"
 	if (!ctx.matchCharCode(CharCode.colon)) {
 		return ctx.fail();
@@ -24,4 +25,4 @@ export function emojiCodeMatcher(ctx: MatcherContext): Match<MfmEmojiCode> {
 	ctx.pos++;
 
 	return ctx.ok(EMOJI_CODE(name));
-}
+});

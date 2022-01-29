@@ -1,8 +1,9 @@
 import { MATH_INLINE, MfmMathInline } from '../../../node';
-import { Match, MatcherContext } from '../services/matcher';
+import { SyntaxMatcher } from '../services/matcher';
+import { SyntaxId } from '../services/syntax';
 
-export function mathInlineMatcher(ctx: MatcherContext): Match<MfmMathInline> {
+export const mathInlineMatcher = new SyntaxMatcher<MfmMathInline>(SyntaxId.MathInline, ctx => {
 	// TODO
 
 	return ctx.ok(MATH_INLINE(''));
-}
+});

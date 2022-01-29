@@ -1,8 +1,9 @@
 import { MfmSearch, SEARCH } from '../../../node';
-import { Match, MatcherContext } from '../services/matcher';
+import { SyntaxMatcher } from '../services/matcher';
+import { SyntaxId } from '../services/syntax';
 
-export function searchMatcher(ctx: MatcherContext): Match<MfmSearch> {
+export const searchMatcher = new SyntaxMatcher<MfmSearch>(SyntaxId.Search, ctx => {
 	// TODO
 
 	return ctx.ok(SEARCH('', ''));
-}
+});
