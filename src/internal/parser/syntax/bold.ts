@@ -1,10 +1,9 @@
 import { BOLD, MfmBold, MfmInline, TEXT } from '../../../node';
-import { SyntaxMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
-import { SyntaxId } from '../services/syntax';
-import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
+import { inlineMatcher } from '../services/syntaxMatcher';
 
-export const boldAstaMatcher = new SyntaxMatcher<MfmBold>(SyntaxId.BoldAsta, ctx => {
+export const boldAstaMatcher = defineCachedMatcher<MfmBold>('boldAsta', ctx => {
 	let matched;
 
 	// "**"
@@ -18,7 +17,7 @@ export const boldAstaMatcher = new SyntaxMatcher<MfmBold>(SyntaxId.BoldAsta, ctx
 	while (true) {
 		if (ctx.matchStr('**')) break;
 
-		matched = ctx.consume(inlineSyntaxMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
@@ -35,7 +34,7 @@ export const boldAstaMatcher = new SyntaxMatcher<MfmBold>(SyntaxId.BoldAsta, ctx
 	return ctx.ok(BOLD(children));
 });
 
-export const boldUnderMatcher = new SyntaxMatcher<MfmBold>(SyntaxId.BoldUnder, ctx => {
+export const boldUnderMatcher = defineCachedMatcher<MfmBold>('boldUnder', ctx => {
 	let matched;
 
 	// "__"
@@ -70,7 +69,7 @@ export const boldUnderMatcher = new SyntaxMatcher<MfmBold>(SyntaxId.BoldUnder, c
 	return ctx.ok(BOLD([TEXT(text)]));
 });
 
-export const boldTagMatcher = new SyntaxMatcher<MfmBold>(SyntaxId.BoldTag, ctx => {
+export const boldTagMatcher = defineCachedMatcher<MfmBold>('boldTag', ctx => {
 	let matched;
 
 	// "<b>"
@@ -84,7 +83,7 @@ export const boldTagMatcher = new SyntaxMatcher<MfmBold>(SyntaxId.BoldTag, ctx =
 	while (true) {
 		if (ctx.matchStr('</b>')) break;
 
-		matched = ctx.consume(inlineSyntaxMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}

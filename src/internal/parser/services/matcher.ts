@@ -1,19 +1,25 @@
-import { FullParserOpts } from '../index';
+import { ParserOpts } from '../index';
 
-export class Matcher<T> {
-	public name = 'unnamed';
-
-	public match(ctx: MatcherContext): Match<T> {
-		return ctx.fail();
-	}
+export interface Matcher<T> {
+	name: string;
+	isCacheable: boolean;
+	match: (ctx: MatcherContext) => Match<T>;
 }
 
-export class CacheableMatcher<T> extends Matcher<T> {
-	public cache: Record<number, CacheItem<T> | null> = {};
+export function defineMatcher<T>(name: string, match: (ctx: MatcherContext) => Match<T>): Matcher<T> {
+	return {
+		name: name,
+		isCacheable: false,
+		match: match,
+	};
 }
 
-export function isCacheableMatcher<T>(x: Matcher<T>): x is CacheableMatcher<T> {
-	return 'cache' in x;
+export function defineCachedMatcher<T>(name: string, match: (ctx: MatcherContext) => Match<T>): Matcher<T> {
+	return {
+		name: name,
+		isCacheable: true,
+		match: match,
+	};
 }
 
 export type CacheItem<T> = {
@@ -32,7 +38,7 @@ export type MatchFailure = {
 	ok: false;
 };
 
-export type MatchResult<T> = T extends CacheableMatcher<infer R> ? R : never;
+export type MatchResult<T> = T extends Matcher<infer R> ? R : never;
 
 export class MatcherContext {
 	public input: string;
@@ -40,13 +46,15 @@ export class MatcherContext {
 	public nestLimit: number;
 	public depth = 0;
 	public debug = false;
+	public cache: Map<string, Map<number, CacheItem<any>>> = new Map();
 	public enableCache = true;
+	public stack: Matcher<any>[] = [];
 	// fn
 	public fnNameList: string[] | undefined;
 	// link
 	public linkLabel = false;
 
-	constructor(input: string, opts: FullParserOpts) {
+	constructor(input: string, opts: ParserOpts) {
 		this.input = input;
 		this.fnNameList = opts.fnNameList;
 		this.nestLimit = opts.nestLimit || 20;
@@ -69,52 +77,49 @@ export class MatcherContext {
 		return this.pos >= this.input.length;
 	}
 
-	public consume<T extends Matcher<MatchResult<T>> | CacheableMatcher<MatchResult<T>>>(matcher: T): Match<MatchResult<T>> {
+	public consume<T extends Matcher<MatchResult<T>>>(matcher: T): Match<MatchResult<T>> {
 		const storedPos = this.pos;
-
-		if (isCacheableMatcher(matcher) && this.enableCache) {
-			const cache = matcher.cache[this.pos];
+		if (matcher.isCacheable && this.enableCache) {
+			// read cache
+			let cacheTable = this.cache.get(matcher.name);
+			if (cacheTable == null) {
+				cacheTable = new Map();
+				this.cache.set(matcher.name, cacheTable);
+			}
+			const cache: CacheItem<MatchResult<T>> | undefined = cacheTable.get(this.pos);
 			if (cache != null) {
-				if (this.debug) {
-					console.log(`${this.pos}\t[hit cache] ${matcher.name}`);
-				}
+				this.debugLog(`${this.pos}\t[hit cache] ${matcher.name}`);
 				this.pos = cache.pos;
 				return this.ok(cache.result);
 			}
-			if (this.debug) {
-				console.log(`${this.pos}\t[miss cache] ${matcher.name}`);
+			// match
+			this.debugLog(`${this.pos}\tenter ${matcher.name}`);
+			this.stack.unshift(matcher);
+			const match = matcher.match(this);
+			this.stack.shift();
+			this.debugLog(`${storedPos}:${this.pos}\t${match.ok ? 'match' : 'fail'} ${matcher.name}`);
+			// write cache
+			if (match.ok) {
+				cacheTable.set(storedPos, { pos: this.pos, result: match.result });
+				this.debugLog(`${storedPos}\t[set cache] ${matcher.name}`);
 			}
+			return match;
+		} else {
+			this.debugLog(`${this.pos}\tenter ${matcher.name}`);
+			this.stack.unshift(matcher);
+			const match = matcher.match(this);
+			this.stack.shift();
+			this.debugLog(`${storedPos}:${this.pos}\t${match.ok ? 'match' : 'fail'} ${matcher.name}`);
+			return match;
 		}
-
-		if (this.debug) {
-			console.log(`${this.pos}\tenter ${matcher.name}`);
-		}
-		const match = matcher.match(this);
-		if (this.debug) {
-			console.log(`${storedPos}:${this.pos}\t${match.ok ? 'match' : 'fail'} ${matcher.name}`);
-		}
-
-		if (match.ok) {
-			if (isCacheableMatcher(matcher) && this.enableCache) {
-				matcher.cache[storedPos] = { pos: this.pos, result: match.result };
-				if (this.debug) {
-					console.log(`${storedPos}\t[set cache] ${matcher.name}`);
-				}
-			}
-		}
-
-		return match;
 	}
 
 	public tryConsume<T extends Matcher<MatchResult<T>>>(matcher: T): Match<MatchResult<T>> {
 		const storedPos = this.pos;
-
 		const match = this.consume(matcher);
-
 		if (!match.ok) {
 			this.pos = storedPos; // fallback
 		}
-
 		return match;
 	}
 
@@ -149,5 +154,11 @@ export class MatcherContext {
 
 	public matchRegex(regex: RegExp): RegExpExecArray | null {
 		return regex.exec(this.input.substr(this.pos));
+	}
+
+	private debugLog(log: string): void {
+		if (this.debug) {
+			console.log(log);
+		}
 	}
 }

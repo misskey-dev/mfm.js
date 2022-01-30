@@ -1,21 +1,21 @@
 import { MfmNode, MfmPlainNode } from '../../node';
 import { MatcherContext } from './services/matcher';
 import { pushNode } from './services/nodeTree';
-import { fullSyntaxMatcher, plainSyntaxMatcher } from './services/syntaxMatcher';
+import { fullMatcher, plainMatcher } from './services/syntaxMatcher';
 
-export type FullParserOpts = Partial<{
+export type ParserOpts = Partial<{
 	fnNameList: string[];
 	nestLimit: number;
 }>;
 
-export function fullParser(input: string, opts: FullParserOpts): MfmNode[] {
+export function fullParser(input: string, opts: ParserOpts): MfmNode[] {
 	const result: MfmNode[] = [];
 
 	const ctx = new MatcherContext(input, opts);
 	//ctx.debug = true;
 	let matched;
 	while (true) {
-		matched = ctx.consume(fullSyntaxMatcher);
+		matched = ctx.consume(fullMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.result, result);
 	}
@@ -30,7 +30,7 @@ export function plainParser(input: string): MfmPlainNode[] {
 	//ctx.debug = true;
 	let matched;
 	while (true) {
-		matched = ctx.consume(plainSyntaxMatcher);
+		matched = ctx.consume(plainMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.result, result);
 	}
