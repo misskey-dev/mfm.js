@@ -2,8 +2,6 @@ import { MfmSearch, SEARCH } from '../../../node';
 import { defineCachedMatcher } from '../services/matcher';
 
 const searchRightMatcher = defineCachedMatcher<true>('searchRight', ctx => {
-	let match;
-
 	// spacing
 	if (!ctx.matchRegex(/^[ \u3000\t\u00a0]/)) {
 		return ctx.fail();
@@ -11,7 +9,7 @@ const searchRightMatcher = defineCachedMatcher<true>('searchRight', ctx => {
 	ctx.pos++;
 
 	// search key
-	match = ctx.matchRegex(/^\[?(検索|search)]?/i);
+	const match = ctx.matchRegex(/^\[?(検索|search)]?/i);
 	if (match == null) {
 		return ctx.fail();
 	}
