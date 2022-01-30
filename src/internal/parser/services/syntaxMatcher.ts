@@ -229,6 +229,9 @@ export const inlineMatcher = defineMatcher<MfmInline | string>('inline', ctx => 
 	if (ctx.depth < ctx.nestLimit) {
 		ctx.depth++;
 
+		// have some links in parent matchers
+		const inLink = ctx.stack.find(m => m.name == 'link') != null;
+
 		switch (ctx.input.charCodeAt(ctx.pos)) {
 
 			case CharCode.asterisk: {
@@ -258,7 +261,7 @@ export const inlineMatcher = defineMatcher<MfmInline | string>('inline', ctx => 
 			}
 
 			case CharCode.question: {
-				if (!ctx.linkLabel) {
+				if (!inLink) {
 					// ?[silent link]()
 					matched = ctx.tryConsume(silentLinkMatcher);
 					if (matched.ok) {
@@ -284,7 +287,7 @@ export const inlineMatcher = defineMatcher<MfmInline | string>('inline', ctx => 
 					ctx.depth--;
 					return matched;
 				}
-				if (!ctx.linkLabel) {
+				if (!inLink) {
 					// <https://example.com>
 					matched = ctx.tryConsume(urlAltMatcher);
 					if (matched.ok) {
@@ -296,7 +299,7 @@ export const inlineMatcher = defineMatcher<MfmInline | string>('inline', ctx => 
 			}
 
 			case CharCode.openBracket: {
-				if (!ctx.linkLabel) {
+				if (!inLink) {
 					// [link]()
 					matched = ctx.tryConsume(linkMatcher);
 					if (matched.ok) {
@@ -358,7 +361,7 @@ export const inlineMatcher = defineMatcher<MfmInline | string>('inline', ctx => 
 			}
 
 			case CharCode.at: {
-				if (!ctx.linkLabel) {
+				if (!inLink) {
 					// @mention
 					matched = ctx.tryConsume(mentionMatcher);
 					if (matched.ok) {
@@ -386,7 +389,7 @@ export const inlineMatcher = defineMatcher<MfmInline | string>('inline', ctx => 
 			ctx.depth--;
 			return matched;
 		}
-		if (!ctx.linkLabel) {
+		if (!inLink) {
 			// https://example.com
 			matched = ctx.tryConsume(urlMatcher);
 			if (matched.ok) {

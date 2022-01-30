@@ -19,9 +19,7 @@ export const linkMatcher = defineCachedMatcher<MfmLink>('link', ctx => {
 	while (true) {
 		if (ctx.matchCharCode(CharCode.closeBracket)) break;
 
-		ctx.linkLabel = true;
 		matched = ctx.consume(inlineMatcher);
-		ctx.linkLabel = false;
 		if (!matched.ok) break;
 		pushNode(matched.result, label);
 	}

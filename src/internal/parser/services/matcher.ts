@@ -49,12 +49,9 @@ export class MatcherContext {
 	public depth = 0;
 	public debug = false;
 	public cache: Map<string, Map<number, CacheItem<any>>> = new Map();
-	public enableCache = true;
 	public stack: Matcher<any>[] = [];
 	// fn
 	public fnNameList: string[] | undefined;
-	// link
-	public linkLabel = false;
 
 	constructor(input: string, opts: ParserOpts) {
 		this.input = input;
@@ -81,7 +78,7 @@ export class MatcherContext {
 
 	public consume<T extends Matcher<MatchResult<T>>>(matcher: T): Match<MatchResult<T>> {
 		const storedPos = this.pos;
-		if (matcher.isCacheable && this.enableCache) {
+		if (matcher.isCacheable) {
 			// read cache
 			let cacheTable = this.cache.get(matcher.name);
 			if (cacheTable == null) {
