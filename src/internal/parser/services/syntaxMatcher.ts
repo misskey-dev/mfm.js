@@ -16,6 +16,7 @@ import { unicodeEmojiMatcher } from '../syntax/unicodeEmoji';
 import { inlineCodeMatcher } from '../syntax/inlineCode';
 import { urlAltMatcher, urlMatcher } from '../syntax/url';
 import { linkMatcher, silentLinkMatcher } from '../syntax/link';
+import { searchMatcher } from '../syntax/search';
 
 // NOTE: SyntaxMatcher は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。
@@ -200,7 +201,7 @@ export const fullMatcher = defineMatcher<MfmNode | string>('full', ctx => {
 			// https://example.com
 			urlMatcher,
 			// abc [search]
-			// searchMatcher,
+			searchMatcher,
 		]);
 		if (matched.ok) {
 			ctx.depth--;
