@@ -1,6 +1,6 @@
+import { MfmInline, MfmNode, MfmPlainNode } from '../../../node';
 import { defineMatcher } from './matcher';
 import { CharCode } from './string';
-import { MfmInline, MfmNode, MfmPlainNode } from '../../../node';
 
 import { bigMatcher } from '../syntax/big';
 import { boldAstaMatcher, boldTagMatcher, boldUnderMatcher } from '../syntax/bold';
@@ -8,15 +8,16 @@ import { centerTagMatcher } from '../syntax/center';
 import { emojiCodeMatcher } from '../syntax/emojiCode';
 import { fnMatcher } from '../syntax/fn';
 import { hashtagMatcher } from '../syntax/hashtag';
+import { inlineCodeMatcher } from '../syntax/inlineCode';
 import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from '../syntax/italic';
+import { linkMatcher, silentLinkMatcher } from '../syntax/link';
+import { mathInlineMatcher } from '../syntax/mathInline';
 import { mentionMatcher } from '../syntax/mention';
+import { searchMatcher } from '../syntax/search';
 import { smallTagMatcher } from '../syntax/small';
 import { strikeTagMatcher, strikeTildeMatcher } from '../syntax/strike';
 import { unicodeEmojiMatcher } from '../syntax/unicodeEmoji';
-import { inlineCodeMatcher } from '../syntax/inlineCode';
 import { urlAltMatcher, urlMatcher } from '../syntax/url';
-import { linkMatcher, silentLinkMatcher } from '../syntax/link';
-import { searchMatcher } from '../syntax/search';
 
 // NOTE: SyntaxMatcher は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。
@@ -133,7 +134,11 @@ export const fullMatcher = defineMatcher<MfmNode | string>('full', ctx => {
 
 			case CharCode.backslash: {
 				// \(math inline\)
-				//mathInlineMatcher;
+				matched = ctx.tryConsume(mathInlineMatcher);
+				if (matched.ok) {
+					ctx.depth--;
+					return matched;
+				}
 
 				// \[math block\]
 				//mathBlockMatcher;
@@ -323,7 +328,11 @@ export const inlineMatcher = defineMatcher<MfmInline | string>('inline', ctx => 
 
 			case CharCode.backslash: {
 				// \(math inline\)
-				//mathInlineMatcher;
+				matched = ctx.tryConsume(mathInlineMatcher);
+				if (matched.ok) {
+					ctx.depth--;
+					return matched;
+				}
 				break;
 			}
 
