@@ -1,12 +1,11 @@
 import { LINK, MfmInline, MfmLink } from '../../../node';
-import { SyntaxMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
-import { SyntaxId } from '../services/syntax';
-import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
+import { inlineMatcher } from '../services/syntaxMatcher';
 import { urlAltMatcher, urlMatcher } from './url';
 
-export const linkMatcher = new SyntaxMatcher<MfmLink>(SyntaxId.Link, ctx => {
+export const linkMatcher = defineCachedMatcher<MfmLink>('link', ctx => {
 	let matched;
 
 	// "["
@@ -21,7 +20,7 @@ export const linkMatcher = new SyntaxMatcher<MfmLink>(SyntaxId.Link, ctx => {
 		if (ctx.matchCharCode(CharCode.closeBracket)) break;
 
 		ctx.linkLabel = true;
-		matched = ctx.consume(inlineSyntaxMatcher);
+		matched = ctx.consume(inlineMatcher);
 		ctx.linkLabel = false;
 		if (!matched.ok) break;
 		pushNode(matched.result, label);
@@ -55,7 +54,7 @@ export const linkMatcher = new SyntaxMatcher<MfmLink>(SyntaxId.Link, ctx => {
 	return ctx.ok(LINK(false, url.props.url, label));
 });
 
-export const silentLinkMatcher = new SyntaxMatcher<MfmLink>(SyntaxId.SilentLink, ctx => {
+export const silentLinkMatcher = defineCachedMatcher<MfmLink>('silentLink', ctx => {
 	// "?"
 	if (!ctx.matchCharCode(CharCode.question)) {
 		return ctx.fail();

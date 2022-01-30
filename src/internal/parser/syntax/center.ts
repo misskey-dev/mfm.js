@@ -1,10 +1,9 @@
 import { CENTER, MfmCenter, MfmInline } from '../../../node';
-import { SyntaxMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
-import { SyntaxId } from '../services/syntax';
-import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
+import { inlineMatcher } from '../services/syntaxMatcher';
 
-export const centerTagMatcher = new SyntaxMatcher<MfmCenter>(SyntaxId.Center, ctx => {
+export const centerTagMatcher = defineCachedMatcher<MfmCenter>('center', ctx => {
 	let matched;
 
 	// line-head
@@ -29,7 +28,7 @@ export const centerTagMatcher = new SyntaxMatcher<MfmCenter>(SyntaxId.Center, ct
 	while (true) {
 		if (ctx.matchStr('</center>')) break;
 
-		matched = ctx.consume(inlineSyntaxMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}

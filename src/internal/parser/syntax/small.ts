@@ -1,10 +1,9 @@
 import { MfmInline, MfmSmall, SMALL } from '../../../node';
-import { SyntaxMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
-import { SyntaxId } from '../services/syntax';
-import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
+import { inlineMatcher } from '../services/syntaxMatcher';
 
-export const smallTagMatcher = new SyntaxMatcher<MfmSmall>(SyntaxId.Small, ctx => {
+export const smallTagMatcher = defineCachedMatcher<MfmSmall>('small', ctx => {
 	let matched;
 
 	// "<small>"
@@ -18,7 +17,7 @@ export const smallTagMatcher = new SyntaxMatcher<MfmSmall>(SyntaxId.Small, ctx =
 	while (true) {
 		if (ctx.matchStr('</small>')) break;
 
-		matched = ctx.consume(inlineSyntaxMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}

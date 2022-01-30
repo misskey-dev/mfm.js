@@ -1,8 +1,7 @@
 import { MfmQuote, QUOTE } from '../../../node';
-import { SyntaxMatcher } from '../services/matcher';
-import { SyntaxId } from '../services/syntax';
+import { defineCachedMatcher } from '../services/matcher';
 
-export const quoteMatcher = new SyntaxMatcher<MfmQuote>(SyntaxId.Quote, ctx => {
+export const quoteMatcher = defineCachedMatcher<MfmQuote>('quote', ctx => {
 	// TODO
 
 	return ctx.ok(QUOTE([]));

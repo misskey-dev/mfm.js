@@ -1,9 +1,8 @@
 import { EMOJI_CODE, MfmEmojiCode } from '../../../node';
-import { SyntaxMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../services/matcher';
 import { CharCode } from '../services/string';
-import { SyntaxId } from '../services/syntax';
 
-export const emojiCodeMatcher = new SyntaxMatcher<MfmEmojiCode>(SyntaxId.EmojiCode, ctx => {
+export const emojiCodeMatcher = defineCachedMatcher<MfmEmojiCode>('emojiCode', ctx => {
 	// ":"
 	if (!ctx.matchCharCode(CharCode.colon)) {
 		return ctx.fail();

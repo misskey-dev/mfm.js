@@ -3,10 +3,10 @@ import { ParserOpts } from '../index';
 export interface Matcher<T> {
 	name: string;
 	isCacheable: boolean;
-	match: (ctx: MatcherContext) => Match<T>;
+	match: MatcherHandler<T>;
 }
 
-export function defineMatcher<T>(name: string, match: (ctx: MatcherContext) => Match<T>): Matcher<T> {
+export function defineMatcher<T>(name: string, match: MatcherHandler<T>): Matcher<T> {
 	return {
 		name: name,
 		isCacheable: false,
@@ -14,7 +14,7 @@ export function defineMatcher<T>(name: string, match: (ctx: MatcherContext) => M
 	};
 }
 
-export function defineCachedMatcher<T>(name: string, match: (ctx: MatcherContext) => Match<T>): Matcher<T> {
+export function defineCachedMatcher<T>(name: string, match: MatcherHandler<T>): Matcher<T> {
 	return {
 		name: name,
 		isCacheable: true,
@@ -26,6 +26,8 @@ export type CacheItem<T> = {
 	pos: number;
 	result: T;
 };
+
+export type MatcherHandler<T> = (ctx: MatcherContext) => Match<T>;
 
 export type Match<T> = MatchSuccess<T> | MatchFailure;
 

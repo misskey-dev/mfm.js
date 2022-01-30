@@ -1,8 +1,7 @@
 import { MfmSearch, SEARCH } from '../../../node';
-import { SyntaxMatcher } from '../services/matcher';
-import { SyntaxId } from '../services/syntax';
+import { defineCachedMatcher } from '../services/matcher';
 
-export const searchMatcher = new SyntaxMatcher<MfmSearch>(SyntaxId.Search, ctx => {
+export const searchMatcher = defineCachedMatcher<MfmSearch>('search', ctx => {
 	// TODO
 
 	return ctx.ok(SEARCH('', ''));

@@ -1,8 +1,7 @@
 import { CODE_BLOCK, MfmCodeBlock } from '../../../node';
-import { SyntaxMatcher } from '../services/matcher';
-import { SyntaxId } from '../services/syntax';
+import { defineCachedMatcher } from '../services/matcher';
 
-export const codeBlockMatcher = new SyntaxMatcher<MfmCodeBlock>(SyntaxId.CodeBlock, ctx => {
+export const codeBlockMatcher = defineCachedMatcher<MfmCodeBlock>('codeBlock', ctx => {
 	let matched;
 
 	// TODO: check line-head

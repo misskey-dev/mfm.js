@@ -1,9 +1,8 @@
 import { INLINE_CODE, MfmInlineCode } from '../../../node';
-import { SyntaxMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../services/matcher';
 import { CharCode } from '../services/string';
-import { SyntaxId } from '../services/syntax';
 
-export const inlineCodeMatcher = new SyntaxMatcher<MfmInlineCode>(SyntaxId.InlineCode, ctx => {
+export const inlineCodeMatcher = defineCachedMatcher<MfmInlineCode>('inlineCode', ctx => {
 	// "`"
 	if (!ctx.matchCharCode(CharCode.backtick)) {
 		return ctx.fail();

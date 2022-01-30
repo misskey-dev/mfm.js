@@ -1,12 +1,11 @@
 import { ITALIC, MfmInline, MfmItalic } from '../../../node';
-import { SyntaxMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../services/matcher';
 import { isAllowedAsBackChar } from '../services/matchingUtil';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
-import { SyntaxId } from '../services/syntax';
-import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
+import { inlineMatcher } from '../services/syntaxMatcher';
 
-export const italicAstaMatcher = new SyntaxMatcher<MfmItalic>(SyntaxId.ItalicAsta, ctx => {
+export const italicAstaMatcher = defineCachedMatcher<MfmItalic>('italicAsta', ctx => {
 	let matched;
 
 	// check a back char
@@ -25,7 +24,7 @@ export const italicAstaMatcher = new SyntaxMatcher<MfmItalic>(SyntaxId.ItalicAst
 	while (true) {
 		if (ctx.matchCharCode(CharCode.asterisk)) break;
 
-		matched = ctx.consume(inlineSyntaxMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
@@ -42,7 +41,7 @@ export const italicAstaMatcher = new SyntaxMatcher<MfmItalic>(SyntaxId.ItalicAst
 	return ctx.ok(ITALIC(children));
 });
 
-export const italicUnderMatcher = new SyntaxMatcher<MfmItalic>(SyntaxId.ItalicUnder, ctx => {
+export const italicUnderMatcher = defineCachedMatcher<MfmItalic>('italicUnder', ctx => {
 	// let matched;
 
 	// check a back char
@@ -71,7 +70,7 @@ export const italicUnderMatcher = new SyntaxMatcher<MfmItalic>(SyntaxId.ItalicUn
 	return ctx.ok(ITALIC([]));
 });
 
-export const italicTagMatcher = new SyntaxMatcher<MfmItalic>(SyntaxId.ItalicTag, ctx => {
+export const italicTagMatcher = defineCachedMatcher<MfmItalic>('italicTag', ctx => {
 	let matched;
 
 	// "<i>"
@@ -85,7 +84,7 @@ export const italicTagMatcher = new SyntaxMatcher<MfmItalic>(SyntaxId.ItalicTag,
 	while (true) {
 		if (ctx.matchStr('</i>')) break;
 
-		matched = ctx.consume(inlineSyntaxMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}

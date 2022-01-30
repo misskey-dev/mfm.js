@@ -1,10 +1,9 @@
 import { MENTION, MfmMention } from '../../../node';
-import { Matcher, SyntaxMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../services/matcher';
 import { isAllowedAsBackChar } from '../services/matchingUtil';
 import { CharCode } from '../services/string';
-import { SyntaxId } from '../services/syntax';
 
-export const hostMatcher = new Matcher<string>(ctx => {
+export const hostMatcher = defineCachedMatcher<string>('mentionHost', ctx => {
 	// "@"
 	if (!ctx.matchCharCode(CharCode.at)) {
 		return ctx.fail();
@@ -42,7 +41,7 @@ export const hostMatcher = new Matcher<string>(ctx => {
 	return ctx.ok(name);
 });
 
-export const mentionMatcher = new SyntaxMatcher<MfmMention>(SyntaxId.Mention, ctx => {
+export const mentionMatcher = defineCachedMatcher<MfmMention>('mention', ctx => {
 	let matched;
 	const headPos = ctx.pos;
 

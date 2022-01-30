@@ -1,11 +1,10 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
-import { Matcher, SyntaxMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
-import { SyntaxId } from '../services/syntax';
-import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
+import { inlineMatcher } from '../services/syntaxMatcher';
 
-const argMatcher = new Matcher<{ k: string, v: string | true }>(ctx => {
+const argMatcher = defineCachedMatcher<{ k: string, v: string | true }>('fnArg', ctx => {
 	let matched;
 
 	// select 1: key + value
@@ -34,7 +33,7 @@ const argMatcher = new Matcher<{ k: string, v: string | true }>(ctx => {
 	return ctx.fail();
 });
 
-const argsMatcher = new Matcher<Record<string, string | true>>(ctx => {
+const argsMatcher = defineCachedMatcher<Record<string, string | true>>('fnArgs', ctx => {
 	let matched;
 	const args: Record<string, string | true> = {};
 
@@ -70,7 +69,7 @@ const argsMatcher = new Matcher<Record<string, string | true>>(ctx => {
 	return ctx.ok(args);
 });
 
-export const fnMatcher = new SyntaxMatcher<MfmFn>(SyntaxId.Fn, ctx => {
+export const fnMatcher = defineCachedMatcher<MfmFn>('fn', ctx => {
 	let matched;
 
 	// "$["
@@ -107,7 +106,7 @@ export const fnMatcher = new SyntaxMatcher<MfmFn>(SyntaxId.Fn, ctx => {
 	while (true) {
 		if (ctx.matchCharCode(CharCode.closeBracket)) break;
 
-		matched = ctx.consume(inlineSyntaxMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}

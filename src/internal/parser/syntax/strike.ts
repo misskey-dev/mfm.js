@@ -1,11 +1,10 @@
 import { MfmInline, MfmStrike, STRIKE } from '../../../node';
-import { SyntaxMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { CharCode } from '../services/string';
-import { SyntaxId } from '../services/syntax';
-import { inlineSyntaxMatcher } from '../services/syntaxMatcher';
+import { inlineMatcher } from '../services/syntaxMatcher';
 
-export const strikeTagMatcher = new SyntaxMatcher<MfmStrike>(SyntaxId.StrikeTag, ctx => {
+export const strikeTagMatcher = defineCachedMatcher<MfmStrike>('strikeTag', ctx => {
 	let matched;
 
 	// "<s>"
@@ -20,7 +19,7 @@ export const strikeTagMatcher = new SyntaxMatcher<MfmStrike>(SyntaxId.StrikeTag,
 		if (ctx.matchStr('</s>')) break;
 		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null) break;
 
-		matched = ctx.consume(inlineSyntaxMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
@@ -37,7 +36,7 @@ export const strikeTagMatcher = new SyntaxMatcher<MfmStrike>(SyntaxId.StrikeTag,
 	return ctx.ok(STRIKE(children));
 });
 
-export const strikeTildeMatcher = new SyntaxMatcher<MfmStrike>(SyntaxId.StrikeTilde, ctx => {
+export const strikeTildeMatcher = defineCachedMatcher<MfmStrike>('strikeTilde', ctx => {
 	let matched;
 
 	// "~~"
@@ -52,7 +51,7 @@ export const strikeTildeMatcher = new SyntaxMatcher<MfmStrike>(SyntaxId.StrikeTi
 		if (ctx.matchCharCode(CharCode.tilde)) break;
 		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null) break;
 
-		matched = ctx.consume(inlineSyntaxMatcher);
+		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}

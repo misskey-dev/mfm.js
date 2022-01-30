@@ -1,13 +1,12 @@
 import { HASHTAG, MfmHashtag } from '../../../node';
-import { SyntaxMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../services/matcher';
 import { isAllowedAsBackChar } from '../services/matchingUtil';
 import { CharCode } from '../services/string';
-import { SyntaxId } from '../services/syntax';
 
 // TODO: 「#」がUnicode絵文字の一部である場合があるので判定する
 // TODO: 括弧は対になっている時のみ内容に含めることができる。対象: `()` `[]` `「」`
 
-export const hashtagMatcher = new SyntaxMatcher<MfmHashtag>(SyntaxId.HashTag, ctx => {
+export const hashtagMatcher = defineCachedMatcher<MfmHashtag>('hashtag', ctx => {
 	// check a back char
 	if (!isAllowedAsBackChar(ctx)) {
 		return ctx.fail();
