@@ -22,8 +22,7 @@ export const hashtagMatcher = defineCachedMatcher<MfmHashtag>('hashtag', ctx => 
 	let value = '';
 	while (true) {
 		if (/^[ \u3000\t.,!?'"#:/[\]【】()「」<>]/i.test(ctx.input.charAt(ctx.pos))) break;
-		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null) break;
-		if (ctx.eof()) break;
+		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null || ctx.eof()) break;
 
 		value += ctx.input.charAt(ctx.pos);
 		ctx.pos++;

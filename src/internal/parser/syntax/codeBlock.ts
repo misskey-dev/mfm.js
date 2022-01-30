@@ -15,8 +15,7 @@ export const codeBlockMatcher = defineCachedMatcher<MfmCodeBlock>('codeBlock', c
 	// lang
 	let lang = '';
 	while (true) {
-		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null) break;
-		if (ctx.eof()) break;
+		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null || ctx.eof()) break;
 
 		lang += ctx.input.charAt(ctx.pos);
 		ctx.pos++;
