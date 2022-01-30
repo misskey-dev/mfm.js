@@ -1,9 +1,7 @@
 import { MfmNode } from '../../../node';
 import { FullParserOpts } from '../index';
 import { CacheItem } from './cache';
-import { SyntaxId } from './syntax';
-
-//export type Matcher<T> = (ctx: MatcherContext) => Match<T>;
+import { SyntaxId, SyntaxName } from './syntax';
 
 export class Matcher<T> {
 	public handler: MatcherHandler<T>;
@@ -14,14 +12,12 @@ export class Matcher<T> {
 }
 
 export class SyntaxMatcher<T> extends Matcher<T> {
-	//public matcherName: string;
 	public id: SyntaxId;
 
 	constructor(id: SyntaxId, handler: (ctx: MatcherContext) => Match<T>) {
 		super(handler);
 		this.id = id;
 		this.handler = handler;
-		//this.matcherName = matcherName;
 	}
 }
 
@@ -91,9 +87,13 @@ export class MatcherContext {
 			}
 		}
 
-		if (this.debug) console.log(`${this.pos}\tenter`);
+		if (this.debug && matcher instanceof SyntaxMatcher) {
+			console.log(`${this.pos}\tenter ${SyntaxName[matcher.id]}`);
+		}
 		const match = matcher.handler(this);
-		if (this.debug) console.log(`${storedPos}:${this.pos}\t${match.ok ? 'match' : 'fail'}`);
+		if (this.debug && matcher instanceof SyntaxMatcher) {
+			console.log(`${storedPos}:${this.pos}\t${match.ok ? 'match' : 'fail'} ${SyntaxName[matcher.id]}`);
+		}
 
 		if (match.ok) {
 			if (matcher instanceof SyntaxMatcher) {
@@ -116,12 +116,12 @@ export class MatcherContext {
 			}
 		}
 
-		if (this.debug) {
-			console.log(`${this.pos}\tenter`);
+		if (this.debug && matcher instanceof SyntaxMatcher) {
+			console.log(`${this.pos}\tenter ${SyntaxName[matcher.id]}`);
 		}
 		const match = matcher.handler(this);
-		if (this.debug) {
-			console.log(`${fallback}:${this.pos}\t${match.ok ? 'match' : 'fail'}`);
+		if (this.debug && matcher instanceof SyntaxMatcher) {
+			console.log(`${fallback}:${this.pos}\t${match.ok ? 'match' : 'fail'} ${SyntaxName[matcher.id]}`);
 		}
 
 		if (match.ok) {
@@ -137,9 +137,9 @@ export class MatcherContext {
 
 	public tryConsumeAny<T extends Matcher<MatchResult<T>>>(matchers: T[], opts: MatcherOpts = {}): Match<MatchResult<T>> {
 		for (const matcher of matchers) {
-			const matched = this.tryConsume(matcher, opts);
-			if (matched.ok) {
-				return matched;
+			const match = this.tryConsume(matcher, opts);
+			if (match.ok) {
+				return match;
 			}
 		}
 		return this.fail();
@@ -147,11 +147,11 @@ export class MatcherContext {
 
 	// public match<T extends Matcher<MatchResult<T>>>(matcher: T, opts: MatcherOpts = {}): Match<MatchResult<T>> {
 	// 	const storedPos = this.pos;
-	// 	if (this.debug) console.log(`${this.pos}\tenter ${matcher.matcherName}`);
-	// 	const matched = matcher.handler(this);
-	// 	if (this.debug) console.log(`${storedPos}:${this.pos}\t${matched.ok ? 'match' : 'fail'} ${matcher.matcherName}`);
+	// 	if (this.debug) console.log(`${this.pos}\tenter ${SyntaxName[matcher.id]}`);
+	// 	const match = matcher.handler(this);
+	// 	if (this.debug) console.log(`${storedPos}:${this.pos}\t${match.ok ? 'match' : 'fail'} ${SyntaxName[matcher.id]}`);
 	// 	this.pos = storedPos;
-	// 	return matched;
+	// 	return match;
 	// }
 
 	public matchCharCode(charCode: number): boolean {
@@ -169,7 +169,8 @@ export class MatcherContext {
 	private setCache(key: number, result: MfmNode): void {
 		if (this.debug) {
 			const pos = Math.floor(key / SyntaxId.COUNT);
-			console.log(`${pos}\t[set cache] ${key}`);
+			const id = key % SyntaxId.COUNT;
+			console.log(`${pos}\t[set cache] ${SyntaxName[id]}`);
 		}
 		this.cache[key] = {
 			pos: this.pos,
@@ -178,13 +179,21 @@ export class MatcherContext {
 	}
 
 	private getCache<T extends MfmNode>(key: number): T | null {
+		let id = 0;
+		if (this.debug) {
+			id = key % SyntaxId.COUNT;
+		}
 		if (this.cache[key] != null) {
 			const cache = this.cache[key] as CacheItem<T>;
-			if (this.debug) console.log(`${this.pos}\t[hit cache] ${key}`);
+			if (this.debug) {
+				console.log(`${this.pos}\t[hit cache] ${SyntaxName[id]}`);
+			}
 			this.pos = cache.pos;
 			return cache.result;
 		}
-		if (this.debug) console.log(`${this.pos}\t[miss cache] ${key}`);
+		if (this.debug) {
+			console.log(`${this.pos}\t[miss cache] ${SyntaxName[id]}`);
+		}
 		return null;
 	}
 }

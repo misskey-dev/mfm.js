@@ -28,3 +28,32 @@ export enum SyntaxId {
 
 	COUNT,
 }
+
+export const SyntaxName: Record<number, string> = {
+	[SyntaxId.Big]: 'big',
+	[SyntaxId.BoldAsta]: 'boldAsta',
+	[SyntaxId.BoldUnder]: 'boldUnder',
+	[SyntaxId.BoldTag]: 'boldTag',
+	[SyntaxId.Center]: 'center',
+	[SyntaxId.CodeBlock]: 'codeBlock',
+	[SyntaxId.EmojiCode]: 'emojiCode',
+	[SyntaxId.Fn]: 'fn',
+	[SyntaxId.HashTag]: 'hashtag',
+	[SyntaxId.InlineCode]: 'inlineCode',
+	[SyntaxId.ItalicAsta]: 'italicAsta',
+	[SyntaxId.ItalicUnder]: 'italicUnder',
+	[SyntaxId.ItalicTag]: 'italicTag',
+	[SyntaxId.Link]: 'link',
+	[SyntaxId.SilentLink]: 'silentLink',
+	[SyntaxId.MathBlock]: 'mathBlock',
+	[SyntaxId.MathInline]: 'mathInline',
+	[SyntaxId.Mention]: 'mention',
+	[SyntaxId.Quote]: 'quote',
+	[SyntaxId.Search]: 'search',
+	[SyntaxId.Small]: 'small',
+	[SyntaxId.StrikeTag]: 'strikeTag',
+	[SyntaxId.StrikeTilde]: 'strikeTilde',
+	[SyntaxId.UnicodeEmoji]: 'unicodeEmoji',
+	[SyntaxId.Url]: 'url',
+	[SyntaxId.UrlAlt]: 'urlAlt',
+};
