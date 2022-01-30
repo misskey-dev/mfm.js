@@ -1146,11 +1146,7 @@ hoge`;
 				const output = [
 					QUOTE([
 						QUOTE([
-							TEXT('*'),
-							ITALIC([
-								TEXT('abc'),
-							]),
-							TEXT('*'),
+							TEXT('**abc**'),
 						]),
 					]),
 				];
@@ -1163,11 +1159,7 @@ hoge`;
 			const output = [
 				BOLD([
 					BOLD([
-						TEXT('**'),
-						ITALIC([
-							TEXT('abc'),
-						]),
-						TEXT('**'),
+						TEXT('***abc***'),
 					]),
 				]),
 			];
@@ -1180,11 +1172,7 @@ hoge`;
 				const output = [
 					ITALIC([
 						ITALIC([
-							TEXT('*'),
-							ITALIC([
-								TEXT('abc'),
-							]),
-							TEXT('*'),
+							TEXT('**abc**'),
 						]),
 					]),
 				];
@@ -1259,8 +1247,7 @@ hoge`;
 			const output = [
 				BOLD([
 					BOLD([
-						HASHTAG('abc'),
-						TEXT('(xyz)'),
+						TEXT('#abc(xyz)'),
 					]),
 				]),
 			];
@@ -1272,8 +1259,7 @@ hoge`;
 			const output = [
 				BOLD([
 					BOLD([
-						N_URL('https://example.com/abc'),
-						TEXT('(xyz)'),
+						TEXT('https://example.com/abc(xyz)'),
 					]),
 				]),
 			];
