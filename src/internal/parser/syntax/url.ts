@@ -80,7 +80,7 @@ export const urlAltMatcher = defineCachedMatcher<MfmUrl>('urlAlt', ctx => {
 	while (true) {
 		if (ctx.matchCharCode(CharCode.greaterThan)) break;
 		if (ctx.matchRegex(/^[ \u3000\t\u00a0]/) != null) break;
-		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null || ctx.eof()) break;
+		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
 
 		c += ctx.input.charAt(ctx.pos);
 		ctx.pos++;

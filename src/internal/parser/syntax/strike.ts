@@ -17,7 +17,7 @@ export const strikeTagMatcher = defineCachedMatcher<MfmStrike>('strikeTag', ctx 
 	const children: MfmInline[] = [];
 	while (true) {
 		if (ctx.matchStr('</s>')) break;
-		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null) break;
+		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null) break;
 
 		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) break;
@@ -49,7 +49,7 @@ export const strikeTildeMatcher = defineCachedMatcher<MfmStrike>('strikeTilde', 
 	const children: MfmInline[] = [];
 	while (true) {
 		if (ctx.matchCharCode(CharCode.tilde)) break;
-		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null) break;
+		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null) break;
 
 		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) break;

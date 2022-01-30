@@ -12,7 +12,7 @@ export const mathInlineMatcher = defineCachedMatcher<MfmMathInline>('mathInline'
 	let math = '';
 	while (true) {
 		if (ctx.matchStr('\\)')) break;
-		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null || ctx.eof()) break;
+		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
 
 		math += ctx.input.charAt(ctx.pos);
 		ctx.pos++;

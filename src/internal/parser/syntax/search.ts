@@ -30,7 +30,7 @@ export const searchMatcher = defineCachedMatcher<MfmSearch>('search', ctx => {
 	let q = '';
 	while (true) {
 		if (ctx.match(searchRightMatcher).ok) break;
-		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null || ctx.eof()) break;
+		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
 
 		q += ctx.input.charAt(ctx.pos);
 		ctx.pos++;

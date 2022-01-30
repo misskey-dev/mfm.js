@@ -13,7 +13,7 @@ export const inlineCodeMatcher = defineCachedMatcher<MfmInlineCode>('inlineCode'
 	let code = '';
 	while (true) {
 		if (/^[`´]/.test(ctx.input.charAt(ctx.pos))) break;
-		if (ctx.matchRegex(/^\r\n|[\r\n]/) != null || ctx.eof()) break;
+		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
 
 		code += ctx.input.charAt(ctx.pos);
 		ctx.pos++;
