@@ -3,7 +3,25 @@ import { defineCachedMatcher } from '../services/matcher';
 import { pushNode } from '../services/nodeTree';
 import { inlineMatcher } from '../services/syntaxMatcher';
 
-export const centerTagMatcher = defineCachedMatcher<MfmCenter>('center', ctx => {
+const centerTagRightMatcher = defineCachedMatcher<true>('centerTagRight', ctx => {
+	// optional LF
+	const matched = ctx.matchRegex(/^(\r\n|[\r\n])/);
+	if (matched != null) {
+		ctx.pos += matched[0].length;
+	}
+
+	// "</center>"
+	if (!ctx.matchStr('</center>')) {
+		return ctx.fail();
+	}
+	ctx.pos += 9;
+
+	// TODO: check line-end
+
+	return ctx.ok(true);
+});
+
+export const centerTagMatcher = defineCachedMatcher<MfmCenter>('centerTag', ctx => {
 	let matched;
 
 	// line-head
@@ -18,7 +36,7 @@ export const centerTagMatcher = defineCachedMatcher<MfmCenter>('center', ctx => 
 	ctx.pos += 8;
 
 	// optional LF
-	matched = ctx.matchRegex(/^\r\n|[\r\n]/);
+	matched = ctx.matchRegex(/^(\r\n|[\r\n])/);
 	if (matched != null) {
 		ctx.pos += matched[0].length;
 	}
@@ -26,7 +44,7 @@ export const centerTagMatcher = defineCachedMatcher<MfmCenter>('center', ctx => 
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchStr('</center>')) break;
+		if (ctx.match(centerTagRightMatcher).ok) break;
 
 		matched = ctx.consume(inlineMatcher);
 		if (!matched.ok) break;
@@ -36,19 +54,9 @@ export const centerTagMatcher = defineCachedMatcher<MfmCenter>('center', ctx => 
 		return ctx.fail();
 	}
 
-	// optional LF
-	matched = ctx.matchRegex(/^\r\n|[\r\n]/);
-	if (matched != null) {
-		ctx.pos += matched[0].length;
-	}
-
-	// "</center>"
-	if (!ctx.matchStr('</center>')) {
+	if (!ctx.consume(centerTagRightMatcher).ok) {
 		return ctx.fail();
 	}
-	ctx.pos += 9;
-
-	// TODO: check line-end
 
 	return ctx.ok(CENTER(children));
 });
