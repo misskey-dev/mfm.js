@@ -1,14 +1,9 @@
 import { MfmNode, MfmPlainNode } from '../../node';
-import { ParserContext } from '../services/parser';
+import { ContextOpts, ParserContext } from '../services/parser';
 import { pushNode } from '../services/nodeTree';
 import { fullMatcher, plainMatcher } from './parser';
 
-export type ParserOpts = Partial<{
-	fnNameList: string[];
-	nestLimit: number;
-}>;
-
-export function fullParser(input: string, opts: ParserOpts): MfmNode[] {
+export function fullParser(input: string, opts: ContextOpts): MfmNode[] {
 	const result: MfmNode[] = [];
 
 	const ctx = new ParserContext(input, opts);

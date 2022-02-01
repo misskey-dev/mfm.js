@@ -1,5 +1,3 @@
-import { ParserOpts } from '../mfm';
-
 export type Parser<T> = (ctx: ParserContext) => Result<T>;
 
 export type Result<T> = Success<T> | Failure;
@@ -20,18 +18,25 @@ export type CacheItem<T> = {
 	result: T;
 };
 
+export type ContextOpts = Partial<{
+	fnNameList: string[];
+	nestLimit: number;
+}>;
+
 export class ParserContext {
 	public input: string;
 	public pos = 0;
+	public stack: Parser<any>[] = [];
+	public debug = false;
+	// cache
+	public cache: Map<string, Map<number, CacheItem<any>>> = new Map();
+	// nesting control
 	public nestLimit: number;
 	public depth = 0;
-	public debug = false;
-	public cache: Map<string, Map<number, CacheItem<any>>> = new Map();
-	public stack: Parser<any>[] = [];
 	// fn
 	public fnNameList: string[] | undefined;
 
-	constructor(input: string, opts: ParserOpts) {
+	constructor(input: string, opts: ContextOpts) {
 		this.input = input;
 		this.fnNameList = opts.fnNameList;
 		this.nestLimit = opts.nestLimit || 20;
