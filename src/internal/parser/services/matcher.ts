@@ -144,7 +144,7 @@ export class MatcherContext {
 	}
 
 	public matchCharCode(charCode: number): boolean {
-		return this.input.charCodeAt(this.pos) == charCode;
+		return this.input.charCodeAt(this.pos) === charCode;
 	}
 
 	public matchStr(value: string): boolean {

@@ -236,7 +236,7 @@ export const inlineMatcher = defineMatcher<MfmInline | string>('inline', ctx => 
 		ctx.depth++;
 
 		// have some links in parent matchers
-		const inLink = ctx.stack.find(m => m.name == 'link') != null;
+		const inLink = ctx.stack.find(m => m.name === 'link') != null;
 
 		switch (ctx.input.charCodeAt(ctx.pos)) {
 

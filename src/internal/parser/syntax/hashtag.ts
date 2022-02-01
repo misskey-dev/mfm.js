@@ -27,7 +27,7 @@ export const hashtagMatcher = defineCachedMatcher<MfmHashtag>('hashtag', ctx => 
 		value += ctx.input.charAt(ctx.pos);
 		ctx.pos++;
 	}
-	if (value.length == 0 || /^[0-9]+$/.test(value)) {
+	if (value.length === 0 || /^[0-9]+$/.test(value)) {
 		return ctx.fail();
 	}
 

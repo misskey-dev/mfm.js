@@ -17,7 +17,7 @@ export const mathInlineMatcher = defineCachedMatcher<MfmMathInline>('mathInline'
 		math += ctx.input.charAt(ctx.pos);
 		ctx.pos++;
 	}
-	if (math.length == 0) {
+	if (math.length === 0) {
 		return ctx.fail();
 	}
 

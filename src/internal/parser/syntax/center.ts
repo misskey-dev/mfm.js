@@ -25,7 +25,7 @@ export const centerTagMatcher = defineCachedMatcher<MfmCenter>('centerTag', ctx 
 	let matched;
 
 	// line-head
-	if (ctx.pos != 0) {
+	if (ctx.pos !== 0) {
 		// TODO: check column 0
 	}
 

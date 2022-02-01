@@ -37,13 +37,13 @@ export const urlMatcher = defineCachedMatcher<MfmUrl>('url', ctx => {
 	let length = path.length;
 	while (length > 0) {
 		const lastCode = path.charCodeAt(length - 1);
-		if (lastCode != CharCode.dot && lastCode != CharCode.comma) break;
+		if (lastCode !== CharCode.dot && lastCode !== CharCode.comma) break;
 		length--;
 	}
-	if (length == 0) {
+	if (length === 0) {
 		return ctx.fail();
 	}
-	if (length != path.length) {
+	if (length !== path.length) {
 		path = path.substr(0, length);
 	}
 	ctx.pos += path.length;

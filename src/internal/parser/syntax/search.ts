@@ -35,7 +35,7 @@ export const searchMatcher = defineCachedMatcher<MfmSearch>('search', ctx => {
 		q += ctx.input.charAt(ctx.pos);
 		ctx.pos++;
 	}
-	if (q.length == 0) {
+	if (q.length === 0) {
 		return ctx.fail();
 	}
 

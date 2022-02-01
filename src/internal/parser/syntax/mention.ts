@@ -19,7 +19,7 @@ export const hostMatcher = defineCachedMatcher<string>('mentionHost', ctx => {
 
 	// (name) first character must not be "-" or "."
 	const firstCode = name.charCodeAt(0);
-	if (firstCode == CharCode.minus || firstCode == CharCode.dot) {
+	if (firstCode === CharCode.minus || firstCode === CharCode.dot) {
 		return ctx.fail();
 	}
 
@@ -27,13 +27,13 @@ export const hostMatcher = defineCachedMatcher<string>('mentionHost', ctx => {
 	let length = name.length;
 	while (length > 0) {
 		const lastCode = name.charCodeAt(length - 1);
-		if (lastCode != CharCode.minus && lastCode != CharCode.dot) break;
+		if (lastCode !== CharCode.minus && lastCode !== CharCode.dot) break;
 		length--;
 	}
-	if (length == 0) {
+	if (length === 0) {
 		return ctx.fail();
 	}
-	if (length != name.length) {
+	if (length !== name.length) {
 		name = name.substr(0, length);
 	}
 	ctx.pos += name.length;
@@ -63,18 +63,18 @@ export const mentionMatcher = defineCachedMatcher<MfmMention>('mention', ctx => 
 	}
 	let name = matched[0];
 	// (name) first character must not be "-"
-	if (name.charCodeAt(0) == CharCode.minus) {
+	if (name.charCodeAt(0) === CharCode.minus) {
 		return ctx.fail();
 	}
 	// (name) last character must not be "-"
 	let length = name.length;
-	while (length > 0 && name.charCodeAt(length - 1) == CharCode.minus) {
+	while (length > 0 && name.charCodeAt(length - 1) === CharCode.minus) {
 		length--;
 	}
-	if (length == 0) {
+	if (length === 0) {
 		return ctx.fail();
 	}
-	if (length != name.length) {
+	if (length !== name.length) {
 		name = name.substr(0, length);
 	}
 	ctx.pos += name.length;
