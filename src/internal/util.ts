@@ -102,13 +102,13 @@ export function stringifyTree(nodes: MfmNode[]): string {
 
 		let pushLf = true;
 		if (isMfmBlock(node)) {
-			if (state == stringifyState.none) {
+			if (state === stringifyState.none) {
 				pushLf = false;
 			}
 			state = stringifyState.block;
 		}
 		else {
-			if (state == stringifyState.none || state == stringifyState.inline) {
+			if (state === stringifyState.none || state === stringifyState.inline) {
 				pushLf = false;
 			}
 			state = stringifyState.inline;
