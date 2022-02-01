@@ -1,7 +1,7 @@
 import { MfmInline, MfmSmall, SMALL } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
-import { pushNode } from '../services/nodeTree';
-import { inlineMatcher } from '../services/syntaxMatcher';
+import { defineCachedMatcher } from '../../services/parser';
+import { pushNode } from '../../services/nodeTree';
+import { inlineMatcher } from '../parser';
 
 export const smallTagMatcher = defineCachedMatcher<MfmSmall>('small', ctx => {
 	let matched;

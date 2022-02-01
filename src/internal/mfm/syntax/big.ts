@@ -1,7 +1,7 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
-import { pushNode } from '../services/nodeTree';
-import { inlineMatcher } from '../services/syntaxMatcher';
+import { defineCachedMatcher } from '../../services/parser';
+import { pushNode } from '../../services/nodeTree';
+import { inlineMatcher } from '../parser';
 
 export const bigMatcher = defineCachedMatcher<MfmFn>('big', ctx => {
 	let matched;

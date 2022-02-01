@@ -1,9 +1,9 @@
 import { ITALIC, MfmInline, MfmItalic } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
-import { isAllowedAsBackChar } from '../services/matchingUtil';
-import { pushNode } from '../services/nodeTree';
-import { CharCode } from '../services/string';
-import { inlineMatcher } from '../services/syntaxMatcher';
+import { defineCachedMatcher } from '../../services/parser';
+import { isAllowedAsBackChar } from '../../services/matchingUtil';
+import { pushNode } from '../../services/nodeTree';
+import { CharCode } from '../../services/character';
+import { inlineMatcher } from '../parser';
 
 export const italicAstaMatcher = defineCachedMatcher<MfmItalic>('italicAsta', ctx => {
 	let matched;

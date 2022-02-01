@@ -1,6 +1,6 @@
 import { EMOJI_CODE, MfmEmojiCode } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
-import { CharCode } from '../services/string';
+import { defineCachedMatcher } from '../../services/parser';
+import { CharCode } from '../../services/character';
 
 export const emojiCodeMatcher = defineCachedMatcher<MfmEmojiCode>('emojiCode', ctx => {
 	// ":"

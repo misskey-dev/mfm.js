@@ -1,5 +1,5 @@
 import { MATH_INLINE, MfmMathInline } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../../services/parser';
 
 export const mathInlineMatcher = defineCachedMatcher<MfmMathInline>('mathInline', ctx => {
 	// "\("

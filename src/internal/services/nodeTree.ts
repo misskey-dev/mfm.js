@@ -1,4 +1,4 @@
-import { MfmNode, MfmText, TEXT } from '../../../node';
+import { MfmNode, MfmText, TEXT } from '../../node';
 
 export function pushNode<T extends MfmNode>(node: T | string, nodes: (T | MfmText)[]): void {
 	if (typeof node !== 'string') {

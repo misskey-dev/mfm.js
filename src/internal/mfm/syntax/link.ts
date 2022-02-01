@@ -1,8 +1,8 @@
 import { LINK, MfmInline, MfmLink } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
-import { pushNode } from '../services/nodeTree';
-import { CharCode } from '../services/string';
-import { inlineMatcher } from '../services/syntaxMatcher';
+import { defineCachedMatcher } from '../../services/parser';
+import { pushNode } from '../../services/nodeTree';
+import { CharCode } from '../../services/character';
+import { inlineMatcher } from '../parser';
 import { urlAltMatcher, urlMatcher } from './url';
 
 export const linkMatcher = defineCachedMatcher<MfmLink>('link', ctx => {

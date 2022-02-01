@@ -1,23 +1,23 @@
-import { MfmInline, MfmNode, MfmPlainNode } from '../../../node';
-import { defineMatcher } from './matcher';
-import { CharCode } from './string';
+import { MfmInline, MfmNode, MfmPlainNode } from '../../node';
+import { defineMatcher } from '../services/parser';
+import { CharCode } from '../services/character';
 
-import { bigMatcher } from '../syntax/big';
-import { boldAstaMatcher, boldTagMatcher, boldUnderMatcher } from '../syntax/bold';
-import { centerTagMatcher } from '../syntax/center';
-import { emojiCodeMatcher } from '../syntax/emojiCode';
-import { fnMatcher } from '../syntax/fn';
-import { hashtagMatcher } from '../syntax/hashtag';
-import { inlineCodeMatcher } from '../syntax/inlineCode';
-import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from '../syntax/italic';
-import { linkMatcher, silentLinkMatcher } from '../syntax/link';
-import { mathInlineMatcher } from '../syntax/mathInline';
-import { mentionMatcher } from '../syntax/mention';
-import { searchMatcher } from '../syntax/search';
-import { smallTagMatcher } from '../syntax/small';
-import { strikeTagMatcher, strikeTildeMatcher } from '../syntax/strike';
-import { unicodeEmojiMatcher } from '../syntax/unicodeEmoji';
-import { urlAltMatcher, urlMatcher } from '../syntax/url';
+import { bigMatcher } from './syntax/big';
+import { boldAstaMatcher, boldTagMatcher, boldUnderMatcher } from './syntax/bold';
+import { centerTagMatcher } from './syntax/center';
+import { emojiCodeMatcher } from './syntax/emojiCode';
+import { fnMatcher } from './syntax/fn';
+import { hashtagMatcher } from './syntax/hashtag';
+import { inlineCodeMatcher } from './syntax/inlineCode';
+import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from './syntax/italic';
+import { linkMatcher, silentLinkMatcher } from './syntax/link';
+import { mathInlineMatcher } from './syntax/mathInline';
+import { mentionMatcher } from './syntax/mention';
+import { searchMatcher } from './syntax/search';
+import { smallTagMatcher } from './syntax/small';
+import { strikeTagMatcher, strikeTildeMatcher } from './syntax/strike';
+import { unicodeEmojiMatcher } from './syntax/unicodeEmoji';
+import { urlAltMatcher, urlMatcher } from './syntax/url';
 
 // NOTE: SyntaxMatcher は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。

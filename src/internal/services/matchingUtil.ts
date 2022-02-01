@@ -1,9 +1,9 @@
-import { MatcherContext } from './matcher';
+import { ParserContext } from './parser';
 
 // 一つ前の文字が:
 // 無い OR 改行 OR スペース OR ![a-z0-9]i
 // の時にtrueを返します。
-export function isAllowedAsBackChar(ctx: MatcherContext): boolean {
+export function isAllowedAsBackChar(ctx: ParserContext): boolean {
 	if (ctx.pos > 0) {
 		const fallback = ctx.pos;
 		ctx.pos--;

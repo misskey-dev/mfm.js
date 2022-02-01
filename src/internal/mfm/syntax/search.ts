@@ -1,5 +1,5 @@
 import { MfmSearch, SEARCH } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../../services/parser';
 
 const searchRightMatcher = defineCachedMatcher<true>('searchRight', ctx => {
 	// spacing

@@ -1,5 +1,5 @@
 import { MfmQuote, QUOTE } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../../services/parser';
 
 export const quoteMatcher = defineCachedMatcher<MfmQuote>('quote', ctx => {
 	// TODO

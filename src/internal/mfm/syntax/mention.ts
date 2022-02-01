@@ -1,7 +1,7 @@
 import { MENTION, MfmMention } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
-import { isAllowedAsBackChar } from '../services/matchingUtil';
-import { CharCode } from '../services/string';
+import { defineCachedMatcher } from '../../services/parser';
+import { isAllowedAsBackChar } from '../../services/matchingUtil';
+import { CharCode } from '../../services/character';
 
 export const hostMatcher = defineCachedMatcher<string>('mentionHost', ctx => {
 	// "@"

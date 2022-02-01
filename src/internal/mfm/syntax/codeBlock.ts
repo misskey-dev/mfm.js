@@ -1,5 +1,5 @@
 import { CODE_BLOCK, MfmCodeBlock } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../../services/parser';
 
 export const codeBlockMatcher = defineCachedMatcher<MfmCodeBlock>('codeBlock', ctx => {
 	let matched;

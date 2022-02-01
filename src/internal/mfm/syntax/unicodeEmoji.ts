@@ -1,5 +1,5 @@
 import { MfmUnicodeEmoji, UNI_EMOJI } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
+import { defineCachedMatcher } from '../../services/parser';
 import emojiRegex from 'twemoji-parser/dist/lib/regex';
 const anchoredEmojiRegex = RegExp(`^(?:${emojiRegex.source})`);
 

@@ -1,7 +1,7 @@
 import { CENTER, MfmCenter, MfmInline } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
-import { pushNode } from '../services/nodeTree';
-import { inlineMatcher } from '../services/syntaxMatcher';
+import { defineCachedMatcher } from '../../services/parser';
+import { pushNode } from '../../services/nodeTree';
+import { inlineMatcher } from '../parser';
 
 const centerTagRightMatcher = defineCachedMatcher<true>('centerTagRight', ctx => {
 	// optional LF

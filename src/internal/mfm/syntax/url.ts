@@ -1,6 +1,6 @@
 import { MfmUrl, N_URL } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
-import { CharCode } from '../services/string';
+import { defineCachedMatcher } from '../../services/parser';
+import { CharCode } from '../../services/character';
 
 // TODO: urlMatcher 括弧のペア
 

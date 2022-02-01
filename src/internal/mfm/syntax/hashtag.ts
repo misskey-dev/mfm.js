@@ -1,7 +1,7 @@
 import { HASHTAG, MfmHashtag } from '../../../node';
-import { defineCachedMatcher } from '../services/matcher';
-import { isAllowedAsBackChar } from '../services/matchingUtil';
-import { CharCode } from '../services/string';
+import { defineCachedMatcher } from '../../services/parser';
+import { isAllowedAsBackChar } from '../../services/matchingUtil';
+import { CharCode } from '../../services/character';
 
 // TODO: 「#」がUnicode絵文字の一部である場合があるので判定する
 // TODO: 括弧は対になっている時のみ内容に含めることができる。対象: `()` `[]` `「」`
