@@ -4,14 +4,14 @@ export type Result<T> = Success<T> | Failure;
 
 export type Success<T> = {
 	ok: true;
-	resultData: T;
+	result: T;
 };
 
 export type Failure = {
 	ok: false;
 };
 
-export type ResultData<T> = T extends Result<infer R> ? R : never;
+export type ResultData<T> = T extends Parser<infer R> ? R : never;
 
 export type CacheItem<T> = {
 	pos: number;
@@ -42,23 +42,24 @@ export class ParserContext {
 		this.nestLimit = opts.nestLimit || 20;
 	}
 
+	// result
+
 	public ok<T>(result: T): Success<T> {
 		return {
 			ok: true,
-			resultData: result,
+			result: result,
 		};
 	}
 
 	public fail(): Failure {
-		return {
-			ok: false,
-		};
+		return failureObject;
 	}
 
-	public eof(): boolean {
-		return this.pos >= this.input.length;
-	}
+	// scan
 
+	/**
+	 * scan an any char
+	*/
 	public anyChar(): Result<string> {
 		if (this.pos < this.input.length) {
 			return this.fail();
@@ -68,6 +69,9 @@ export class ParserContext {
 		return this.ok(c);
 	}
 
+	/**
+	 * scan a string
+	*/
 	public str(value: string): Result<string> {
 		if (!this.input.startsWith(value, this.pos)) {
 			return this.fail();
@@ -76,6 +80,9 @@ export class ParserContext {
 		return this.ok(value);
 	}
 
+	/**
+	 * scan a char
+	*/
 	public char(charCode: number): Result<number> {
 		if (this.input.charCodeAt(this.pos) !== charCode) {
 			return this.fail();
@@ -84,6 +91,9 @@ export class ParserContext {
 		return this.ok(charCode);
 	}
 
+	/**
+	 * scan with regex
+	*/
 	public regex(regex: RegExp): Result<RegExpExecArray> {
 		const result = regex.exec(this.input.substr(this.pos));
 		if (result == null) {
@@ -93,87 +103,69 @@ export class ParserContext {
 		return this.ok(result);
 	}
 
-	public consume<T extends Parser<ResultData<T>>>(matcher: T): Result<ResultData<T>> {
+	/**
+	 * scan with parser
+	*/
+	public parser<T extends Parser<ResultData<T>>>(parser: T): Result<ResultData<T>> {
 		const storedPos = this.pos;
-		// if (matcher.isCacheable) {
-		// 	// read cache
-		// 	let cacheTable = this.cache.get(matcher.name);
-		// 	if (cacheTable == null) {
-		// 		cacheTable = new Map();
-		// 		this.cache.set(matcher.name, cacheTable);
-		// 	}
-		// 	const cache: CacheItem<ResultData<T>> | undefined = cacheTable.get(this.pos);
-		// 	if (cache != null) {
-		// 		this.debugLog(`${this.pos}\t[hit cache] ${matcher.name}`);
-		// 		this.pos = cache.pos;
-		// 		return this.ok(cache.result);
-		// 	}
-		// 	// match
-		// 	this.debugLog(`${this.pos}\tenter ${matcher.name}`);
-		// 	this.stack.unshift(matcher);
-		// 	const match = matcher(this);
-		// 	this.stack.shift();
-		// 	this.debugLog(`${storedPos}:${this.pos}\t${match.ok ? 'match' : 'fail'} ${matcher.name}`);
-		// 	// write cache
-		// 	if (match.ok) {
-		// 		cacheTable.set(storedPos, { pos: this.pos, result: match.resultData });
-		// 		this.debugLog(`${storedPos}\t[set cache] ${matcher.name}`);
-		// 	}
-		// 	return match;
-		// }
-		this.debugLog(`${this.pos}\tenter ${matcher.name}`);
-		this.stack.unshift(matcher);
-		const match = matcher(this);
-		this.stack.shift();
-		this.debugLog(`${storedPos}:${this.pos}\t${match.ok ? 'match' : 'fail'} ${matcher.name}`);
-		return match;
-	}
-
-	public tryConsume<T extends Parser<ResultData<T>>>(matcher: T): Result<ResultData<T>> {
-		const storedPos = this.pos;
-		const match = this.consume(matcher);
+		const match = parser(this);
 		if (!match.ok) {
-			this.pos = storedPos; // fallback
+			this.pos = storedPos; // backtrack
 		}
 		return match;
 	}
 
-	public tryConsumeAny<T extends Parser<ResultData<T>>>(matchers: T[]): Result<ResultData<T>> {
-		for (const matcher of matchers) {
-			const storedPos = this.pos;
-			const match = this.consume(matcher);
-			if (match.ok) {
-				return match;
+	// operation
+
+	public iteration<T extends Parser<ResultData<T>>>(min: number, parser: T): Result<ResultData<T>[]> {
+		const result: ResultData<T>[] = [];
+		while (true) {
+			const originPos = this.pos;
+			const r = parser(this);
+			if (!r.ok) {
+				this.pos = originPos;
+				break;
 			}
-			this.pos = storedPos; // fallback
+			result.push(r.result);
 		}
-
-		return this.fail();
+		if (result.length < min) {
+			return this.fail();
+		}
+		return this.ok(result);
 	}
 
-	public match<T extends Parser<ResultData<T>>>(matcher: T): Result<ResultData<T>> {
-		const storedPos = this.pos;
-		const match = this.consume(matcher);
-		this.pos = storedPos;
-
-		return match;
+	public choice() {
+		// TODO
 	}
 
-	public matchCharCode(charCode: number): boolean {
-		return this.input.charCodeAt(this.pos) === charCode;
+	// match
+
+	/**
+	 * match with parser (no-consuming)
+	*/
+	public match<T extends Parser<ResultData<T>>>(parser: T): boolean {
+		const originPos = this.pos;
+		const match = parser(this);
+		this.pos = originPos;
+		return match.ok;
 	}
 
-	public matchStr(value: string): boolean {
-		return this.input.startsWith(value, this.pos);
+	/**
+	 * match eof
+	*/
+	public eof(): boolean {
+		return this.pos >= this.input.length;
 	}
 
-	public matchRegex(regex: RegExp): RegExpExecArray | null {
-		return regex.exec(this.input.substr(this.pos));
-	}
+	// other
 
-	private debugLog(log: string): void {
+	public debugLog(log: string): void {
 		if (this.debug) {
 			console.log(log);
 		}
 	}
 }
+
+const failureObject: Failure = {
+	ok: false,
+};

@@ -10,9 +10,9 @@ export function fullParser(input: string, opts: ContextOpts): MfmNode[] {
 	//ctx.debug = true;
 	let matched;
 	while (true) {
-		matched = ctx.consume(fullMatcher);
+		matched = ctx.parser(fullMatcher);
 		if (!matched.ok) break;
-		pushNode(matched.resultData, result);
+		pushNode(matched.result, result);
 	}
 
 	return result;
@@ -25,9 +25,9 @@ export function plainParser(input: string): MfmPlainNode[] {
 	//ctx.debug = true;
 	let matched;
 	while (true) {
-		matched = ctx.consume(plainMatcher);
+		matched = ctx.parser(plainMatcher);
 		if (!matched.ok) break;
-		pushNode(matched.resultData, result);
+		pushNode(matched.result, result);
 	}
 
 	return result;

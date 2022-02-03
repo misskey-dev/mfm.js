@@ -1,5 +1,5 @@
 import { MfmInline, MfmNode, MfmPlainNode } from '../../node';
-import { defineMatcher } from '../services/parser';
+import { Parser } from '../services/parser';
 import { CharCode } from '../services/character';
 
 import { bigMatcher } from './syntax/big';
@@ -32,7 +32,7 @@ import { urlAltMatcher, urlMatcher } from './syntax/url';
 // リンクラベル部分以外のマッチではlinkLabelが常にfalseであることが分かっているため、
 // inlineSyntaxMatcherでのみlinkLabelの判定をすれば良いと分かります。
 
-export const fullMatcher = defineMatcher<MfmNode | string>('full', ctx => {
+export const fullMatcher: Parser<MfmNode | string> = (ctx) => {
 	let matched;
 
 	// check EOF
@@ -43,175 +43,182 @@ export const fullMatcher = defineMatcher<MfmNode | string>('full', ctx => {
 	if (ctx.depth < ctx.nestLimit) {
 		ctx.depth++;
 
-		switch (ctx.input.charCodeAt(ctx.pos)) {
-
-			case CharCode.asterisk: {
-				matched = ctx.tryConsumeAny([
-					// ***big***
-					bigMatcher,
-					// **bold**
-					boldAstaMatcher,
-					// *italic*
-					italicAstaMatcher,
-				]);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
-
-			case CharCode.dollar: {
-				// $[fn ]
-				matched = ctx.tryConsume(fnMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
-
-			case CharCode.question: {
-				// ?[silent link]()
-				matched = ctx.tryConsume(silentLinkMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
-
-			case CharCode.lessThan: {
-				matched = ctx.tryConsumeAny([
-					// <s>
-					strikeTagMatcher,
-					// <i>
-					italicTagMatcher,
-					// <b>
-					boldTagMatcher,
-					// <small>
-					smallTagMatcher,
-					// <center>
-					centerTagMatcher,
-					// <https://example.com>
-					urlAltMatcher,
-				]);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
-
-			case CharCode.greaterThan: {
-				// > quote
-				// quoteMatcher
-				break;
-			}
-
-			case CharCode.openBracket: {
-				// [link]()
-				matched = ctx.tryConsume(linkMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
-
-			case CharCode.backtick: {
-				// ```code block```
-				// codeBlockMatcher;
-
-				// `inline code`
-				matched = ctx.tryConsume(inlineCodeMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
-
-			case CharCode.backslash: {
-				// \(math inline\)
-				matched = ctx.tryConsume(mathInlineMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-
-				// \[math block\]
-				//mathBlockMatcher;
-				break;
-			}
-
-			case CharCode.tilde: {
-				// ~~strike~~
-				matched = ctx.tryConsume(strikeTildeMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
-
-			case CharCode.colon: {
-				// :emojiCode:
-				matched = ctx.tryConsume(emojiCodeMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
-
-			case CharCode.underscore: {
-				matched = ctx.tryConsumeAny([
-					// __bold__
-					boldUnderMatcher,
-					// _italic_
-					italicUnderMatcher,
-				]);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
-
-			case CharCode.at: {
-				// @mention
-				matched = ctx.tryConsume(mentionMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
-
-			case CharCode.hash: {
-				// #hashtag
-				matched = ctx.tryConsume(hashtagMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
-		}
-
-		matched = ctx.tryConsumeAny([
-			// unicode emoji
-			unicodeEmojiMatcher,
-			// https://example.com
-			urlMatcher,
-			// abc [search]
-			searchMatcher,
-		]);
+		// **bold**
+		matched = ctx.parser(boldAstaMatcher);
 		if (matched.ok) {
 			ctx.depth--;
 			return matched;
 		}
+
+		switch (ctx.input.charCodeAt(ctx.pos)) {
+
+			// case CharCode.asterisk: {
+			// 	matched = ctx.parserAny([
+			// 		// ***big***
+			// 		bigMatcher,
+			// 		// **bold**
+			// 		boldAstaMatcher,
+			// 		// *italic*
+			// 		italicAstaMatcher,
+			// 	]);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
+
+			// case CharCode.dollar: {
+			// 	// $[fn ]
+			// 	matched = ctx.parser(fnMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
+
+			// case CharCode.question: {
+			// 	// ?[silent link]()
+			// 	matched = ctx.parser(silentLinkMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
+
+			// case CharCode.lessThan: {
+			// 	matched = ctx.tryConsumeAny([
+			// 		// <s>
+			// 		strikeTagMatcher,
+			// 		// <i>
+			// 		italicTagMatcher,
+			// 		// <b>
+			// 		boldTagMatcher,
+			// 		// <small>
+			// 		smallTagMatcher,
+			// 		// <center>
+			// 		centerTagMatcher,
+			// 		// <https://example.com>
+			// 		urlAltMatcher,
+			// 	]);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
+
+			// case CharCode.greaterThan: {
+			// 	// > quote
+			// 	// quoteMatcher
+			// 	break;
+			// }
+
+			// case CharCode.openBracket: {
+			// 	// [link]()
+			// 	matched = ctx.parser(linkMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
+
+			// case CharCode.backtick: {
+			// 	// ```code block```
+			// 	// codeBlockMatcher;
+
+			// 	// `inline code`
+			// 	matched = ctx.parser(inlineCodeMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
+
+			// case CharCode.backslash: {
+			// 	// \(math inline\)
+			// 	matched = ctx.parser(mathInlineMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+
+			// 	// \[math block\]
+			// 	//mathBlockMatcher;
+			// 	break;
+			// }
+
+			// case CharCode.tilde: {
+			// 	// ~~strike~~
+			// 	matched = ctx.parser(strikeTildeMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
+
+			// case CharCode.colon: {
+			// 	// :emojiCode:
+			// 	matched = ctx.parser(emojiCodeMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
+
+			// case CharCode.underscore: {
+			// 	matched = ctx.tryConsumeAny([
+			// 		// __bold__
+			// 		boldUnderMatcher,
+			// 		// _italic_
+			// 		italicUnderMatcher,
+			// 	]);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
+
+			// case CharCode.at: {
+			// 	// @mention
+			// 	matched = ctx.parser(mentionMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
+
+			// case CharCode.hash: {
+			// 	// #hashtag
+			// 	matched = ctx.parser(hashtagMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
+		}
+
+		// matched = ctx.tryConsumeAny([
+		// 	// unicode emoji
+		// 	unicodeEmojiMatcher,
+		// 	// https://example.com
+		// 	urlMatcher,
+		// 	// abc [search]
+		// 	searchMatcher,
+		// ]);
+		// if (matched.ok) {
+		// 	ctx.depth--;
+		// 	return matched;
+		// }
 
 		ctx.depth--;
 	}
@@ -222,9 +229,9 @@ export const fullMatcher = defineMatcher<MfmNode | string>('full', ctx => {
 	ctx.pos++;
 
 	return ctx.ok(text);
-});
+};
 
-export const inlineMatcher = defineMatcher<MfmInline | string>('inline', ctx => {
+export const inlineMatcher: Parser<MfmInline | string> = (ctx) => {
 	let matched;
 
 	// check EOF
@@ -240,173 +247,173 @@ export const inlineMatcher = defineMatcher<MfmInline | string>('inline', ctx => 
 
 		switch (ctx.input.charCodeAt(ctx.pos)) {
 
-			case CharCode.asterisk: {
-				matched = ctx.tryConsumeAny([
-					// ***big***
-					bigMatcher,
-					// **bold**
-					boldAstaMatcher,
-					// *italic*
-					italicAstaMatcher,
-				]);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
+			// case CharCode.asterisk: {
+			// 	matched = ctx.tryConsumeAny([
+			// 		// ***big***
+			// 		bigMatcher,
+			// 		// **bold**
+			// 		boldAstaMatcher,
+			// 		// *italic*
+			// 		italicAstaMatcher,
+			// 	]);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
 
-			case CharCode.dollar: {
-				// $[fn ]
-				matched = ctx.tryConsume(fnMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
+			// case CharCode.dollar: {
+			// 	// $[fn ]
+			// 	matched = ctx.parser(fnMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
 
-			case CharCode.question: {
-				if (!inLink) {
-					// ?[silent link]()
-					matched = ctx.tryConsume(silentLinkMatcher);
-					if (matched.ok) {
-						ctx.depth--;
-						return matched;
-					}
-				}
-				break;
-			}
+			// case CharCode.question: {
+			// 	if (!inLink) {
+			// 		// ?[silent link]()
+			// 		matched = ctx.parser(silentLinkMatcher);
+			// 		if (matched.ok) {
+			// 			ctx.depth--;
+			// 			return matched;
+			// 		}
+			// 	}
+			// 	break;
+			// }
 
-			case CharCode.lessThan: {
-				matched = ctx.tryConsumeAny([
-					// <s>
-					strikeTagMatcher,
-					// <i>
-					italicTagMatcher,
-					// <b>
-					boldTagMatcher,
-					// <small>
-					smallTagMatcher,
-				]);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				if (!inLink) {
-					// <https://example.com>
-					matched = ctx.tryConsume(urlAltMatcher);
-					if (matched.ok) {
-						ctx.depth--;
-						return matched;
-					}
-				}
-				break;
-			}
+			// case CharCode.lessThan: {
+			// 	matched = ctx.tryConsumeAny([
+			// 		// <s>
+			// 		strikeTagMatcher,
+			// 		// <i>
+			// 		italicTagMatcher,
+			// 		// <b>
+			// 		boldTagMatcher,
+			// 		// <small>
+			// 		smallTagMatcher,
+			// 	]);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	if (!inLink) {
+			// 		// <https://example.com>
+			// 		matched = ctx.parser(urlAltMatcher);
+			// 		if (matched.ok) {
+			// 			ctx.depth--;
+			// 			return matched;
+			// 		}
+			// 	}
+			// 	break;
+			// }
 
-			case CharCode.openBracket: {
-				if (!inLink) {
-					// [link]()
-					matched = ctx.tryConsume(linkMatcher);
-					if (matched.ok) {
-						ctx.depth--;
-						return matched;
-					}
-				}
-				break;
-			}
+			// case CharCode.openBracket: {
+			// 	if (!inLink) {
+			// 		// [link]()
+			// 		matched = ctx.parser(linkMatcher);
+			// 		if (matched.ok) {
+			// 			ctx.depth--;
+			// 			return matched;
+			// 		}
+			// 	}
+			// 	break;
+			// }
 
-			case CharCode.backtick: {
-				// `inline code`
-				matched = ctx.tryConsume(inlineCodeMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
+			// case CharCode.backtick: {
+			// 	// `inline code`
+			// 	matched = ctx.parser(inlineCodeMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
 
-			case CharCode.backslash: {
-				// \(math inline\)
-				matched = ctx.tryConsume(mathInlineMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
+			// case CharCode.backslash: {
+			// 	// \(math inline\)
+			// 	matched = ctx.parser(mathInlineMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
 
-			case CharCode.tilde: {
-				// ~~strike~~
-				matched = ctx.tryConsume(strikeTildeMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
+			// case CharCode.tilde: {
+			// 	// ~~strike~~
+			// 	matched = ctx.parser(strikeTildeMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
 
-			case CharCode.colon: {
-				// :emojiCode:
-				matched = ctx.tryConsume(emojiCodeMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
+			// case CharCode.colon: {
+			// 	// :emojiCode:
+			// 	matched = ctx.parser(emojiCodeMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
 
-			case CharCode.underscore: {
-				matched = ctx.tryConsumeAny([
-					// __bold__
-					boldUnderMatcher,
-					// _italic_
-					italicUnderMatcher,
-				]);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
+			// case CharCode.underscore: {
+			// 	matched = ctx.tryConsumeAny([
+			// 		// __bold__
+			// 		boldUnderMatcher,
+			// 		// _italic_
+			// 		italicUnderMatcher,
+			// 	]);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
 
-			case CharCode.at: {
-				if (!inLink) {
-					// @mention
-					matched = ctx.tryConsume(mentionMatcher);
-					if (matched.ok) {
-						ctx.depth--;
-						return matched;
-					}
-				}
-				break;
-			}
+			// case CharCode.at: {
+			// 	if (!inLink) {
+			// 		// @mention
+			// 		matched = ctx.parser(mentionMatcher);
+			// 		if (matched.ok) {
+			// 			ctx.depth--;
+			// 			return matched;
+			// 		}
+			// 	}
+			// 	break;
+			// }
 
-			case CharCode.hash: {
-				// #hashtag
-				matched = ctx.tryConsume(hashtagMatcher);
-				if (matched.ok) {
-					ctx.depth--;
-					return matched;
-				}
-				break;
-			}
+			// case CharCode.hash: {
+			// 	// #hashtag
+			// 	matched = ctx.parser(hashtagMatcher);
+			// 	if (matched.ok) {
+			// 		ctx.depth--;
+			// 		return matched;
+			// 	}
+			// 	break;
+			// }
 		}
 
-		// unicode emoji
-		matched = ctx.tryConsume(unicodeEmojiMatcher);
-		if (matched.ok) {
-			ctx.depth--;
-			return matched;
-		}
-		if (!inLink) {
-			// https://example.com
-			matched = ctx.tryConsume(urlMatcher);
-			if (matched.ok) {
-				ctx.depth--;
-				return matched;
-			}
-		}
+		// // unicode emoji
+		// matched = ctx.parser(unicodeEmojiMatcher);
+		// if (matched.ok) {
+		// 	ctx.depth--;
+		// 	return matched;
+		// }
+		// if (!inLink) {
+		// 	// https://example.com
+		// 	matched = ctx.parser(urlMatcher);
+		// 	if (matched.ok) {
+		// 		ctx.depth--;
+		// 		return matched;
+		// 	}
+		// }
 
 		ctx.depth--;
 	}
@@ -417,23 +424,23 @@ export const inlineMatcher = defineMatcher<MfmInline | string>('inline', ctx => 
 	ctx.pos++;
 
 	return ctx.ok(text);
-});
+};
 
-export const plainMatcher = defineMatcher<MfmPlainNode | string>('plain', ctx => {
+export const plainMatcher: Parser<MfmPlainNode | string> = (ctx) => {
 	// check EOF
 	if (ctx.eof()) {
 		return ctx.fail();
 	}
 
-	const matched = ctx.tryConsumeAny([
-		// :emojiCode:
-		emojiCodeMatcher,
-		// unicode emoji
-		unicodeEmojiMatcher,
-	]);
-	if (matched.ok) {
-		return matched;
-	}
+	// const matched = ctx.tryConsumeAny([
+	// 	// :emojiCode:
+	// 	emojiCodeMatcher,
+	// 	// unicode emoji
+	// 	unicodeEmojiMatcher,
+	// ]);
+	// if (matched.ok) {
+	// 	return matched;
+	// }
 
 	// text node
 	if (ctx.debug) console.log(`${ctx.pos}\tmatch text`);
@@ -441,4 +448,4 @@ export const plainMatcher = defineMatcher<MfmPlainNode | string>('plain', ctx =>
 	ctx.pos++;
 
 	return ctx.ok(text);
-});
+};
