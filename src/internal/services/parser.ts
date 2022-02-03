@@ -59,6 +59,40 @@ export class ParserContext {
 		return this.pos >= this.input.length;
 	}
 
+	public anyChar(): Result<string> {
+		if (this.pos < this.input.length) {
+			return this.fail();
+		}
+		const c = this.input.charAt(this.pos);
+		this.pos++;
+		return this.ok(c);
+	}
+
+	public str(value: string): Result<string> {
+		if (!this.input.startsWith(value, this.pos)) {
+			return this.fail();
+		}
+		this.pos += value.length;
+		return this.ok(value);
+	}
+
+	public char(charCode: number): Result<number> {
+		if (this.input.charCodeAt(this.pos) !== charCode) {
+			return this.fail();
+		}
+		this.pos++;
+		return this.ok(charCode);
+	}
+
+	public regex(regex: RegExp): Result<RegExpExecArray> {
+		const result = regex.exec(this.input.substr(this.pos));
+		if (result == null) {
+			return this.fail();
+		}
+		this.pos += result[0].length;
+		return this.ok(result);
+	}
+
 	public consume<T extends Parser<ResultData<T>>>(matcher: T): Result<ResultData<T>> {
 		const storedPos = this.pos;
 		// if (matcher.isCacheable) {
