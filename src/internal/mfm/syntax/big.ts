@@ -1,24 +1,22 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { inlineMatcher } from '../parser';
 
-export const bigMatcher = defineCachedMatcher<MfmFn>('big', ctx => {
-	let matched;
-
+export const bigMatcher: Parser<MfmFn> = (ctx) => {
 	// "***"
-	if (!ctx.matchStr('***')) {
+	if (!ctx.str('***').ok) {
 		return ctx.fail();
 	}
-	ctx.pos += 3;
 
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchStr('***')) break;
+		if (ctx.match(() => ctx.str('***'))) break;
 
-		matched = ctx.consume(inlineMatcher);
+		const matched = ctx.parser(inlineMatcher);
 		if (!matched.ok) break;
+
 		pushNode(matched.result, children);
 	}
 	if (children.length < 1) {
@@ -26,10 +24,9 @@ export const bigMatcher = defineCachedMatcher<MfmFn>('big', ctx => {
 	}
 
 	// "***"
-	if (!ctx.matchStr('***')) {
+	if (!ctx.str('***').ok) {
 		return ctx.fail();
 	}
-	ctx.pos += 3;
 
 	return ctx.ok(FN('tada', { }, children));
-});
+};

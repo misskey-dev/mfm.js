@@ -10,17 +10,18 @@ export const boldAstaMatcher: Parser<MfmBold> = (ctx) => {
 	}
 
 	// children
-	const match = ctx.iteration(1, () => {
-		if (ctx.match(() => ctx.str('**'))) {
-			return ctx.fail();
-		}
-		return ctx.parser(inlineMatcher);
-	});
-	if (!match.ok) {
+	const children: MfmInline[] = [];
+	while (true) {
+		if (ctx.match(() => ctx.str('**'))) break;
+
+		const match = ctx.parser(inlineMatcher);
+		if (!match.ok) break;
+
+		pushNode(match.result, children);
+	}
+	if (children.length < 1) {
 		return ctx.fail();
 	}
-	const children: MfmInline[] = [];
-	match.result.forEach(i => pushNode(i, children));
 
 	// "**"
 	if (!ctx.str('**').ok) {

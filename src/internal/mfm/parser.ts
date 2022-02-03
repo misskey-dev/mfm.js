@@ -3,7 +3,7 @@ import { Parser } from '../services/parser';
 import { CharCode } from '../services/character';
 
 import { bigMatcher } from './syntax/big';
-import { boldAstaMatcher, boldTagMatcher, boldUnderMatcher } from './syntax/bold';
+import { boldAstaMatcher } from './syntax/bold';
 import { centerTagMatcher } from './syntax/center';
 import { emojiCodeMatcher } from './syntax/emojiCode';
 import { fnMatcher } from './syntax/fn';
@@ -43,8 +43,12 @@ export const fullMatcher: Parser<MfmNode | string> = (ctx) => {
 	if (ctx.depth < ctx.nestLimit) {
 		ctx.depth++;
 
-		// **bold**
-		matched = ctx.parser(boldAstaMatcher);
+		matched = ctx.choice([
+			// ***big***
+			bigMatcher,
+			// **bold**
+			boldAstaMatcher,
+		]);
 		if (matched.ok) {
 			ctx.depth--;
 			return matched;

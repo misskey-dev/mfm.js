@@ -115,27 +115,26 @@ export class ParserContext {
 		return match;
 	}
 
-	// operation
-
-	public iteration<T extends Parser<ResultData<T>>>(min: number, parser: T): Result<ResultData<T>[]> {
+	public sequence<T extends Parser<ResultData<T>>[]>(parsers: T): Result<ResultData<T>[]> {
 		const result: ResultData<T>[] = [];
-		while (true) {
-			const originPos = this.pos;
-			const r = parser(this);
-			if (!r.ok) {
-				this.pos = originPos;
-				break;
+		for (const p of parsers) {
+			const match = this.parser(p);
+			if (!match.ok) {
+				return this.fail();
 			}
-			result.push(r.result);
-		}
-		if (result.length < min) {
-			return this.fail();
+			result.push(match.result);
 		}
 		return this.ok(result);
 	}
 
-	public choice() {
-		// TODO
+	public choice<T extends Parser<ResultData<T>>>(parsers: T[]): Result<ResultData<T>> {
+		for (const p of parsers) {
+			const result = this.parser(p);
+			if (result.ok) {
+				return result;
+			}
+		}
+		return this.fail();
 	}
 
 	// match
