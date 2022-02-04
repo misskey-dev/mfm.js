@@ -32,15 +32,13 @@ export const boldAstaParser: Parser<MfmBold> = cache((ctx) => {
 });
 
 export const boldUnderParser: Parser<MfmBold> = cache((ctx) => {
-	let matched;
-
 	// "__"
 	if (!ctx.str('__').ok) {
 		return ctx.fail();
 	}
 
 	// content
-	matched = ctx.regex(/^[a-z0-9 \u3000\t\u00a0]+/i);
+	const matched = ctx.regex(/^[a-z0-9 \u3000\t\u00a0]+/i);
 	if (!matched.ok) {
 		return ctx.fail();
 	}
