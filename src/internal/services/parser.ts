@@ -11,9 +11,9 @@ export type Failure = {
 	ok: false;
 };
 
-export type ResultData<T> = T extends Parser<infer R> ? R : never;
+export type ParserResult<T> = T extends Parser<infer U> ? U : never;
 
-export type ParserResults<T> = T extends [infer Head, ...infer Tail] ? [ResultData<Head>, ...ParserResults<Tail>] : [];
+export type ParserResults<T> = T extends [infer U, ...infer V] ? [ParserResult<U>, ...ParserResults<V>] : [];
 
 export type CacheItem<T> = {
 	pos: number;
@@ -57,7 +57,7 @@ export class ParserContext {
 		return failureObject;
 	}
 
-	public pushStack<T extends Parser<ResultData<T>>>(parser: T): void {
+	public pushStack<T extends Parser<ParserResult<T>>>(parser: T): void {
 		this.stack.unshift(parser);
 	}
 
@@ -116,7 +116,7 @@ export class ParserContext {
 	/**
 	 * scan with parser
 	*/
-	public parser<T extends Parser<ResultData<T>>>(parser: T): Result<ResultData<T>> {
+	public parser<T extends Parser<ParserResult<T>>>(parser: T): Result<ParserResult<T>> {
 		const storedPos = this.pos;
 		const match = parser(this);
 		if (!match.ok) {
@@ -145,7 +145,7 @@ export class ParserContext {
 	/**
 	 * scan by ordered-choice
 	*/
-	public choice<T extends Parser<ResultData<T>>>(parsers: T[]): Result<ResultData<T>> {
+	public choice<T extends Parser<ParserResult<T>>>(parsers: T[]): Result<ParserResult<T>> {
 		for (const p of parsers) {
 			const result = this.parser(p);
 			if (result.ok) {
@@ -160,7 +160,7 @@ export class ParserContext {
 	/**
 	 * match with parser (no-consuming)
 	*/
-	public match<T extends Parser<ResultData<T>>>(parser: T): boolean {
+	public match<T extends Parser<ParserResult<T>>>(parser: T): boolean {
 		const originPos = this.pos;
 		const match = parser(this);
 		this.pos = originPos;
@@ -187,9 +187,9 @@ const failureObject: Failure = {
 	ok: false,
 };
 
-export function cache<T extends Parser<ResultData<T>>>(parser: T, cacheTable: Map<number, CacheItem<ResultData<T>>> = new Map()): Parser<ResultData<T>> {
+export function cache<T extends Parser<ParserResult<T>>>(parser: T, cacheTable: Map<number, CacheItem<ParserResult<T>>> = new Map()): Parser<ParserResult<T>> {
 	return (ctx) => {
-		let cache = cacheTable.get(ctx.pos);
+		const cache = cacheTable.get(ctx.pos);
 		if (cache != null) {
 			// hit cache
 			ctx.pos = cache.pos;

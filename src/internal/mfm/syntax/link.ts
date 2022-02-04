@@ -34,7 +34,7 @@ export const linkMatcher = defineCachedMatcher<MfmLink>('link', ctx => {
 	ctx.pos += 2;
 
 	// url
-	matched = ctx.tryConsumeAny([
+	matched = ctx.choice([
 		urlAltMatcher,
 		urlMatcher,
 	]);

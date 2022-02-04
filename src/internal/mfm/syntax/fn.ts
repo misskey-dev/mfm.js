@@ -36,7 +36,7 @@ const argsParser: Parser<Record<string, string | true>> = cache((ctx) => {
 					k: k,
 					v: true,
 				});
-			}
+			},
 
 		]);
 	});
