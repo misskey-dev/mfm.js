@@ -193,6 +193,7 @@ export function cache<T extends Parser<ParserResult<T>>>(parser: T): Parser<Pars
 		let cacheTable = ctx.cache.get(parser);
 		if (cacheTable == null) {
 			cacheTable = new Map();
+			ctx.cache.set(parser, cacheTable);
 		}
 		// get cache
 		const cache = cacheTable.get(ctx.pos);
