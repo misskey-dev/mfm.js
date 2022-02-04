@@ -121,7 +121,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 
 			case CharCode.backtick: {
 				// ```code block```
-				// codeBlockMatcher;
+				// codeBlockParser;
 
 				// `inline code`
 				matched = ctx.parser(inlineCodeMatcher);
