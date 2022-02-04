@@ -105,7 +105,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 
 			case CharCode.greaterThan: {
 				// > quote
-				// quoteMatcher
+				// quoteParser
 				break;
 			}
 
@@ -141,7 +141,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 				}
 
 				// \[math block\]
-				//mathBlockMatcher;
+				//mathBlockParser;
 				break;
 			}
 
