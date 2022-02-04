@@ -9,7 +9,7 @@ import { emojiCodeParser } from './syntax/emojiCode';
 import { fnParser } from './syntax/fn';
 import { hashtagParser } from './syntax/hashtag';
 import { inlineCodeParser } from './syntax/inlineCode';
-import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from './syntax/italic';
+import { italicAstaParser, italicTagParser, italicUnderParser } from './syntax/italic';
 import { linkMatcher, silentLinkMatcher } from './syntax/link';
 import { mathInlineMatcher } from './syntax/mathInline';
 import { mentionMatcher } from './syntax/mention';
@@ -52,7 +52,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 					// **bold**
 					boldAstaParser,
 					// *italic*
-					italicAstaMatcher,
+					italicAstaParser,
 				]);
 				if (matched.ok) {
 					ctx.depth--;
@@ -86,7 +86,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 					// <s>
 					strikeTagMatcher,
 					// <i>
-					italicTagMatcher,
+					italicTagParser,
 					// <b>
 					boldTagParser,
 					// <small>
@@ -170,7 +170,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 					// __bold__
 					boldUnderParser,
 					// _italic_
-					italicUnderMatcher,
+					italicUnderParser,
 				]);
 				if (matched.ok) {
 					ctx.depth--;
@@ -244,7 +244,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 					// **bold**
 					boldAstaParser,
 					// *italic*
-					italicAstaMatcher,
+					italicAstaParser,
 				]);
 				if (matched.ok) {
 					ctx.depth--;
@@ -280,7 +280,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 					// <s>
 					strikeTagMatcher,
 					// <i>
-					italicTagMatcher,
+					italicTagParser,
 					// <b>
 					boldTagParser,
 					// <small>
@@ -358,7 +358,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 					// __bold__
 					boldUnderParser,
 					// _italic_
-					italicUnderMatcher,
+					italicUnderParser,
 				]);
 				if (matched.ok) {
 					ctx.depth--;

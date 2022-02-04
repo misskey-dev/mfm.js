@@ -5,7 +5,7 @@ import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
 
-export const italicAstaMatcher: Parser<MfmItalic> = cache((ctx) => {
+export const italicAstaParser: Parser<MfmItalic> = cache((ctx) => {
 	let matched;
 
 	// check a back char
@@ -14,15 +14,14 @@ export const italicAstaMatcher: Parser<MfmItalic> = cache((ctx) => {
 	}
 
 	// "*"
-	if (!ctx.char(CharCode.asterisk)) {
+	if (!ctx.char(CharCode.asterisk).ok) {
 		return ctx.fail();
 	}
-	ctx.pos++;
 
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.char(CharCode.asterisk)) break;
+		if (ctx.match(() => ctx.char(CharCode.asterisk))) break;
 
 		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;
@@ -33,15 +32,14 @@ export const italicAstaMatcher: Parser<MfmItalic> = cache((ctx) => {
 	}
 
 	// "*"
-	if (!ctx.char(CharCode.asterisk)) {
+	if (!ctx.char(CharCode.asterisk).ok) {
 		return ctx.fail();
 	}
-	ctx.pos++;
 
 	return ctx.ok(ITALIC(children));
 });
 
-export const italicUnderMatcher: Parser<MfmItalic> = cache((ctx) => {
+export const italicUnderParser: Parser<MfmItalic> = cache((ctx) => {
 	// let matched;
 
 	// check a back char
@@ -50,10 +48,9 @@ export const italicUnderMatcher: Parser<MfmItalic> = cache((ctx) => {
 	}
 
 	// "_"
-	if (!ctx.char(CharCode.underscore)) {
+	if (!ctx.char(CharCode.underscore).ok) {
 		return ctx.fail();
 	}
-	ctx.pos++;
 
 	// children
 
@@ -62,27 +59,25 @@ export const italicUnderMatcher: Parser<MfmItalic> = cache((ctx) => {
 	// spacing
 
 	// "_"
-	if (!ctx.char(CharCode.underscore)) {
+	if (!ctx.char(CharCode.underscore).ok) {
 		return ctx.fail();
 	}
-	ctx.pos++;
 
 	return ctx.ok(ITALIC([]));
 });
 
-export const italicTagMatcher: Parser<MfmItalic> = cache((ctx) => {
+export const italicTagParser: Parser<MfmItalic> = cache((ctx) => {
 	let matched;
 
 	// "<i>"
-	if (!ctx.str('<i>')) {
+	if (!ctx.str('<i>').ok) {
 		return ctx.fail();
 	}
-	ctx.pos += 3;
 
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.str('</i>')) break;
+		if (ctx.match(() => ctx.str('</i>'))) break;
 
 		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;
@@ -93,10 +88,9 @@ export const italicTagMatcher: Parser<MfmItalic> = cache((ctx) => {
 	}
 
 	// "</i>"
-	if (!ctx.str('</i>')) {
+	if (!ctx.str('</i>').ok) {
 		return ctx.fail();
 	}
-	ctx.pos += 4;
 
 	return ctx.ok(ITALIC(children));
 });
