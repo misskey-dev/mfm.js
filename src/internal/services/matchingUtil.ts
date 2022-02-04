@@ -5,17 +5,16 @@ import { ParserContext } from './parser';
 // の時にtrueを返します。
 export function isAllowedAsBackChar(ctx: ParserContext): boolean {
 	if (ctx.pos > 0) {
-		const fallback = ctx.pos;
 		ctx.pos--;
 		if (
-			ctx.regex(/^(\r\n|[\r\n])/) == null &&
-			ctx.regex(/^[ \u3000\t\u00a0]/) == null &&
-			/^[a-z0-9]/i.test(ctx.input.charAt(ctx.pos))
+			!ctx.match(() => ctx.regex(/^(\r\n|[\r\n])/)) &&
+			!ctx.match(() => ctx.regex(/^[ \u3000\t\u00a0]/)) &&
+			ctx.match(() => ctx.regex(/^[a-z0-9]/i))
 		) {
-			ctx.pos = fallback;
+			ctx.pos++;
 			return false;
 		}
-		ctx.pos = fallback;
+		ctx.pos++;
 	}
 	return true;
 }
