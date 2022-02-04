@@ -71,7 +71,7 @@ export class ParserContext {
 	 * scan an any char
 	*/
 	public anyChar(): Result<string> {
-		if (this.pos < this.input.length) {
+		if (this.pos >= this.input.length) {
 			return this.fail();
 		}
 		const c = this.input.charAt(this.pos);
