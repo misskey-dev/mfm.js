@@ -12,7 +12,7 @@ import { inlineCodeParser } from './syntax/inlineCode';
 import { italicAstaParser, italicTagParser, italicUnderParser } from './syntax/italic';
 import { linkParser } from './syntax/link';
 import { mathInlineParser } from './syntax/mathInline';
-import { mentionMatcher } from './syntax/mention';
+import { mentionParser } from './syntax/mention';
 import { searchParser } from './syntax/search';
 import { smallTagParser } from './syntax/small';
 import { strikeTagMatcher, strikeTildeMatcher } from './syntax/strike';
@@ -181,7 +181,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 
 			case CharCode.at: {
 				// @mention
-				matched = ctx.parser(mentionMatcher);
+				matched = ctx.parser(mentionParser);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -370,7 +370,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 			case CharCode.at: {
 				if (!inLink) {
 					// @mention
-					matched = ctx.parser(mentionMatcher);
+					matched = ctx.parser(mentionParser);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;

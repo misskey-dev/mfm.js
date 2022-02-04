@@ -3,15 +3,14 @@ import { cache, Parser } from '../../services/parser';
 import { isAllowedAsBackChar } from '../../services/matchingUtil';
 import { CharCode } from '../../services/character';
 
-export const hostMatcher: Parser<string> = cache((ctx) => {
+const hostParser: Parser<string> = cache((ctx) => {
 	// "@"
-	if (!ctx.char(CharCode.at)) {
+	if (!ctx.char(CharCode.at).ok) {
 		return ctx.fail();
 	}
-	ctx.pos++;
 
 	// name
-	const matched = ctx.regex(/^[a-z0-9_.-]+/);
+	const matched = /^[a-z0-9_.-]+/.exec(ctx.input.substr(ctx.pos));
 	if (matched == null) {
 		return ctx.fail();
 	}
@@ -41,7 +40,7 @@ export const hostMatcher: Parser<string> = cache((ctx) => {
 	return ctx.ok(name);
 });
 
-export const mentionMatcher: Parser<MfmMention> = cache((ctx) => {
+export const mentionParser: Parser<MfmMention> = cache((ctx) => {
 	let matched;
 	const headPos = ctx.pos;
 
@@ -51,13 +50,12 @@ export const mentionMatcher: Parser<MfmMention> = cache((ctx) => {
 	}
 
 	// "@"
-	if (!ctx.char(CharCode.at)) {
+	if (!ctx.char(CharCode.at).ok) {
 		return ctx.fail();
 	}
-	ctx.pos++;
 
 	// name
-	matched = ctx.regex(/^[a-z0-9_-]+/);
+	matched = /^[a-z0-9_-]+/.exec(ctx.input.substr(ctx.pos));
 	if (matched == null) {
 		return ctx.fail();
 	}
@@ -80,7 +78,7 @@ export const mentionMatcher: Parser<MfmMention> = cache((ctx) => {
 	ctx.pos += name.length;
 
 	// host
-	matched = ctx.parser(hostMatcher);
+	matched = ctx.parser(hostParser);
 	const host = matched.ok ? matched.result : null;
 
 	const acct = ctx.input.substring(headPos, ctx.pos);
