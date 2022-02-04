@@ -3,7 +3,7 @@ import { cache, Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 
-export const centerTagMatcher: Parser<MfmCenter> = cache((ctx) => {
+export const centerTagParser: Parser<MfmCenter> = cache((ctx) => {
 	let match, isMatch;
 
 	// line-head

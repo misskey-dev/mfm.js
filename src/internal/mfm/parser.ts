@@ -2,9 +2,9 @@ import { MfmInline, MfmNode, MfmPlainNode } from '../../node';
 import { Parser } from '../services/parser';
 import { CharCode } from '../services/character';
 
-import { bigMatcher } from './syntax/big';
+import { bigParser } from './syntax/big';
 import { boldAstaParser, boldUnderParser, boldTagParser } from './syntax/bold';
-import { centerTagMatcher } from './syntax/center';
+import { centerTagParser } from './syntax/center';
 import { emojiCodeParser } from './syntax/emojiCode';
 import { fnParser } from './syntax/fn';
 import { hashtagParser } from './syntax/hashtag';
@@ -15,22 +15,22 @@ import { mathInlineParser } from './syntax/mathInline';
 import { mentionParser } from './syntax/mention';
 import { searchParser } from './syntax/search';
 import { smallTagParser } from './syntax/small';
-import { strikeTagMatcher, strikeTildeMatcher } from './syntax/strike';
+import { strikeTagParser, strikeTildeParser } from './syntax/strike';
 import { unicodeEmojiParser } from './syntax/unicodeEmoji';
-import { urlAltMatcher, urlMatcher } from './syntax/url';
+import { urlAltParser, urlParser } from './syntax/url';
 
-// NOTE: SyntaxMatcher は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
+// NOTE: MfmParser は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。
 //
-// 通常は、範囲内のMFM文字列を処理するために SyntaxMatcher が繰り返し呼び出されるため、構文にマッチしなかった
+// 通常は、範囲内のMFM文字列を処理するために MfmParser が繰り返し呼び出されるため、構文にマッチしなかった
 // 部分は複数のstring型ノードになります。 pushNode を使用すると、通常の構文ノードはツリーに追加し
 // 連続するstring型ノードは1つのtextノードとして連結してツリーに追加できます。
 
 // NOTE:
-// リンクラベル部分はinlineSyntaxMatcherが適用されます。
-// inlineSyntaxMatcherに含まれる構文でネストされた部分はinlineSyntaxMatcherが適用されることが分かっており、
+// リンクラベル部分はinlineParserが適用されます。
+// inlineParserに含まれる構文でネストされた部分はinlineParserが適用されることが分かっており、
 // リンクラベル部分以外のマッチではlinkLabelが常にfalseであることが分かっているため、
-// inlineSyntaxMatcherでのみlinkLabelの判定をすれば良いと分かります。
+// inlineParserでのみlinkLabelの判定をすれば良いと分かります。
 
 export const fullParser: Parser<MfmNode | string> = (ctx) => {
 	let matched;
@@ -48,7 +48,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 			case CharCode.asterisk: {
 				matched = ctx.choice([
 					// ***big***
-					bigMatcher,
+					bigParser,
 					// **bold**
 					boldAstaParser,
 					// *italic*
@@ -84,7 +84,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 			case CharCode.lessThan: {
 				matched = ctx.choice([
 					// <s>
-					strikeTagMatcher,
+					strikeTagParser,
 					// <i>
 					italicTagParser,
 					// <b>
@@ -92,9 +92,9 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 					// <small>
 					smallTagParser,
 					// <center>
-					centerTagMatcher,
+					centerTagParser,
 					// <https://example.com>
-					urlAltMatcher,
+					urlAltParser,
 				]);
 				if (matched.ok) {
 					ctx.depth--;
@@ -147,7 +147,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 
 			case CharCode.tilde: {
 				// ~~strike~~
-				matched = ctx.parser(strikeTildeMatcher);
+				matched = ctx.parser(strikeTildeParser);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -204,7 +204,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 			// unicode emoji
 			unicodeEmojiParser,
 			// https://example.com
-			urlMatcher,
+			urlParser,
 			// abc [search]
 			searchParser,
 		]);
@@ -240,7 +240,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 			case CharCode.asterisk: {
 				matched = ctx.choice([
 					// ***big***
-					bigMatcher,
+					bigParser,
 					// **bold**
 					boldAstaParser,
 					// *italic*
@@ -278,7 +278,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 			case CharCode.lessThan: {
 				matched = ctx.choice([
 					// <s>
-					strikeTagMatcher,
+					strikeTagParser,
 					// <i>
 					italicTagParser,
 					// <b>
@@ -292,7 +292,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 				}
 				if (!inLink) {
 					// <https://example.com>
-					matched = ctx.parser(urlAltMatcher);
+					matched = ctx.parser(urlAltParser);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
@@ -335,7 +335,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 
 			case CharCode.tilde: {
 				// ~~strike~~
-				matched = ctx.parser(strikeTildeMatcher);
+				matched = ctx.parser(strikeTildeParser);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -398,7 +398,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 		}
 		if (!inLink) {
 			// https://example.com
-			matched = ctx.parser(urlMatcher);
+			matched = ctx.parser(urlParser);
 			if (matched.ok) {
 				ctx.depth--;
 				return matched;

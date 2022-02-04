@@ -2,14 +2,16 @@ import { MfmUrl, N_URL } from '../../../node';
 import { cache, Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
 
-// TODO: urlMatcher 括弧のペア
+// TODO: apply new api
+
+// TODO: urlParser 括弧のペア
 
 const schemes: string[] = [
 	'https',
 	'http',
 ];
 
-export const urlMatcher: Parser<MfmUrl> = cache((ctx) => {
+export const urlParser: Parser<MfmUrl> = cache((ctx) => {
 	const urlHead = ctx.pos;
 
 	// scheme
@@ -54,7 +56,7 @@ export const urlMatcher: Parser<MfmUrl> = cache((ctx) => {
 	return ctx.ok(N_URL(value));
 });
 
-export const urlAltMatcher: Parser<MfmUrl> = cache((ctx) => {
+export const urlAltParser: Parser<MfmUrl> = cache((ctx) => {
 	// "<"
 	if (!ctx.char(CharCode.lessThan)) {
 		return ctx.fail();

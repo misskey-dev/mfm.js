@@ -4,7 +4,9 @@ import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
 
-export const strikeTagMatcher: Parser<MfmStrike> = cache((ctx) => {
+// TODO: apply new api
+
+export const strikeTagParser: Parser<MfmStrike> = cache((ctx) => {
 	let matched;
 
 	// "<s>"
@@ -36,7 +38,7 @@ export const strikeTagMatcher: Parser<MfmStrike> = cache((ctx) => {
 	return ctx.ok(STRIKE(children));
 });
 
-export const strikeTildeMatcher: Parser<MfmStrike> = cache((ctx) => {
+export const strikeTildeParser: Parser<MfmStrike> = cache((ctx) => {
 	let matched;
 
 	// "~~"

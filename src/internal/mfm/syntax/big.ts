@@ -3,7 +3,7 @@ import { cache, Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 
-export const bigMatcher: Parser<MfmFn> = cache((ctx) => {
+export const bigParser: Parser<MfmFn> = cache((ctx) => {
 	// "***"
 	if (!ctx.str('***').ok) {
 		return ctx.fail();

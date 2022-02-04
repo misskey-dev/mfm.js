@@ -3,7 +3,7 @@ import { cache, Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
-import { urlAltMatcher, urlMatcher } from './url';
+import { urlAltParser, urlParser } from './url';
 
 export const linkParser: Parser<MfmLink> = cache((ctx) => {
 	let matched;
@@ -37,8 +37,8 @@ export const linkParser: Parser<MfmLink> = cache((ctx) => {
 
 	// url
 	matched = ctx.choice([
-		urlAltMatcher,
-		urlMatcher,
+		urlAltParser,
+		urlParser,
 	]);
 	if (!matched.ok) {
 		return ctx.fail();
