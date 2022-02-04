@@ -1,17 +1,17 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
-import { Parser } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineMatcher } from '../parser';
 
-const argsMatcher: Parser<Record<string, string | true>> = (ctx) => {
+const argsMatcher: Parser<Record<string, string | true>> = cache((ctx) => {
 	let matched;
 	const args: Record<string, string | true> = {};
 
-	const argMatcher: Parser<{ k: string, v: string | true }> = (ctx) => {
+	const argMatcher: Parser<{ k: string, v: string | true }> = cache((ctx) => {
 		return ctx.choice([
-	
-			// select 1: key + value
+
+			// key + value
 			() => {
 				const matched = ctx.regex(/^([a-z0-9_]+)=([a-z0-9_.]+)/i);
 				if (!matched.ok) {
@@ -24,8 +24,8 @@ const argsMatcher: Parser<Record<string, string | true>> = (ctx) => {
 					v: v,
 				});
 			},
-	
-			// select 2: key
+
+			// key
 			() => {
 				const matched = ctx.regex(/^([a-z0-9_]+)/i);
 				if (!matched.ok) {
@@ -37,9 +37,9 @@ const argsMatcher: Parser<Record<string, string | true>> = (ctx) => {
 					v: true,
 				});
 			}
-	
+
 		]);
-	};
+	});
 
 	// "."
 	if (!ctx.char(CharCode.dot).ok) {
@@ -68,9 +68,9 @@ const argsMatcher: Parser<Record<string, string | true>> = (ctx) => {
 	}
 
 	return ctx.ok(args);
-};
+});
 
-export const fnMatcher: Parser<MfmFn> = (ctx) => {
+export const fnMatcher: Parser<MfmFn> = cache((ctx) => {
 	let matched;
 
 	// "$["
@@ -118,4 +118,4 @@ export const fnMatcher: Parser<MfmFn> = (ctx) => {
 	}
 
 	return ctx.ok(FN(name, params, children));
-};
+});

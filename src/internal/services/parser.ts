@@ -57,6 +57,14 @@ export class ParserContext {
 		return failureObject;
 	}
 
+	public pushStack<T extends Parser<ResultData<T>>>(parser: T): void {
+		this.stack.unshift(parser);
+	}
+
+	public popStack(): void {
+		this.stack.shift();
+	}
+
 	// scan
 
 	/**
@@ -178,3 +186,26 @@ export class ParserContext {
 const failureObject: Failure = {
 	ok: false,
 };
+
+export function cache<T extends Parser<ResultData<T>>>(parser: T, cacheTable: Map<number, CacheItem<ResultData<T>>> = new Map()): Parser<ResultData<T>> {
+	return (ctx) => {
+		let cache = cacheTable.get(ctx.pos);
+		if (cache != null) {
+			// hit cache
+			ctx.pos = cache.pos;
+			return ctx.ok(cache.result);
+		}
+
+		const cachePos = ctx.pos;
+		const match = ctx.parser(parser);
+
+		if (match.ok) {
+			// set cache
+			cacheTable.set(cachePos, {
+				pos: ctx.pos, // next pos
+				result: match.result,
+			});
+		}
+		return match;
+	};
+}
