@@ -7,7 +7,7 @@ import { boldAstaParser, boldUnderParser, boldTagParser } from './syntax/bold';
 import { centerTagMatcher } from './syntax/center';
 import { emojiCodeParser } from './syntax/emojiCode';
 import { fnParser } from './syntax/fn';
-import { hashtagMatcher } from './syntax/hashtag';
+import { hashtagParser } from './syntax/hashtag';
 import { inlineCodeMatcher } from './syntax/inlineCode';
 import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from './syntax/italic';
 import { linkMatcher, silentLinkMatcher } from './syntax/link';
@@ -191,7 +191,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 
 			case CharCode.hash: {
 				// #hashtag
-				matched = ctx.parser(hashtagMatcher);
+				matched = ctx.parser(hashtagParser);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -381,7 +381,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 
 			case CharCode.hash: {
 				// #hashtag
-				matched = ctx.parser(hashtagMatcher);
+				matched = ctx.parser(hashtagParser);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;

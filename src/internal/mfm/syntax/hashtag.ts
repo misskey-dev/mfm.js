@@ -6,26 +6,27 @@ import { CharCode } from '../../services/character';
 // TODO: 「#」がUnicode絵文字の一部である場合があるので判定する
 // TODO: 括弧は対になっている時のみ内容に含めることができる。対象: `()` `[]` `「」`
 
-export const hashtagMatcher: Parser<MfmHashtag> = cache((ctx) => {
+export const hashtagParser: Parser<MfmHashtag> = cache((ctx) => {
 	// check a back char
 	if (!isAllowedAsBackChar(ctx)) {
 		return ctx.fail();
 	}
 
 	// "#"
-	if (!ctx.char(CharCode.hash)) {
+	if (!ctx.char(CharCode.hash).ok) {
 		return ctx.fail();
 	}
-	ctx.pos++;
 
 	// value
 	let value = '';
 	while (true) {
-		if (/^[ \u3000\t.,!?'"#:/[\]【】()「」<>]/i.test(ctx.input.charAt(ctx.pos))) break;
-		if (ctx.regex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
-
-		value += ctx.input.charAt(ctx.pos);
-		ctx.pos++;
+		if (ctx.match(() => ctx.regex(/^[ \u3000\t.,!?'"#:/[\]【】()「」<>]/))) break;
+		// LF
+		if (ctx.match(() => ctx.regex(/^(\r\n|[\r\n])/))) break;
+		// .
+		const match = ctx.anyChar();
+		if (!match.ok) break;
+		value += match.result;
 	}
 	if (value.length === 0 || /^[0-9]+$/.test(value)) {
 		return ctx.fail();
