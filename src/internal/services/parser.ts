@@ -31,7 +31,7 @@ export class ParserContext {
 	public stack: Parser<any>[] = [];
 	public debug = false;
 	// cache
-	public cache: Map<string, Map<number, CacheItem<any>>> = new Map();
+	public cache: Map<Parser<any>, Map<number, CacheItem<any>>> = new Map();
 	// nesting control
 	public nestLimit: number;
 	public depth = 0;
@@ -187,11 +187,16 @@ const failureObject: Failure = {
 	ok: false,
 };
 
-export function cache<T extends Parser<ParserResult<T>>>(parser: T, cacheTable: Map<number, CacheItem<ParserResult<T>>> = new Map()): Parser<ParserResult<T>> {
+export function cache<T extends Parser<ParserResult<T>>>(parser: T): Parser<ParserResult<T>> {
 	return (ctx) => {
+		// get cache table
+		let cacheTable = ctx.cache.get(parser);
+		if (cacheTable == null) {
+			cacheTable = new Map();
+		}
+		// get cache
 		const cache = cacheTable.get(ctx.pos);
 		if (cache != null) {
-			// hit cache
 			ctx.pos = cache.pos;
 			return ctx.ok(cache.result);
 		}
@@ -199,13 +204,14 @@ export function cache<T extends Parser<ParserResult<T>>>(parser: T, cacheTable: 
 		const cachePos = ctx.pos;
 		const match = ctx.parser(parser);
 
+		// set cache
 		if (match.ok) {
-			// set cache
 			cacheTable.set(cachePos, {
 				pos: ctx.pos, // next pos
 				result: match.result,
 			});
 		}
+
 		return match;
 	};
 }
