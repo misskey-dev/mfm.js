@@ -1,7 +1,7 @@
 import { MfmInline, MfmSmall, SMALL } from '../../../node';
 import { defineCachedMatcher } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
-import { inlineMatcher } from '../parser';
+import { inlineParser } from '../parser';
 
 export const smallTagMatcher = defineCachedMatcher<MfmSmall>('small', ctx => {
 	let matched;
@@ -17,7 +17,7 @@ export const smallTagMatcher = defineCachedMatcher<MfmSmall>('small', ctx => {
 	while (true) {
 		if (ctx.matchStr('</small>')) break;
 
-		matched = ctx.consume(inlineMatcher);
+		matched = ctx.consume(inlineParser);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}

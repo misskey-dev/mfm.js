@@ -2,7 +2,7 @@ import { LINK, MfmInline, MfmLink } from '../../../node';
 import { defineCachedMatcher } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
-import { inlineMatcher } from '../parser';
+import { inlineParser } from '../parser';
 import { urlAltMatcher, urlMatcher } from './url';
 
 export const linkMatcher = defineCachedMatcher<MfmLink>('link', ctx => {
@@ -19,7 +19,7 @@ export const linkMatcher = defineCachedMatcher<MfmLink>('link', ctx => {
 	while (true) {
 		if (ctx.matchCharCode(CharCode.closeBracket)) break;
 
-		matched = ctx.consume(inlineMatcher);
+		matched = ctx.consume(inlineParser);
 		if (!matched.ok) break;
 		pushNode(matched.result, label);
 	}

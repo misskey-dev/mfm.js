@@ -1,7 +1,7 @@
 import { CENTER, MfmCenter, MfmInline } from '../../../node';
 import { defineCachedMatcher } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
-import { inlineMatcher } from '../parser';
+import { inlineParser } from '../parser';
 
 const centerTagRightMatcher = defineCachedMatcher<true>('centerTagRight', ctx => {
 	// optional LF
@@ -46,7 +46,7 @@ export const centerTagMatcher = defineCachedMatcher<MfmCenter>('centerTag', ctx 
 	while (true) {
 		if (ctx.match(centerTagRightMatcher).ok) break;
 
-		matched = ctx.consume(inlineMatcher);
+		matched = ctx.consume(inlineParser);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}

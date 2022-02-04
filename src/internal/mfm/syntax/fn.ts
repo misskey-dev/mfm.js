@@ -2,23 +2,23 @@ import { FN, MfmFn, MfmInline } from '../../../node';
 import { cache, Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
-import { inlineMatcher } from '../parser';
+import { inlineParser } from '../parser';
 
-const argsMatcher: Parser<Record<string, string | true>> = cache((ctx) => {
-	let matched;
+const argsParser: Parser<Record<string, string | true>> = cache((ctx) => {
+	let match;
 	const args: Record<string, string | true> = {};
 
-	const argMatcher: Parser<{ k: string, v: string | true }> = cache((ctx) => {
+	const argParser: Parser<{ k: string, v: string | true }> = cache((ctx) => {
 		return ctx.choice([
 
 			// key + value
 			() => {
-				const matched = ctx.regex(/^([a-z0-9_]+)=([a-z0-9_.]+)/i);
-				if (!matched.ok) {
+				const match = ctx.regex(/^([a-z0-9_]+)=([a-z0-9_.]+)/i);
+				if (!match.ok) {
 					return ctx.fail();
 				}
-				const k = matched.result[1];
-				const v = matched.result[2];
+				const k = match.result[1];
+				const v = match.result[2];
 				return ctx.ok({
 					k: k,
 					v: v,
@@ -27,11 +27,11 @@ const argsMatcher: Parser<Record<string, string | true>> = cache((ctx) => {
 
 			// key
 			() => {
-				const matched = ctx.regex(/^([a-z0-9_]+)/i);
-				if (!matched.ok) {
+				const match = ctx.regex(/^([a-z0-9_]+)/i);
+				if (!match.ok) {
 					return ctx.fail();
 				}
-				const k = matched.result[1];
+				const k = match.result[1];
 				return ctx.ok<{ k: string, v: string | true }>({
 					k: k,
 					v: true,
@@ -47,31 +47,31 @@ const argsMatcher: Parser<Record<string, string | true>> = cache((ctx) => {
 	}
 
 	// head
-	matched = ctx.parser(argMatcher);
-	if (!matched.ok) {
+	match = ctx.parser(argParser);
+	if (!match.ok) {
 		return ctx.fail();
 	}
-	args[matched.result.k] = matched.result.v;
+	args[match.result.k] = match.result.v;
 
 	// tails
 	while (true) {
-		matched = ctx.sequence([
+		match = ctx.sequence([
 			// ","
 			() => ctx.char(CharCode.comma),
 			// arg
-			argMatcher,
+			argParser,
 		]);
-		if (!matched.ok) break;
+		if (!match.ok) break;
 
-		const arg = matched.result[1];
+		const arg = match.result[1];
 		args[arg.k] = arg.v;
 	}
 
 	return ctx.ok(args);
 });
 
-export const fnMatcher: Parser<MfmFn> = cache((ctx) => {
-	let matched;
+export const fnParser: Parser<MfmFn> = cache((ctx) => {
+	let match;
 
 	// "$["
 	if (!ctx.str('$[').ok) {
@@ -79,11 +79,11 @@ export const fnMatcher: Parser<MfmFn> = cache((ctx) => {
 	}
 
 	// name
-	matched = ctx.regex(/^[a-z0-9_]+/i);
-	if (!matched.ok) {
+	match = ctx.regex(/^[a-z0-9_]+/i);
+	if (!match.ok) {
 		return ctx.fail();
 	}
-	const name = matched.result[0];
+	const name = match.result[0];
 
 	// (name) compare fn name
 	if (ctx.fnNameList != null && !ctx.fnNameList.includes(name)) {
@@ -91,8 +91,8 @@ export const fnMatcher: Parser<MfmFn> = cache((ctx) => {
 	}
 
 	// args (option)
-	matched = ctx.parser(argsMatcher);
-	const params = matched.ok ? matched.result : {};
+	match = ctx.parser(argsParser);
+	const params = match.ok ? match.result : {};
 
 	// spacing
 	if (!ctx.regex(/^[ \u3000\t\u00a0]/).ok) {
@@ -104,9 +104,9 @@ export const fnMatcher: Parser<MfmFn> = cache((ctx) => {
 	while (true) {
 		if (ctx.match(() => ctx.char(CharCode.closeBracket))) break;
 
-		matched = ctx.parser(inlineMatcher);
-		if (!matched.ok) break;
-		pushNode(matched.result, children);
+		match = ctx.parser(inlineParser);
+		if (!match.ok) break;
+		pushNode(match.result, children);
 	}
 	if (children.length < 1) {
 		return ctx.fail();

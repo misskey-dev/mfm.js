@@ -3,10 +3,10 @@ import { Parser } from '../services/parser';
 import { CharCode } from '../services/character';
 
 import { bigMatcher } from './syntax/big';
-import { boldAstaMatcher } from './syntax/bold';
+import { boldAstaParser } from './syntax/bold';
 import { centerTagMatcher } from './syntax/center';
 import { emojiCodeMatcher } from './syntax/emojiCode';
-import { fnMatcher } from './syntax/fn';
+import { fnParser } from './syntax/fn';
 import { hashtagMatcher } from './syntax/hashtag';
 import { inlineCodeMatcher } from './syntax/inlineCode';
 import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from './syntax/italic';
@@ -32,7 +32,7 @@ import { urlAltMatcher, urlMatcher } from './syntax/url';
 // リンクラベル部分以外のマッチではlinkLabelが常にfalseであることが分かっているため、
 // inlineSyntaxMatcherでのみlinkLabelの判定をすれば良いと分かります。
 
-export const fullMatcher: Parser<MfmNode | string> = (ctx) => {
+export const fullParser: Parser<MfmNode | string> = (ctx) => {
 	let matched;
 
 	// check EOF
@@ -47,7 +47,7 @@ export const fullMatcher: Parser<MfmNode | string> = (ctx) => {
 			// ***big***
 			bigMatcher,
 			// **bold**
-			boldAstaMatcher,
+			boldAstaParser,
 		]);
 		if (matched.ok) {
 			ctx.depth--;
@@ -235,7 +235,7 @@ export const fullMatcher: Parser<MfmNode | string> = (ctx) => {
 	return ctx.ok(text);
 };
 
-export const inlineMatcher: Parser<MfmInline | string> = (ctx) => {
+export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 	let matched;
 
 	// check EOF
@@ -430,7 +430,7 @@ export const inlineMatcher: Parser<MfmInline | string> = (ctx) => {
 	return ctx.ok(text);
 };
 
-export const plainMatcher: Parser<MfmPlainNode | string> = (ctx) => {
+export const plainParser: Parser<MfmPlainNode | string> = (ctx) => {
 	// check EOF
 	if (ctx.eof()) {
 		return ctx.fail();

@@ -1,9 +1,9 @@
 import { BOLD, MfmBold, MfmInline } from '../../../node';
 import { Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
-import { inlineMatcher } from '../parser';
+import { inlineParser } from '../parser';
 
-export const boldAstaMatcher: Parser<MfmBold> = (ctx) => {
+export const boldAstaParser: Parser<MfmBold> = (ctx) => {
 	// "**"
 	if (!ctx.str('**').ok) {
 		return ctx.fail();
@@ -14,7 +14,7 @@ export const boldAstaMatcher: Parser<MfmBold> = (ctx) => {
 	while (true) {
 		if (ctx.match(() => ctx.str('**'))) break;
 
-		const match = ctx.parser(inlineMatcher);
+		const match = ctx.parser(inlineParser);
 		if (!match.ok) break;
 
 		pushNode(match.result, children);

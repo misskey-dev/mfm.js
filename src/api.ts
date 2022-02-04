@@ -1,19 +1,19 @@
 import { MfmNode, MfmPlainNode } from './node';
 import { stringifyNode, stringifyTree, inspectOne } from './internal/util';
-import { fullParser, plainParser } from './internal/mfm';
+import { fullMfmParser, plainMfmParser } from './internal/mfm';
 
 /**
  * Generates a MfmNode tree from the MFM string.
 */
 export function parse(input: string, opts: Partial<{ fnNameList: string[]; nestLimit: number; }> = {}): MfmNode[] {
-	return fullParser(input, opts);
+	return fullMfmParser(input, opts);
 }
 
 /**
  * Generates a MfmNode tree of plain from the MFM string.
 */
 export function parsePlain(input: string): MfmPlainNode[] {
-	return plainParser(input);
+	return plainMfmParser(input);
 }
 
 /**

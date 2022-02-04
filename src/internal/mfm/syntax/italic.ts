@@ -3,7 +3,7 @@ import { defineCachedMatcher } from '../../services/parser';
 import { isAllowedAsBackChar } from '../../services/matchingUtil';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
-import { inlineMatcher } from '../parser';
+import { inlineParser } from '../parser';
 
 export const italicAstaMatcher = defineCachedMatcher<MfmItalic>('italicAsta', ctx => {
 	let matched;
@@ -24,7 +24,7 @@ export const italicAstaMatcher = defineCachedMatcher<MfmItalic>('italicAsta', ct
 	while (true) {
 		if (ctx.matchCharCode(CharCode.asterisk)) break;
 
-		matched = ctx.consume(inlineMatcher);
+		matched = ctx.consume(inlineParser);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
@@ -84,7 +84,7 @@ export const italicTagMatcher = defineCachedMatcher<MfmItalic>('italicTag', ctx 
 	while (true) {
 		if (ctx.matchStr('</i>')) break;
 
-		matched = ctx.consume(inlineMatcher);
+		matched = ctx.consume(inlineParser);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}

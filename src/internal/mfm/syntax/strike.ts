@@ -2,7 +2,7 @@ import { MfmInline, MfmStrike, STRIKE } from '../../../node';
 import { defineCachedMatcher } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
-import { inlineMatcher } from '../parser';
+import { inlineParser } from '../parser';
 
 export const strikeTagMatcher = defineCachedMatcher<MfmStrike>('strikeTag', ctx => {
 	let matched;
@@ -19,7 +19,7 @@ export const strikeTagMatcher = defineCachedMatcher<MfmStrike>('strikeTag', ctx 
 		if (ctx.matchStr('</s>')) break;
 		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null) break;
 
-		matched = ctx.consume(inlineMatcher);
+		matched = ctx.consume(inlineParser);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
@@ -51,7 +51,7 @@ export const strikeTildeMatcher = defineCachedMatcher<MfmStrike>('strikeTilde', 
 		if (ctx.matchCharCode(CharCode.tilde)) break;
 		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null) break;
 
-		matched = ctx.consume(inlineMatcher);
+		matched = ctx.consume(inlineParser);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}

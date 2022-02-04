@@ -1,7 +1,7 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
 import { Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
-import { inlineMatcher } from '../parser';
+import { inlineParser } from '../parser';
 
 export const bigMatcher: Parser<MfmFn> = (ctx) => {
 	// "***"
@@ -14,7 +14,7 @@ export const bigMatcher: Parser<MfmFn> = (ctx) => {
 	while (true) {
 		if (ctx.match(() => ctx.str('***'))) break;
 
-		const matched = ctx.parser(inlineMatcher);
+		const matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;
 
 		pushNode(matched.result, children);
