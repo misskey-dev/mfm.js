@@ -13,6 +13,8 @@ export type Failure = {
 
 export type ResultData<T> = T extends Parser<infer R> ? R : never;
 
+export type ParserResults<T> = T extends [infer Head, ...infer Tail] ? [ResultData<Head>, ...ParserResults<Tail>] : [];
+
 export type CacheItem<T> = {
 	pos: number;
 	result: T;
@@ -115,8 +117,13 @@ export class ParserContext {
 		return match;
 	}
 
-	public sequence<T extends Parser<ResultData<T>>[]>(parsers: T): Result<ResultData<T>[]> {
-		const result: ResultData<T>[] = [];
+	/**
+	 * scan by sequence with parsers
+	*/
+	// NOTE: Tの制約が思いつくまでは`Parser<any>[]`
+	// NOTE: resultの型が思いつくまでは`any`
+	public sequence<T extends Parser<any>[]>(parsers: [...T]): Result<ParserResults<T>> {
+		const result: any = [];
 		for (const p of parsers) {
 			const match = this.parser(p);
 			if (!match.ok) {
@@ -127,6 +134,9 @@ export class ParserContext {
 		return this.ok(result);
 	}
 
+	/**
+	 * scan by ordered-choice
+	*/
 	public choice<T extends Parser<ResultData<T>>>(parsers: T[]): Result<ResultData<T>> {
 		for (const p of parsers) {
 			const result = this.parser(p);
