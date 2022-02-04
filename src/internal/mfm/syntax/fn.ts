@@ -1,112 +1,110 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineMatcher } from '../parser';
 
-const argMatcher = defineCachedMatcher<{ k: string, v: string | true }>('fnArg', ctx => {
-	let matched;
-
-	// select 1: key + value
-	matched = ctx.matchRegex(/^([a-z0-9_]+)=([a-z0-9_.]+)/i);
-	if (matched != null) {
-		ctx.pos += matched[0].length;
-		const k = matched[1];
-		const v = matched[2];
-		return ctx.ok({
-			k: k,
-			v: v,
-		});
-	}
-
-	// select 2: key
-	matched = ctx.matchRegex(/^([a-z0-9_]+)/i);
-	if (matched != null) {
-		ctx.pos += matched[0].length;
-		const k = matched[1];
-		return ctx.ok<{ k: string, v: string | true }>({
-			k: k,
-			v: true,
-		});
-	}
-
-	return ctx.fail();
-});
-
-const argsMatcher = defineCachedMatcher<Record<string, string | true>>('fnArgs', ctx => {
+const argsMatcher: Parser<Record<string, string | true>> = (ctx) => {
 	let matched;
 	const args: Record<string, string | true> = {};
 
+	const argMatcher: Parser<{ k: string, v: string | true }> = (ctx) => {
+		return ctx.choice([
+	
+			// select 1: key + value
+			() => {
+				const matched = ctx.regex(/^([a-z0-9_]+)=([a-z0-9_.]+)/i);
+				if (!matched.ok) {
+					return ctx.fail();
+				}
+				const k = matched.result[1];
+				const v = matched.result[2];
+				return ctx.ok({
+					k: k,
+					v: v,
+				});
+			},
+	
+			// select 2: key
+			() => {
+				const matched = ctx.regex(/^([a-z0-9_]+)/i);
+				if (!matched.ok) {
+					return ctx.fail();
+				}
+				const k = matched.result[1];
+				return ctx.ok<{ k: string, v: string | true }>({
+					k: k,
+					v: true,
+				});
+			}
+	
+		]);
+	};
+
 	// "."
-	if (!ctx.matchCharCode(CharCode.dot)) {
+	if (!ctx.char(CharCode.dot).ok) {
 		return ctx.fail();
 	}
-	ctx.pos++;
 
-	// arg list
-	matched = ctx.consume(argMatcher);
+	// head
+	matched = ctx.parser(argMatcher);
 	if (!matched.ok) {
 		return ctx.fail();
 	}
 	args[matched.result.k] = matched.result.v;
 
+	// tails
 	while (true) {
-		const fallback = ctx.pos;
-		// ","
-		if (!ctx.matchCharCode(CharCode.comma)) break;
-		ctx.pos++;
+		matched = ctx.sequence([
+			// ","
+			() => ctx.char(CharCode.comma),
+			// arg
+			argMatcher,
+		]);
+		if (!matched.ok) break;
 
-		// arg
-		matched = ctx.consume(argMatcher);
-		if (!matched.ok) {
-			ctx.pos = fallback;
-			break;
-		}
-
-		args[matched.result.k] = matched.result.v;
+		const arg = matched.result[1];
+		args[arg.k] = arg.v;
 	}
 
 	return ctx.ok(args);
-});
+};
 
-export const fnMatcher = defineCachedMatcher<MfmFn>('fn', ctx => {
+export const fnMatcher: Parser<MfmFn> = (ctx) => {
 	let matched;
 
 	// "$["
-	if (!ctx.matchStr('$[')) {
+	if (!ctx.str('$[').ok) {
 		return ctx.fail();
 	}
-	ctx.pos += 2;
 
 	// name
-	matched = ctx.matchRegex(/^[a-z0-9_]+/i);
-	if (matched == null) {
+	matched = ctx.regex(/^[a-z0-9_]+/i);
+	if (!matched.ok) {
 		return ctx.fail();
 	}
-	const name = matched[0];
-	ctx.pos += name.length;
+	const name = matched.result[0];
 
 	// (name) compare fn name
 	if (ctx.fnNameList != null && !ctx.fnNameList.includes(name)) {
 		return ctx.fail();
 	}
 
-	// args
-	matched = ctx.tryConsume(argsMatcher);
+	// args (option)
+	matched = ctx.parser(argsMatcher);
 	const params = matched.ok ? matched.result : {};
 
 	// spacing
-	if (!ctx.matchRegex(/^[ \u3000\t\u00a0]/)) {
+	if (!ctx.regex(/^[ \u3000\t\u00a0]/).ok) {
 		return ctx.fail();
 	}
-	ctx.pos++;
 
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchCharCode(CharCode.closeBracket)) break;
+		if (ctx.match(() => ctx.char(CharCode.closeBracket))) break;
 
-		matched = ctx.consume(inlineMatcher);
+		matched = ctx.parser(inlineMatcher);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
@@ -115,10 +113,9 @@ export const fnMatcher = defineCachedMatcher<MfmFn>('fn', ctx => {
 	}
 
 	// "]"
-	if (!ctx.matchCharCode(CharCode.closeBracket)) {
+	if (!ctx.char(CharCode.closeBracket).ok) {
 		return ctx.fail();
 	}
-	ctx.pos++;
 
 	return ctx.ok(FN(name, params, children));
-});
+};
