@@ -8,7 +8,7 @@ import { centerTagMatcher } from './syntax/center';
 import { emojiCodeParser } from './syntax/emojiCode';
 import { fnParser } from './syntax/fn';
 import { hashtagParser } from './syntax/hashtag';
-import { inlineCodeMatcher } from './syntax/inlineCode';
+import { inlineCodeParser } from './syntax/inlineCode';
 import { italicAstaMatcher, italicTagMatcher, italicUnderMatcher } from './syntax/italic';
 import { linkMatcher, silentLinkMatcher } from './syntax/link';
 import { mathInlineMatcher } from './syntax/mathInline';
@@ -124,7 +124,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 				// codeBlockParser;
 
 				// `inline code`
-				matched = ctx.parser(inlineCodeMatcher);
+				matched = ctx.parser(inlineCodeParser);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -315,7 +315,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 
 			case CharCode.backtick: {
 				// `inline code`
-				matched = ctx.parser(inlineCodeMatcher);
+				matched = ctx.parser(inlineCodeParser);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
