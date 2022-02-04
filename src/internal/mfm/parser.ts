@@ -218,10 +218,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 
 	// text node
 	if (ctx.debug) console.log(`${ctx.pos}\tmatch text`);
-	const text = ctx.input.charAt(ctx.pos);
-	ctx.pos++;
-
-	return ctx.ok(text);
+	return ctx.anyChar();
 };
 
 export const inlineParser: Parser<MfmInline | string> = (ctx) => {
@@ -413,10 +410,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 
 	// text node
 	if (ctx.debug) console.log(`${ctx.pos}\tmatch text`);
-	const text = ctx.input.charAt(ctx.pos);
-	ctx.pos++;
-
-	return ctx.ok(text);
+	return ctx.anyChar();
 };
 
 export const plainParser: Parser<MfmPlainNode | string> = (ctx) => {
@@ -437,8 +431,5 @@ export const plainParser: Parser<MfmPlainNode | string> = (ctx) => {
 
 	// text node
 	if (ctx.debug) console.log(`${ctx.pos}\tmatch text`);
-	const text = ctx.input.charAt(ctx.pos);
-	ctx.pos++;
-
-	return ctx.ok(text);
+	return ctx.anyChar();
 };
