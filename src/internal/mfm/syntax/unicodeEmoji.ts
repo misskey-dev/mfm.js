@@ -3,12 +3,11 @@ import { cache, Parser } from '../../services/parser';
 import emojiRegex from 'twemoji-parser/dist/lib/regex';
 const anchoredEmojiRegex = RegExp(`^(?:${emojiRegex.source})`);
 
-export const unicodeEmojiMatcher: Parser<MfmUnicodeEmoji> = cache((ctx) => {
+export const unicodeEmojiParser: Parser<MfmUnicodeEmoji> = cache((ctx) => {
 	const matched = ctx.regex(anchoredEmojiRegex);
-	if (matched == null) {
+	if (!matched.ok) {
 		return ctx.fail();
 	}
-	ctx.pos += matched[0].length;
 
-	return ctx.ok(UNI_EMOJI(matched[0]));
+	return ctx.ok(UNI_EMOJI(matched.result[0]));
 });

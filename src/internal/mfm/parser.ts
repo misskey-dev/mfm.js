@@ -14,9 +14,9 @@ import { linkParser } from './syntax/link';
 import { mathInlineParser } from './syntax/mathInline';
 import { mentionMatcher } from './syntax/mention';
 import { searchParser } from './syntax/search';
-import { smallTagMatcher } from './syntax/small';
+import { smallTagParser } from './syntax/small';
 import { strikeTagMatcher, strikeTildeMatcher } from './syntax/strike';
-import { unicodeEmojiMatcher } from './syntax/unicodeEmoji';
+import { unicodeEmojiParser } from './syntax/unicodeEmoji';
 import { urlAltMatcher, urlMatcher } from './syntax/url';
 
 // NOTE: SyntaxMatcher は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
@@ -90,7 +90,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 					// <b>
 					boldTagParser,
 					// <small>
-					smallTagMatcher,
+					smallTagParser,
 					// <center>
 					centerTagMatcher,
 					// <https://example.com>
@@ -202,7 +202,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 
 		matched = ctx.choice([
 			// unicode emoji
-			unicodeEmojiMatcher,
+			unicodeEmojiParser,
 			// https://example.com
 			urlMatcher,
 			// abc [search]
@@ -284,7 +284,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 					// <b>
 					boldTagParser,
 					// <small>
-					smallTagMatcher,
+					smallTagParser,
 				]);
 				if (matched.ok) {
 					ctx.depth--;
@@ -391,7 +391,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 		}
 
 		// unicode emoji
-		matched = ctx.parser(unicodeEmojiMatcher);
+		matched = ctx.parser(unicodeEmojiParser);
 		if (matched.ok) {
 			ctx.depth--;
 			return matched;
@@ -423,7 +423,7 @@ export const plainParser: Parser<MfmPlainNode | string> = (ctx) => {
 		// :emojiCode:
 		emojiCodeParser,
 		// unicode emoji
-		unicodeEmojiMatcher,
+		unicodeEmojiParser,
 	]);
 	if (matched.ok) {
 		return matched;

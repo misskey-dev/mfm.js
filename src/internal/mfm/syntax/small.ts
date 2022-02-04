@@ -3,19 +3,18 @@ import { cache, Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 
-export const smallTagMatcher: Parser<MfmSmall> = cache((ctx) => {
+export const smallTagParser: Parser<MfmSmall> = cache((ctx) => {
 	let matched;
 
 	// "<small>"
-	if (!ctx.str('<small>')) {
+	if (!ctx.str('<small>').ok) {
 		return ctx.fail();
 	}
-	ctx.pos += 7;
 
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.str('</small>')) break;
+		if (ctx.match(() => ctx.str('</small>'))) break;
 
 		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;
@@ -26,10 +25,9 @@ export const smallTagMatcher: Parser<MfmSmall> = cache((ctx) => {
 	}
 
 	// "</small>"
-	if (!ctx.str('</small>')) {
+	if (!ctx.str('</small>').ok) {
 		return ctx.fail();
 	}
-	ctx.pos += 8;
 
 	return ctx.ok(SMALL(children));
 });
