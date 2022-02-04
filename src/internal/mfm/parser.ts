@@ -13,7 +13,7 @@ import { italicAstaParser, italicTagParser, italicUnderParser } from './syntax/i
 import { linkParser } from './syntax/link';
 import { mathInlineParser } from './syntax/mathInline';
 import { mentionMatcher } from './syntax/mention';
-import { searchMatcher } from './syntax/search';
+import { searchParser } from './syntax/search';
 import { smallTagMatcher } from './syntax/small';
 import { strikeTagMatcher, strikeTildeMatcher } from './syntax/strike';
 import { unicodeEmojiMatcher } from './syntax/unicodeEmoji';
@@ -206,7 +206,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 			// https://example.com
 			urlMatcher,
 			// abc [search]
-			searchMatcher,
+			searchParser,
 		]);
 		if (matched.ok) {
 			ctx.depth--;

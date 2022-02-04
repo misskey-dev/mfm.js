@@ -1,26 +1,7 @@
 import { MfmSearch, SEARCH } from '../../../node';
 import { cache, Parser } from '../../services/parser';
 
-const searchRightMatcher: Parser<true> = cache((ctx) => {
-	// spacing
-	if (!ctx.regex(/^[ \u3000\t\u00a0]/)) {
-		return ctx.fail();
-	}
-	ctx.pos++;
-
-	// search key
-	const match = ctx.regex(/^\[?(検索|search)]?/i);
-	if (match == null) {
-		return ctx.fail();
-	}
-	ctx.pos += match[0].length;
-
-	// TODO: line-tail
-
-	return ctx.ok(true);
-});
-
-export const searchMatcher: Parser<MfmSearch> = cache((ctx) => {
+export const searchParser: Parser<MfmSearch> = cache((ctx) => {
 
 	// TODO: line-head
 
@@ -29,22 +10,46 @@ export const searchMatcher: Parser<MfmSearch> = cache((ctx) => {
 	// query
 	let q = '';
 	while (true) {
-		if (ctx.match(searchRightMatcher).ok) break;
-		if (ctx.regex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
-
-		q += ctx.input.charAt(ctx.pos);
-		ctx.pos++;
+		if (ctx.match(() => {
+			// spacing
+			if (!ctx.regex(/^[ \u3000\t\u00a0]/).ok) {
+				return ctx.fail();
+			}
+			// search key
+			const match = ctx.regex(/^\[?(検索|search)]?/i);
+			if (!match.ok) {
+				return ctx.fail();
+			}
+			// TODO: line-tail
+			return ctx.ok(null);
+		})) break;
+		// LF
+		if (ctx.match(() => ctx.regex(/^(\r\n|[\r\n])/))) break;
+		// .
+		const match = ctx.anyChar();
+		if (!match.ok) break;
+		q += match.result;
 	}
 	if (q.length === 0) {
 		return ctx.fail();
 	}
 
-	// right part
-	if (!ctx.parser(searchRightMatcher).ok) {
+	// spacing
+	if (!ctx.regex(/^[ \u3000\t\u00a0]/).ok) {
 		return ctx.fail();
 	}
 
-	const content = ctx.input.substring(headPos, ctx.pos);
+	// search key
+	const match = ctx.regex(/^\[?(検索|search)]?/i);
+	if (!match.ok) {
+		return ctx.fail();
+	}
+
+	const tailPos = ctx.pos;
+
+	// TODO: line-tail
+
+	const content = ctx.input.substring(headPos, tailPos);
 
 	return ctx.ok(SEARCH(q, content));
 });
