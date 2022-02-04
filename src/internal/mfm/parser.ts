@@ -5,7 +5,7 @@ import { CharCode } from '../services/character';
 import { bigMatcher } from './syntax/big';
 import { boldAstaParser, boldUnderParser, boldTagParser } from './syntax/bold';
 import { centerTagMatcher } from './syntax/center';
-import { emojiCodeMatcher } from './syntax/emojiCode';
+import { emojiCodeParser } from './syntax/emojiCode';
 import { fnParser } from './syntax/fn';
 import { hashtagMatcher } from './syntax/hashtag';
 import { inlineCodeMatcher } from './syntax/inlineCode';
@@ -157,7 +157,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 
 			case CharCode.colon: {
 				// :emojiCode:
-				matched = ctx.parser(emojiCodeMatcher);
+				matched = ctx.parser(emojiCodeParser);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -345,7 +345,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 
 			case CharCode.colon: {
 				// :emojiCode:
-				matched = ctx.parser(emojiCodeMatcher);
+				matched = ctx.parser(emojiCodeParser);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -421,7 +421,7 @@ export const plainParser: Parser<MfmPlainNode | string> = (ctx) => {
 
 	const matched = ctx.choice([
 		// :emojiCode:
-		emojiCodeMatcher,
+		emojiCodeParser,
 		// unicode emoji
 		unicodeEmojiMatcher,
 	]);
