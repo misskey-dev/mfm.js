@@ -10,7 +10,7 @@ import { fnParser } from './syntax/fn';
 import { hashtagParser } from './syntax/hashtag';
 import { inlineCodeParser } from './syntax/inlineCode';
 import { italicAstaParser, italicTagParser, italicUnderParser } from './syntax/italic';
-import { linkMatcher, silentLinkMatcher } from './syntax/link';
+import { linkParser } from './syntax/link';
 import { mathInlineMatcher } from './syntax/mathInline';
 import { mentionMatcher } from './syntax/mention';
 import { searchMatcher } from './syntax/search';
@@ -73,7 +73,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 
 			case CharCode.question: {
 				// ?[silent link]()
-				matched = ctx.parser(silentLinkMatcher);
+				matched = ctx.parser(linkParser);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -111,7 +111,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 
 			case CharCode.openBracket: {
 				// [link]()
-				matched = ctx.parser(linkMatcher);
+				matched = ctx.parser(linkParser);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -266,7 +266,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 			case CharCode.question: {
 				if (!inLink) {
 					// ?[silent link]()
-					matched = ctx.parser(silentLinkMatcher);
+					matched = ctx.parser(linkParser);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;
@@ -304,7 +304,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 			case CharCode.openBracket: {
 				if (!inLink) {
 					// [link]()
-					matched = ctx.parser(linkMatcher);
+					matched = ctx.parser(linkParser);
 					if (matched.ok) {
 						ctx.depth--;
 						return matched;

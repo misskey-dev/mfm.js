@@ -5,19 +5,22 @@ import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
 import { urlAltMatcher, urlMatcher } from './url';
 
-export const linkMatcher: Parser<MfmLink> = cache((ctx) => {
+export const linkParser: Parser<MfmLink> = cache((ctx) => {
 	let matched;
 
+	// "?" (option)
+	matched = ctx.char(CharCode.question);
+	const silent = matched.ok;
+
 	// "["
-	if (!ctx.char(CharCode.openBracket)) {
+	if (!ctx.char(CharCode.openBracket).ok) {
 		return ctx.fail();
 	}
-	ctx.pos++;
 
 	// link label
 	const label: MfmInline[] = [];
 	while (true) {
-		if (ctx.char(CharCode.closeBracket)) break;
+		if (ctx.match(() => ctx.char(CharCode.closeBracket))) break;
 
 		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;
@@ -28,10 +31,9 @@ export const linkMatcher: Parser<MfmLink> = cache((ctx) => {
 	}
 
 	// "]("
-	if (!ctx.str('](')) {
+	if (!ctx.str('](').ok) {
 		return ctx.fail();
 	}
-	ctx.pos += 2;
 
 	// url
 	matched = ctx.choice([
@@ -44,28 +46,9 @@ export const linkMatcher: Parser<MfmLink> = cache((ctx) => {
 	const url = matched.result;
 
 	// ")"
-	if (!ctx.char(CharCode.closeParen)) {
-		return ctx.fail();
-	}
-	ctx.pos++;
-
-	return ctx.ok(LINK(false, url.props.url, label));
-});
-
-export const silentLinkMatcher: Parser<MfmLink> = cache((ctx) => {
-	// "?"
-	if (!ctx.char(CharCode.question)) {
-		return ctx.fail();
-	}
-	ctx.pos++;
-
-	const matched = ctx.parser(linkMatcher);
-	if (!matched.ok) {
+	if (!ctx.char(CharCode.closeParen).ok) {
 		return ctx.fail();
 	}
 
-	const link = matched.result;
-	link.props.silent = true;
-
-	return ctx.ok(link);
+	return ctx.ok(LINK(silent, url.props.url, label));
 });
