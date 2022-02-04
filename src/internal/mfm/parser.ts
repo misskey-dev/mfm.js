@@ -11,7 +11,7 @@ import { hashtagParser } from './syntax/hashtag';
 import { inlineCodeParser } from './syntax/inlineCode';
 import { italicAstaParser, italicTagParser, italicUnderParser } from './syntax/italic';
 import { linkParser } from './syntax/link';
-import { mathInlineMatcher } from './syntax/mathInline';
+import { mathInlineParser } from './syntax/mathInline';
 import { mentionMatcher } from './syntax/mention';
 import { searchMatcher } from './syntax/search';
 import { smallTagMatcher } from './syntax/small';
@@ -134,7 +134,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 
 			case CharCode.backslash: {
 				// \(math inline\)
-				matched = ctx.parser(mathInlineMatcher);
+				matched = ctx.parser(mathInlineParser);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
@@ -325,7 +325,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 
 			case CharCode.backslash: {
 				// \(math inline\)
-				matched = ctx.parser(mathInlineMatcher);
+				matched = ctx.parser(mathInlineParser);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
