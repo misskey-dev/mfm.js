@@ -1,10 +1,10 @@
 import { MfmUnicodeEmoji, UNI_EMOJI } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 import emojiRegex from 'twemoji-parser/dist/lib/regex';
 const anchoredEmojiRegex = RegExp(`^(?:${emojiRegex.source})`);
 
-export const unicodeEmojiMatcher = defineCachedMatcher<MfmUnicodeEmoji>('unicodeEmoji', ctx => {
-	const matched = ctx.matchRegex(anchoredEmojiRegex);
+export const unicodeEmojiMatcher: Parser<MfmUnicodeEmoji> = cache((ctx) => {
+	const matched = ctx.regex(anchoredEmojiRegex);
 	if (matched == null) {
 		return ctx.fail();
 	}

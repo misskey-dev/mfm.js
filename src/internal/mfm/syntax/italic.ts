@@ -1,11 +1,11 @@
 import { ITALIC, MfmInline, MfmItalic } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 import { isAllowedAsBackChar } from '../../services/matchingUtil';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
 
-export const italicAstaMatcher = defineCachedMatcher<MfmItalic>('italicAsta', ctx => {
+export const italicAstaMatcher: Parser<MfmItalic> = cache((ctx) => {
 	let matched;
 
 	// check a back char
@@ -14,7 +14,7 @@ export const italicAstaMatcher = defineCachedMatcher<MfmItalic>('italicAsta', ct
 	}
 
 	// "*"
-	if (!ctx.matchCharCode(CharCode.asterisk)) {
+	if (!ctx.char(CharCode.asterisk)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -22,9 +22,9 @@ export const italicAstaMatcher = defineCachedMatcher<MfmItalic>('italicAsta', ct
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchCharCode(CharCode.asterisk)) break;
+		if (ctx.char(CharCode.asterisk)) break;
 
-		matched = ctx.consume(inlineParser);
+		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
@@ -33,7 +33,7 @@ export const italicAstaMatcher = defineCachedMatcher<MfmItalic>('italicAsta', ct
 	}
 
 	// "*"
-	if (!ctx.matchCharCode(CharCode.asterisk)) {
+	if (!ctx.char(CharCode.asterisk)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -41,7 +41,7 @@ export const italicAstaMatcher = defineCachedMatcher<MfmItalic>('italicAsta', ct
 	return ctx.ok(ITALIC(children));
 });
 
-export const italicUnderMatcher = defineCachedMatcher<MfmItalic>('italicUnder', ctx => {
+export const italicUnderMatcher: Parser<MfmItalic> = cache((ctx) => {
 	// let matched;
 
 	// check a back char
@@ -50,7 +50,7 @@ export const italicUnderMatcher = defineCachedMatcher<MfmItalic>('italicUnder', 
 	}
 
 	// "_"
-	if (!ctx.matchCharCode(CharCode.underscore)) {
+	if (!ctx.char(CharCode.underscore)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -62,7 +62,7 @@ export const italicUnderMatcher = defineCachedMatcher<MfmItalic>('italicUnder', 
 	// spacing
 
 	// "_"
-	if (!ctx.matchCharCode(CharCode.underscore)) {
+	if (!ctx.char(CharCode.underscore)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -70,11 +70,11 @@ export const italicUnderMatcher = defineCachedMatcher<MfmItalic>('italicUnder', 
 	return ctx.ok(ITALIC([]));
 });
 
-export const italicTagMatcher = defineCachedMatcher<MfmItalic>('italicTag', ctx => {
+export const italicTagMatcher: Parser<MfmItalic> = cache((ctx) => {
 	let matched;
 
 	// "<i>"
-	if (!ctx.matchStr('<i>')) {
+	if (!ctx.str('<i>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 3;
@@ -82,9 +82,9 @@ export const italicTagMatcher = defineCachedMatcher<MfmItalic>('italicTag', ctx 
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchStr('</i>')) break;
+		if (ctx.str('</i>')) break;
 
-		matched = ctx.consume(inlineParser);
+		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
@@ -93,7 +93,7 @@ export const italicTagMatcher = defineCachedMatcher<MfmItalic>('italicTag', ctx 
 	}
 
 	// "</i>"
-	if (!ctx.matchStr('</i>')) {
+	if (!ctx.str('</i>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 4;

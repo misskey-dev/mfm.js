@@ -1,14 +1,14 @@
 import { MfmInline, MfmStrike, STRIKE } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
 
-export const strikeTagMatcher = defineCachedMatcher<MfmStrike>('strikeTag', ctx => {
+export const strikeTagMatcher: Parser<MfmStrike> = cache((ctx) => {
 	let matched;
 
 	// "<s>"
-	if (!ctx.matchStr('<s>')) {
+	if (!ctx.str('<s>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 3;
@@ -16,10 +16,10 @@ export const strikeTagMatcher = defineCachedMatcher<MfmStrike>('strikeTag', ctx 
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchStr('</s>')) break;
-		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null) break;
+		if (ctx.str('</s>')) break;
+		if (ctx.regex(/^(\r\n|[\r\n])/) != null) break;
 
-		matched = ctx.consume(inlineParser);
+		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
@@ -28,7 +28,7 @@ export const strikeTagMatcher = defineCachedMatcher<MfmStrike>('strikeTag', ctx 
 	}
 
 	// "</s>"
-	if (!ctx.matchStr('</s>')) {
+	if (!ctx.str('</s>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 4;
@@ -36,11 +36,11 @@ export const strikeTagMatcher = defineCachedMatcher<MfmStrike>('strikeTag', ctx 
 	return ctx.ok(STRIKE(children));
 });
 
-export const strikeTildeMatcher = defineCachedMatcher<MfmStrike>('strikeTilde', ctx => {
+export const strikeTildeMatcher: Parser<MfmStrike> = cache((ctx) => {
 	let matched;
 
 	// "~~"
-	if (!ctx.matchStr('~~')) {
+	if (!ctx.str('~~')) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
@@ -48,10 +48,10 @@ export const strikeTildeMatcher = defineCachedMatcher<MfmStrike>('strikeTilde', 
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchCharCode(CharCode.tilde)) break;
-		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null) break;
+		if (ctx.char(CharCode.tilde)) break;
+		if (ctx.regex(/^(\r\n|[\r\n])/) != null) break;
 
-		matched = ctx.consume(inlineParser);
+		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
@@ -60,7 +60,7 @@ export const strikeTildeMatcher = defineCachedMatcher<MfmStrike>('strikeTilde', 
 	}
 
 	// "~~"
-	if (!ctx.matchStr('~~')) {
+	if (!ctx.str('~~')) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;

@@ -1,9 +1,9 @@
 import { BOLD, MfmBold, MfmInline } from '../../../node';
-import { Parser } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 
-export const boldAstaParser: Parser<MfmBold> = (ctx) => {
+export const boldAstaParser: Parser<MfmBold> = cache((ctx) => {
 	// "**"
 	if (!ctx.str('**').ok) {
 		return ctx.fail();
@@ -29,4 +29,4 @@ export const boldAstaParser: Parser<MfmBold> = (ctx) => {
 	}
 
 	return ctx.ok(BOLD(children));
-};
+});

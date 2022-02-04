@@ -8,8 +8,8 @@ export function isAllowedAsBackChar(ctx: ParserContext): boolean {
 		const fallback = ctx.pos;
 		ctx.pos--;
 		if (
-			ctx.matchRegex(/^(\r\n|[\r\n])/) == null &&
-			ctx.matchRegex(/^[ \u3000\t\u00a0]/) == null &&
+			ctx.regex(/^(\r\n|[\r\n])/) == null &&
+			ctx.regex(/^[ \u3000\t\u00a0]/) == null &&
 			/^[a-z0-9]/i.test(ctx.input.charAt(ctx.pos))
 		) {
 			ctx.pos = fallback;

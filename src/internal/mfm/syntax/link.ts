@@ -1,15 +1,15 @@
 import { LINK, MfmInline, MfmLink } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
 import { urlAltMatcher, urlMatcher } from './url';
 
-export const linkMatcher = defineCachedMatcher<MfmLink>('link', ctx => {
+export const linkMatcher: Parser<MfmLink> = cache((ctx) => {
 	let matched;
 
 	// "["
-	if (!ctx.matchCharCode(CharCode.openBracket)) {
+	if (!ctx.char(CharCode.openBracket)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -17,9 +17,9 @@ export const linkMatcher = defineCachedMatcher<MfmLink>('link', ctx => {
 	// link label
 	const label: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchCharCode(CharCode.closeBracket)) break;
+		if (ctx.char(CharCode.closeBracket)) break;
 
-		matched = ctx.consume(inlineParser);
+		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;
 		pushNode(matched.result, label);
 	}
@@ -28,7 +28,7 @@ export const linkMatcher = defineCachedMatcher<MfmLink>('link', ctx => {
 	}
 
 	// "]("
-	if (!ctx.matchStr('](')) {
+	if (!ctx.str('](')) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
@@ -44,7 +44,7 @@ export const linkMatcher = defineCachedMatcher<MfmLink>('link', ctx => {
 	const url = matched.result;
 
 	// ")"
-	if (!ctx.matchCharCode(CharCode.closeParen)) {
+	if (!ctx.char(CharCode.closeParen)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -52,14 +52,14 @@ export const linkMatcher = defineCachedMatcher<MfmLink>('link', ctx => {
 	return ctx.ok(LINK(false, url.props.url, label));
 });
 
-export const silentLinkMatcher = defineCachedMatcher<MfmLink>('silentLink', ctx => {
+export const silentLinkMatcher: Parser<MfmLink> = cache((ctx) => {
 	// "?"
-	if (!ctx.matchCharCode(CharCode.question)) {
+	if (!ctx.char(CharCode.question)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
 
-	const matched = ctx.consume(linkMatcher);
+	const matched = ctx.parser(linkMatcher);
 	if (!matched.ok) {
 		return ctx.fail();
 	}

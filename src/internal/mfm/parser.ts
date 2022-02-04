@@ -43,17 +43,6 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 	if (ctx.depth < ctx.nestLimit) {
 		ctx.depth++;
 
-		matched = ctx.choice([
-			// ***big***
-			bigMatcher,
-			// **bold**
-			boldAstaParser,
-		]);
-		if (matched.ok) {
-			ctx.depth--;
-			return matched;
-		}
-
 		switch (ctx.input.charCodeAt(ctx.pos)) {
 
 			case CharCode.asterisk: {

@@ -1,16 +1,16 @@
 import { EMOJI_CODE, MfmEmojiCode } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
 
-export const emojiCodeMatcher = defineCachedMatcher<MfmEmojiCode>('emojiCode', ctx => {
+export const emojiCodeMatcher: Parser<MfmEmojiCode> = cache((ctx) => {
 	// ":"
-	if (!ctx.matchCharCode(CharCode.colon)) {
+	if (!ctx.char(CharCode.colon)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
 
 	// name
-	const matched = ctx.matchRegex(/^[a-z0-9_+-]+/i);
+	const matched = ctx.regex(/^[a-z0-9_+-]+/i);
 	if (matched == null) {
 		return ctx.fail();
 	}
@@ -18,7 +18,7 @@ export const emojiCodeMatcher = defineCachedMatcher<MfmEmojiCode>('emojiCode', c
 	ctx.pos += name.length;
 
 	// ":"
-	if (!ctx.matchCharCode(CharCode.colon)) {
+	if (!ctx.char(CharCode.colon)) {
 		return ctx.fail();
 	}
 	ctx.pos++;

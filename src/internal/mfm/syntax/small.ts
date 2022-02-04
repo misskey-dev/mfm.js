@@ -1,13 +1,13 @@
 import { MfmInline, MfmSmall, SMALL } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 
-export const smallTagMatcher = defineCachedMatcher<MfmSmall>('small', ctx => {
+export const smallTagMatcher: Parser<MfmSmall> = cache((ctx) => {
 	let matched;
 
 	// "<small>"
-	if (!ctx.matchStr('<small>')) {
+	if (!ctx.str('<small>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 7;
@@ -15,9 +15,9 @@ export const smallTagMatcher = defineCachedMatcher<MfmSmall>('small', ctx => {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.matchStr('</small>')) break;
+		if (ctx.str('</small>')) break;
 
-		matched = ctx.consume(inlineParser);
+		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;
 		pushNode(matched.result, children);
 	}
@@ -26,7 +26,7 @@ export const smallTagMatcher = defineCachedMatcher<MfmSmall>('small', ctx => {
 	}
 
 	// "</small>"
-	if (!ctx.matchStr('</small>')) {
+	if (!ctx.str('</small>')) {
 		return ctx.fail();
 	}
 	ctx.pos += 8;

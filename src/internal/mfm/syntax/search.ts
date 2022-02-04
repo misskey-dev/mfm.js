@@ -1,15 +1,15 @@
 import { MfmSearch, SEARCH } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 
-const searchRightMatcher = defineCachedMatcher<true>('searchRight', ctx => {
+const searchRightMatcher: Parser<true> = cache((ctx) => {
 	// spacing
-	if (!ctx.matchRegex(/^[ \u3000\t\u00a0]/)) {
+	if (!ctx.regex(/^[ \u3000\t\u00a0]/)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
 
 	// search key
-	const match = ctx.matchRegex(/^\[?(検索|search)]?/i);
+	const match = ctx.regex(/^\[?(検索|search)]?/i);
 	if (match == null) {
 		return ctx.fail();
 	}
@@ -20,7 +20,7 @@ const searchRightMatcher = defineCachedMatcher<true>('searchRight', ctx => {
 	return ctx.ok(true);
 });
 
-export const searchMatcher = defineCachedMatcher<MfmSearch>('search', ctx => {
+export const searchMatcher: Parser<MfmSearch> = cache((ctx) => {
 
 	// TODO: line-head
 
@@ -30,7 +30,7 @@ export const searchMatcher = defineCachedMatcher<MfmSearch>('search', ctx => {
 	let q = '';
 	while (true) {
 		if (ctx.match(searchRightMatcher).ok) break;
-		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
+		if (ctx.regex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
 
 		q += ctx.input.charAt(ctx.pos);
 		ctx.pos++;
@@ -40,7 +40,7 @@ export const searchMatcher = defineCachedMatcher<MfmSearch>('search', ctx => {
 	}
 
 	// right part
-	if (!ctx.consume(searchRightMatcher).ok) {
+	if (!ctx.parser(searchRightMatcher).ok) {
 		return ctx.fail();
 	}
 

@@ -1,5 +1,5 @@
 import { MfmUrl, N_URL } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
 
 // TODO: urlMatcher 括弧のペア
@@ -9,13 +9,13 @@ const schemes: string[] = [
 	'http',
 ];
 
-export const urlMatcher = defineCachedMatcher<MfmUrl>('url', ctx => {
+export const urlMatcher: Parser<MfmUrl> = cache((ctx) => {
 	const urlHead = ctx.pos;
 
 	// scheme
 	let found = false;
 	for (const sch of schemes) {
-		if (ctx.matchStr(sch + ':')) {
+		if (ctx.str(sch + ':')) {
 			found = true;
 			ctx.pos += sch.length + 1;
 			break;
@@ -26,7 +26,7 @@ export const urlMatcher = defineCachedMatcher<MfmUrl>('url', ctx => {
 	}
 
 	// path
-	const matched = ctx.matchRegex(/^\/\/([.,a-z0-9_/:%#@$&?!~=+-]+)/i);
+	const matched = ctx.regex(/^\/\/([.,a-z0-9_/:%#@$&?!~=+-]+)/i);
 	if (matched == null) {
 		return ctx.fail();
 	}
@@ -54,9 +54,9 @@ export const urlMatcher = defineCachedMatcher<MfmUrl>('url', ctx => {
 	return ctx.ok(N_URL(value));
 });
 
-export const urlAltMatcher = defineCachedMatcher<MfmUrl>('urlAlt', ctx => {
+export const urlAltMatcher: Parser<MfmUrl> = cache((ctx) => {
 	// "<"
-	if (!ctx.matchCharCode(CharCode.lessThan)) {
+	if (!ctx.char(CharCode.lessThan)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -66,7 +66,7 @@ export const urlAltMatcher = defineCachedMatcher<MfmUrl>('urlAlt', ctx => {
 	// scheme
 	let found = false;
 	for (const sch of schemes) {
-		if (ctx.matchStr(sch + ':')) {
+		if (ctx.str(sch + ':')) {
 			found = true;
 			ctx.pos += sch.length + 1;
 			break;
@@ -78,9 +78,9 @@ export const urlAltMatcher = defineCachedMatcher<MfmUrl>('urlAlt', ctx => {
 
 	let c = '';
 	while (true) {
-		if (ctx.matchCharCode(CharCode.greaterThan)) break;
-		if (ctx.matchRegex(/^[ \u3000\t\u00a0]/) != null) break;
-		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
+		if (ctx.char(CharCode.greaterThan)) break;
+		if (ctx.regex(/^[ \u3000\t\u00a0]/) != null) break;
+		if (ctx.regex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
 
 		c += ctx.input.charAt(ctx.pos);
 		ctx.pos++;
@@ -92,7 +92,7 @@ export const urlAltMatcher = defineCachedMatcher<MfmUrl>('urlAlt', ctx => {
 	const urlTail = ctx.pos;
 
 	// ">"
-	if (!ctx.matchCharCode(CharCode.greaterThan)) {
+	if (!ctx.char(CharCode.greaterThan)) {
 		return ctx.fail();
 	}
 	ctx.pos++;

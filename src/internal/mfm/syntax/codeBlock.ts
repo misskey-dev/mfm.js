@@ -1,13 +1,13 @@
 import { CODE_BLOCK, MfmCodeBlock } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 
-export const codeBlockMatcher = defineCachedMatcher<MfmCodeBlock>('codeBlock', ctx => {
+export const codeBlockMatcher: Parser<MfmCodeBlock> = cache((ctx) => {
 	let matched;
 
 	// TODO: check line-head
 
 	// "```"
-	if (!ctx.matchStr('```')) {
+	if (!ctx.str('```')) {
 		return ctx.fail();
 	}
 	ctx.pos += 3;
@@ -15,14 +15,14 @@ export const codeBlockMatcher = defineCachedMatcher<MfmCodeBlock>('codeBlock', c
 	// lang
 	let lang = '';
 	while (true) {
-		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
+		if (ctx.regex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
 
 		lang += ctx.input.charAt(ctx.pos);
 		ctx.pos++;
 	}
 
 	// LF
-	matched = ctx.matchRegex(/^(\r\n|[\r\n])/);
+	matched = ctx.regex(/^(\r\n|[\r\n])/);
 	if (matched == null) {
 		return ctx.fail();
 	}
@@ -31,14 +31,14 @@ export const codeBlockMatcher = defineCachedMatcher<MfmCodeBlock>('codeBlock', c
 	// TODO: code
 
 	// LF
-	matched = ctx.matchRegex(/^(\r\n|[\r\n])/);
+	matched = ctx.regex(/^(\r\n|[\r\n])/);
 	if (matched == null) {
 		return ctx.fail();
 	}
 	ctx.pos += matched.length;
 
 	// "```"
-	if (!ctx.matchStr('```')) {
+	if (!ctx.str('```')) {
 		return ctx.fail();
 	}
 	ctx.pos += 3;

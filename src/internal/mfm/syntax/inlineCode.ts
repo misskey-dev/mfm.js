@@ -1,10 +1,10 @@
 import { INLINE_CODE, MfmInlineCode } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
 
-export const inlineCodeMatcher = defineCachedMatcher<MfmInlineCode>('inlineCode', ctx => {
+export const inlineCodeMatcher: Parser<MfmInlineCode> = cache((ctx) => {
 	// "`"
-	if (!ctx.matchCharCode(CharCode.backtick)) {
+	if (!ctx.char(CharCode.backtick)) {
 		return ctx.fail();
 	}
 	ctx.pos++;
@@ -13,7 +13,7 @@ export const inlineCodeMatcher = defineCachedMatcher<MfmInlineCode>('inlineCode'
 	let code = '';
 	while (true) {
 		if (/^[`´]/.test(ctx.input.charAt(ctx.pos))) break;
-		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
+		if (ctx.regex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
 
 		code += ctx.input.charAt(ctx.pos);
 		ctx.pos++;
@@ -23,7 +23,7 @@ export const inlineCodeMatcher = defineCachedMatcher<MfmInlineCode>('inlineCode'
 	}
 
 	// "`"
-	if (!ctx.matchCharCode(CharCode.backtick)) {
+	if (!ctx.char(CharCode.backtick)) {
 		return ctx.fail();
 	}
 	ctx.pos++;

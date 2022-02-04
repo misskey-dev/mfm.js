@@ -1,9 +1,9 @@
 import { MATH_INLINE, MfmMathInline } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 
-export const mathInlineMatcher = defineCachedMatcher<MfmMathInline>('mathInline', ctx => {
+export const mathInlineMatcher: Parser<MfmMathInline> = cache((ctx) => {
 	// "\("
-	if (!ctx.matchStr('\\(')) {
+	if (!ctx.str('\\(')) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;
@@ -11,8 +11,8 @@ export const mathInlineMatcher = defineCachedMatcher<MfmMathInline>('mathInline'
 	// math
 	let math = '';
 	while (true) {
-		if (ctx.matchStr('\\)')) break;
-		if (ctx.matchRegex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
+		if (ctx.str('\\)')) break;
+		if (ctx.regex(/^(\r\n|[\r\n])/) != null || ctx.eof()) break;
 
 		math += ctx.input.charAt(ctx.pos);
 		ctx.pos++;
@@ -22,7 +22,7 @@ export const mathInlineMatcher = defineCachedMatcher<MfmMathInline>('mathInline'
 	}
 
 	// "\)"
-	if (!ctx.matchStr('\\)')) {
+	if (!ctx.str('\\)')) {
 		return ctx.fail();
 	}
 	ctx.pos += 2;

@@ -1,7 +1,7 @@
 import { MATH_BLOCK, MfmMathBlock } from '../../../node';
-import { defineCachedMatcher } from '../../services/parser';
+import { } from '../../services/parser';
 
-export const mathBlockMatcher = defineCachedMatcher<MfmMathBlock>('mathBlock', ctx => {
+export const mathBlockMatcher: Parser<MfmMathBlock> = cache((ctx) => {
 	// TODO
 
 	return ctx.ok(MATH_BLOCK(''));
