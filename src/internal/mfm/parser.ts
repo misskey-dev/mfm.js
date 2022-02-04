@@ -217,7 +217,6 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 	}
 
 	// text node
-	if (ctx.debug) console.log(`${ctx.pos}\tmatch text`);
 	return ctx.anyChar();
 };
 
@@ -409,7 +408,6 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 	}
 
 	// text node
-	if (ctx.debug) console.log(`${ctx.pos}\tmatch text`);
 	return ctx.anyChar();
 };
 
@@ -430,6 +428,5 @@ export const plainParser: Parser<MfmPlainNode | string> = (ctx) => {
 	}
 
 	// text node
-	if (ctx.debug) console.log(`${ctx.pos}\tmatch text`);
 	return ctx.anyChar();
 };
