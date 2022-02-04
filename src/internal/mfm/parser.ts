@@ -3,7 +3,7 @@ import { Parser } from '../services/parser';
 import { CharCode } from '../services/character';
 
 import { bigMatcher } from './syntax/big';
-import { boldAstaParser } from './syntax/bold';
+import { boldAstaParser, boldUnderParser, boldTagParser } from './syntax/bold';
 import { centerTagMatcher } from './syntax/center';
 import { emojiCodeMatcher } from './syntax/emojiCode';
 import { fnParser } from './syntax/fn';
@@ -88,7 +88,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 					// <i>
 					italicTagMatcher,
 					// <b>
-					boldTagMatcher,
+					boldTagParser,
 					// <small>
 					smallTagMatcher,
 					// <center>
@@ -168,7 +168,7 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 			case CharCode.underscore: {
 				matched = ctx.choice([
 					// __bold__
-					boldUnderMatcher,
+					boldUnderParser,
 					// _italic_
 					italicUnderMatcher,
 				]);
@@ -242,7 +242,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 					// ***big***
 					bigMatcher,
 					// **bold**
-					boldAstaMatcher,
+					boldAstaParser,
 					// *italic*
 					italicAstaMatcher,
 				]);
@@ -282,7 +282,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 					// <i>
 					italicTagMatcher,
 					// <b>
-					boldTagMatcher,
+					boldTagParser,
 					// <small>
 					smallTagMatcher,
 				]);
@@ -356,7 +356,7 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 			case CharCode.underscore: {
 				matched = ctx.choice([
 					// __bold__
-					boldUnderMatcher,
+					boldUnderParser,
 					// _italic_
 					italicUnderMatcher,
 				]);
