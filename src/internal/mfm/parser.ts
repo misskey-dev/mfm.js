@@ -32,7 +32,7 @@ import { urlAltParser, urlParser } from './syntax/url';
 // リンクラベル部分以外のマッチではlinkLabelが常にfalseであることが分かっているため、
 // inlineParserでのみlinkLabelの判定をすれば良いと分かります。
 
-export function fullParser(ctx: ParserContext): Result<MfmNode | string> {
+export function fullParser(ctx: ParserContext): Result<MfmNode | string | null> {
 	let matched;
 
 	// check EOF
@@ -216,7 +216,21 @@ export function fullParser(ctx: ParserContext): Result<MfmNode | string> {
 		ctx.depth--;
 	}
 
-	// text node
+	// consume LF before block syntaxes
+	matched = ctx.matchSequence([
+		() => ctx.regex(/^(\r\n|[\r\n])/),
+		centerTagParser,
+	]);
+	if (matched) {
+		ctx.regex(/^(\r\n|[\r\n])/); // ignore LF
+		return ctx.ok(null);
+	}
+
+	// text node (LF or any char)
+	matched = ctx.regex(/^(\r\n|[\r\n])/);
+	if (matched.ok) {
+		return ctx.ok(matched.result[0]);
+	}
 	return ctx.anyChar();
 }
 
@@ -404,17 +418,23 @@ export function inlineParser(ctx: ParserContext): Result<MfmInline | string> {
 		ctx.depth--;
 	}
 
-	// text node
+	// text node (LF or any char)
+	matched = ctx.regex(/^(\r\n|[\r\n])/);
+	if (matched.ok) {
+		return ctx.ok(matched.result[0]);
+	}
 	return ctx.anyChar();
 }
 
 export function plainParser(ctx: ParserContext): Result<MfmPlainNode | string> {
+	let matched;
+
 	// check EOF
 	if (ctx.eof()) {
 		return ctx.fail();
 	}
 
-	const matched = ctx.choice([
+	matched = ctx.choice([
 		// :emojiCode:
 		emojiCodeParser,
 		// unicode emoji
@@ -424,6 +444,10 @@ export function plainParser(ctx: ParserContext): Result<MfmPlainNode | string> {
 		return matched;
 	}
 
-	// text node
+	// text node (LF or any char)
+	matched = ctx.regex(/^(\r\n|[\r\n])/);
+	if (matched.ok) {
+		return ctx.ok(matched.result[0]);
+	}
 	return ctx.anyChar();
 }

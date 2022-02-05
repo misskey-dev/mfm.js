@@ -2,14 +2,14 @@ import { CENTER, MfmCenter, MfmInline } from '../../../node';
 import { Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
-import { syntax } from '../services';
+import { lineEndParser, syntax } from '../services';
 
 export const centerTagParser: Parser<MfmCenter> = syntax('centerTag', (ctx) => {
 	let match, isMatch;
 
-	// line-head
-	if (ctx.pos !== 0) {
-		// TODO: check column 0
+	// begin of line
+	if (ctx.location(ctx.pos).column !== 0) {
+		return ctx.fail();
 	}
 
 	// "<center>"
@@ -46,7 +46,11 @@ export const centerTagParser: Parser<MfmCenter> = syntax('centerTag', (ctx) => {
 		return ctx.fail();
 	}
 
-	// TODO: check line-end
+	// end of line
+	match = lineEndParser(ctx);
+	if (!match.ok) {
+		return ctx.fail();
+	}
 
 	return ctx.ok(CENTER(children));
 });

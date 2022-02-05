@@ -12,7 +12,9 @@ export function fullMfmParser(input: string, opts: ParserOpts): MfmNode[] {
 	while (true) {
 		matched = ctx.parser(fullParser);
 		if (!matched.ok) break;
-		pushNode(matched.result, result);
+		if (matched.result != null) {
+			pushNode(matched.result, result);
+		}
 	}
 
 	return result;

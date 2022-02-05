@@ -1,4 +1,4 @@
-import { Parser, ParserResult } from '../services/parser';
+import { Parser, ParserContext, ParserResult, Result } from '../services/parser';
 
 export function syntax<T extends Parser<ParserResult<T>>>(name: string, parser: T): Parser<ParserResult<T>> {
 	return function syntaxParser(ctx) {
@@ -63,4 +63,17 @@ export function syntax<T extends Parser<ParserResult<T>>>(name: string, parser: 
 
 		return match;
 	};
+}
+
+export function lineEndParser(ctx: ParserContext): Result<null> {
+	const match = ctx.choice([
+		() => ctx.regex(/^(\r\n|[\r\n])/),
+		() => ctx.eof() ? ctx.ok(null) : ctx.fail(),
+	]);
+
+	if (!match.ok) {
+		return ctx.fail();
+	}
+
+	return ctx.ok(null);
 }

@@ -1,10 +1,14 @@
 import { MfmSearch, SEARCH } from '../../../node';
 import { Parser } from '../../services/parser';
-import { syntax } from '../services';
+import { lineEndParser, syntax } from '../services';
 
 export const searchParser: Parser<MfmSearch> = syntax('search', (ctx) => {
+	let match;
 
-	// TODO: line-head
+	// begin of line
+	if (ctx.location(ctx.pos).column !== 0) {
+		return ctx.fail();
+	}
 
 	const headPos = ctx.pos;
 
@@ -17,17 +21,21 @@ export const searchParser: Parser<MfmSearch> = syntax('search', (ctx) => {
 				return ctx.fail();
 			}
 			// search key
-			const match = ctx.regex(/^\[?(検索|search)]?/i);
+			match = ctx.regex(/^\[?(検索|search)]?/i);
 			if (!match.ok) {
 				return ctx.fail();
 			}
-			// TODO: line-tail
+			// end of line
+			match = lineEndParser(ctx);
+			if (!match.ok) {
+				return ctx.fail();
+			}
 			return ctx.ok(null);
 		})) break;
 		// LF
 		if (ctx.matchRegex(/^(\r\n|[\r\n])/)) break;
 		// .
-		const match = ctx.anyChar();
+		match = ctx.anyChar();
 		if (!match.ok) break;
 		q += match.result;
 	}
@@ -41,14 +49,18 @@ export const searchParser: Parser<MfmSearch> = syntax('search', (ctx) => {
 	}
 
 	// search key
-	const match = ctx.regex(/^\[?(検索|search)]?/i);
+	match = ctx.regex(/^\[?(検索|search)]?/i);
 	if (!match.ok) {
 		return ctx.fail();
 	}
 
 	const tailPos = ctx.pos;
 
-	// TODO: line-tail
+	// end of line
+	match = lineEndParser(ctx);
+	if (!match.ok) {
+		return ctx.fail();
+	}
 
 	const content = ctx.input.substring(headPos, tailPos);
 

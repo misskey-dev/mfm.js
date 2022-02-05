@@ -1,3 +1,5 @@
+import { CharCode } from "./character";
+
 export type Parser<T> = (ctx: ParserContext) => Result<T>;
 
 export type Result<T> = Success<T> | Failure;
@@ -20,6 +22,11 @@ export type CacheStorage = Map<Parser<any>, Map<number, CacheItem<any>>>;
 export type CacheItem<T> = {
 	pos: number;
 	result: T;
+};
+
+export type Location = {
+	row: number;
+	column: number;
 };
 
 export type ParserOpts = Partial<{
@@ -189,6 +196,22 @@ export class ParserContext {
 	}
 
 	/**
+	 * match by sequence with parsers
+	*/
+	public matchSequence<T extends Parser<ParserResult<T>>>(parsers: T[]): boolean {
+		const originPos = this.pos;
+		for (const p of parsers) {
+			const match = this.parser(p);
+			if (!match.ok) {
+				this.pos = originPos;
+				return false;
+			}
+		}
+		this.pos = originPos;
+		return true;
+	}
+
+	/**
 	 * match eof
 	*/
 	public eof(): boolean {
@@ -196,6 +219,28 @@ export class ParserContext {
 	}
 
 	// other
+
+	public location(pos: number): Location {
+		// TODO: cache calculated location
+		const loc: Location = {
+			row: 0,
+			column: 0,
+		};
+		let i = 0;
+		while (i < pos) {
+			if (this.input.charCodeAt(i) === CharCode.lf) {
+				loc.row++;
+				loc.column = 0;
+			} else {
+				loc.column++;
+			}
+			i++;
+		}
+		return {
+			row: loc.row,
+			column: loc.column,
+		};
+	}
 
 	public debugLog(log: string): void {
 		if (this.debug) {

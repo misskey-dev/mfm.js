@@ -1,11 +1,14 @@
 import { CODE_BLOCK, MfmCodeBlock } from '../../../node';
 import { Parser } from '../../services/parser';
-import { syntax } from '../services';
+import { lineEndParser, syntax } from '../services';
 
 export const codeBlockParser: Parser<MfmCodeBlock> = syntax('codeBlock', (ctx) => {
-	let matched;
+	let match;
 
-	// TODO: check line-head
+	// begin of line
+	if (ctx.location(ctx.pos).column !== 0) {
+		return ctx.fail();
+	}
 
 	// "```"
 	if (!ctx.str('```').ok) {
@@ -19,9 +22,9 @@ export const codeBlockParser: Parser<MfmCodeBlock> = syntax('codeBlock', (ctx) =
 		if (ctx.matchRegex(/^(\r\n|[\r\n])/)) break;
 
 		// .
-		matched = ctx.anyChar();
-		if (!matched.ok) break;
-		lang += matched.result;
+		match = ctx.anyChar();
+		if (!match.ok) break;
+		lang += match.result;
 	}
 
 	// LF
@@ -41,7 +44,11 @@ export const codeBlockParser: Parser<MfmCodeBlock> = syntax('codeBlock', (ctx) =
 		return ctx.fail();
 	}
 
-	// TODO: check line-tail
+	// end of line
+	match = lineEndParser(ctx);
+	if (!match.ok) {
+		return ctx.fail();
+	}
 
 	lang = lang.trim();
 	return ctx.ok(CODE_BLOCK('', (lang.length > 0 ? lang : null)));
