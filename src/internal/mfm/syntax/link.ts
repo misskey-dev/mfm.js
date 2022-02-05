@@ -2,8 +2,9 @@ import { LINK, MfmInline, MfmLink } from '../../../node';
 import { Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
-import { inlineParser, syntax } from '../parser';
+import { inlineParser } from '../parser';
 import { urlAltParser, urlParser } from './url';
+import { syntax } from '../services';
 
 export const linkParser: Parser<MfmLink> = syntax((ctx) => {
 	let matched;

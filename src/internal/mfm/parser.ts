@@ -1,5 +1,5 @@
 import { MfmInline, MfmNode, MfmPlainNode } from '../../node';
-import { Parser, ParserResult } from '../services/parser';
+import { ParserContext, Result } from '../services/parser';
 import { CharCode } from '../services/character';
 
 import { bigParser } from './syntax/big';
@@ -32,7 +32,7 @@ import { urlAltParser, urlParser } from './syntax/url';
 // リンクラベル部分以外のマッチではlinkLabelが常にfalseであることが分かっているため、
 // inlineParserでのみlinkLabelの判定をすれば良いと分かります。
 
-export const fullParser: Parser<MfmNode | string> = (ctx) => {
+export function fullParser(ctx: ParserContext): Result<MfmNode | string> {
 	let matched;
 
 	// check EOF
@@ -218,9 +218,9 @@ export const fullParser: Parser<MfmNode | string> = (ctx) => {
 
 	// text node
 	return ctx.anyChar();
-};
+}
 
-export const inlineParser: Parser<MfmInline | string> = (ctx) => {
+export function inlineParser(ctx: ParserContext): Result<MfmInline | string> {
 	let matched;
 
 	// check EOF
@@ -409,9 +409,9 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 
 	// text node
 	return ctx.anyChar();
-};
+}
 
-export const plainParser: Parser<MfmPlainNode | string> = (ctx) => {
+export function plainParser(ctx: ParserContext): Result<MfmPlainNode | string> {
 	// check EOF
 	if (ctx.eof()) {
 		return ctx.fail();
@@ -429,39 +429,4 @@ export const plainParser: Parser<MfmPlainNode | string> = (ctx) => {
 
 	// text node
 	return ctx.anyChar();
-};
-
-export function syntax<T extends Parser<ParserResult<T>>>(parser: T): Parser<ParserResult<T>> {
-	return function syntaxParser(ctx) {
-		ctx.pushStack(syntaxParser);
-
-		// get cache table
-		let cacheTable = ctx.cache.get(parser);
-		if (cacheTable == null) {
-			cacheTable = new Map();
-			ctx.cache.set(parser, cacheTable);
-		}
-
-		// get cache
-		const cache = cacheTable.get(ctx.pos);
-		if (cache != null) {
-			ctx.pos = cache.pos;
-			return ctx.ok(cache.result);
-		}
-
-		const cachePos = ctx.pos;
-		const match = parser(ctx);
-
-		// set cache
-		if (match.ok) {
-			cacheTable.set(cachePos, {
-				pos: ctx.pos, // next pos
-				result: match.result,
-			});
-		}
-
-		ctx.popStack();
-
-		return match;
-	};
 }

@@ -1,7 +1,8 @@
 import { MfmInline, MfmSmall, SMALL } from '../../../node';
 import { Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
-import { inlineParser, syntax } from '../parser';
+import { inlineParser } from '../parser';
+import { syntax } from '../services';
 
 export const smallTagParser: Parser<MfmSmall> = syntax((ctx) => {
 	let matched;

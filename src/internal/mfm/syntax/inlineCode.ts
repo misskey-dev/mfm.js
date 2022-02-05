@@ -1,7 +1,7 @@
 import { INLINE_CODE, MfmInlineCode } from '../../../node';
 import { Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
-import { syntax } from '../parser';
+import { syntax } from '../services';
 
 export const inlineCodeParser: Parser<MfmInlineCode> = syntax((ctx) => {
 	// "`"

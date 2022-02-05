@@ -1,6 +1,6 @@
 import { MATH_INLINE, MfmMathInline } from '../../../node';
 import { Parser } from '../../services/parser';
-import { syntax } from '../parser';
+import { syntax } from '../services';
 
 export const mathInlineParser: Parser<MfmMathInline> = syntax((ctx) => {
 	// "\("

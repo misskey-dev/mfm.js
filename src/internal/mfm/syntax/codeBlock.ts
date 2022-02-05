@@ -1,6 +1,6 @@
 import { CODE_BLOCK, MfmCodeBlock } from '../../../node';
 import { Parser } from '../../services/parser';
-import { syntax } from '../parser';
+import { syntax } from '../services';
 
 export const codeBlockParser: Parser<MfmCodeBlock> = syntax((ctx) => {
 	let matched;
