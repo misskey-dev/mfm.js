@@ -33,7 +33,23 @@ export const codeBlockParser: Parser<MfmCodeBlock> = syntax('codeBlock', (ctx) =
 		return ctx.fail();
 	}
 
-	// TODO: code
+	// code
+	let code = '';
+	while (true) {
+		match = ctx.matchSequence([
+			// LF
+			() => ctx.regex(/^(\r\n|[\r\n])/),
+			// "```"
+			() => ctx.str('```'),
+			// end of line
+			lineEndParser,
+		]);
+		if (match) break;
+
+		match = ctx.anyChar();
+		if (!match.ok) break;
+		code += match.result;
+	}
 
 	// LF
 	if (!ctx.regex(/^(\r\n|[\r\n])/).ok) {
@@ -52,5 +68,5 @@ export const codeBlockParser: Parser<MfmCodeBlock> = syntax('codeBlock', (ctx) =
 	}
 
 	lang = lang.trim();
-	return ctx.ok(CODE_BLOCK('', (lang.length > 0 ? lang : null)));
+	return ctx.ok(CODE_BLOCK(code, (lang.length > 0 ? lang : null)));
 });
