@@ -240,5 +240,14 @@ export function cache<T extends Parser<ParserResult<T>>>(parser: T): Parser<Pars
 }
 
 export function syntax<T extends Parser<ParserResult<T>>>(parse: T): Parser<ParserResult<T>> {
-	return cache(parse);
+	return function syntaxParser(ctx) {
+		ctx.pushStack(syntaxParser);
+
+		const cacheParser = cache(parse);
+		const match = cacheParser(ctx);
+
+		ctx.popStack();
+
+		return match;
+	}
 }
