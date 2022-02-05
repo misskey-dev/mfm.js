@@ -1279,11 +1279,19 @@ hoge`;
 		});
 	});
 
-	// describe('cache control', () => {
-	// 	it('re-evaluation', () => {
-	// 		"[**https://example.com/**"
-	// 	});
-	// });
+	describe('parsing cache', () => {
+		it('cache sources of link label and other are difference', () => {
+			const input = '[**https://example.com/**](abc)';
+			const output = [
+				TEXT('['),
+				BOLD([
+					N_URL('https://example.com/'),
+				]),
+				TEXT('](abc)'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
 
 	it('composite', () => {
 		const input =
