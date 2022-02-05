@@ -1,5 +1,6 @@
 import { MfmSearch, SEARCH } from '../../../node';
-import { Parser, syntax } from '../../services/parser';
+import { Parser } from '../../services/parser';
+import { syntax } from '../parser';
 
 export const searchParser: Parser<MfmSearch> = syntax((ctx) => {
 

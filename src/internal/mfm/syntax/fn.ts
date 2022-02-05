@@ -1,15 +1,14 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
-import { inlineParser } from '../parser';
-import { syntax } from '../../services/parser';
+import { inlineParser, syntax } from '../parser';
 
-const argsParser: Parser<Record<string, string | true>> = cache((ctx) => {
+const argsParser: Parser<Record<string, string | true>> = (ctx) => {
 	let match;
 	const args: Record<string, string | true> = {};
 
-	const argParser: Parser<{ k: string, v: string | true }> = cache((ctx) => {
+	const argParser: Parser<{ k: string, v: string | true }> = (ctx) => {
 		return ctx.choice([
 
 			// key + value
@@ -40,7 +39,7 @@ const argsParser: Parser<Record<string, string | true>> = cache((ctx) => {
 			},
 
 		]);
-	});
+	};
 
 	// "."
 	if (!ctx.char(CharCode.dot).ok) {
@@ -69,7 +68,7 @@ const argsParser: Parser<Record<string, string | true>> = cache((ctx) => {
 	}
 
 	return ctx.ok(args);
-});
+};
 
 export const fnParser: Parser<MfmFn> = syntax((ctx) => {
 	let match;

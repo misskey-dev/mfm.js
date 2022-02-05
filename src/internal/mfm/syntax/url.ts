@@ -1,6 +1,7 @@
 import { MfmUrl, N_URL } from '../../../node';
-import { Parser, syntax } from '../../services/parser';
+import { Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
+import { syntax } from '../parser';
 
 // TODO: urlParser 括弧のペア
 

@@ -1,9 +1,9 @@
 import { ITALIC, MfmInline, MfmItalic } from '../../../node';
-import { Parser, syntax } from '../../services/parser';
+import { Parser } from '../../services/parser';
 import { isAllowedAsBackChar } from '../../services/matchingUtil';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
-import { inlineParser } from '../parser';
+import { inlineParser, syntax } from '../parser';
 
 export const italicAstaParser: Parser<MfmItalic> = syntax((ctx) => {
 	let matched;

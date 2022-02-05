@@ -1,5 +1,6 @@
 import { MfmQuote, QUOTE } from '../../../node';
-import { Parser, syntax } from '../../services/parser';
+import { Parser } from '../../services/parser';
+import { syntax } from '../parser';
 
 export const quoteParser: Parser<MfmQuote> = syntax((ctx) => {
 	// TODO
