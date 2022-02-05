@@ -7,9 +7,9 @@ export function isAllowedAsBackChar(ctx: ParserContext): boolean {
 	if (ctx.pos > 0) {
 		ctx.pos--;
 		if (
-			!ctx.match(() => ctx.regex(/^(\r\n|[\r\n])/)) &&
-			!ctx.match(() => ctx.regex(/^[ \u3000\t\u00a0]/)) &&
-			ctx.match(() => ctx.regex(/^[a-z0-9]/i))
+			!ctx.matchRegex(/^(\r\n|[\r\n])/) &&
+			!ctx.matchRegex(/^[ \u3000\t\u00a0]/) &&
+			ctx.matchRegex(/^[a-z0-9]/i)
 		) {
 			ctx.pos++;
 			return false;

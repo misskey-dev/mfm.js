@@ -1,5 +1,5 @@
 import { MfmInline, MfmStrike, STRIKE } from '../../../node';
-import { cache, Parser, syntax } from '../../services/parser';
+import { Parser, syntax } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';

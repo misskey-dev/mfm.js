@@ -1,19 +1,19 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
-import { Parser } from '../../services/parser';
+import { cache, Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
-import { createParser, syntax } from '../../services/parser';
+import { syntax } from '../../services/parser';
 
-const argsParser: Parser<Record<string, string | true>> = syntax((ctx) => {
+const argsParser: Parser<Record<string, string | true>> = cache((ctx) => {
 	let match;
 	const args: Record<string, string | true> = {};
 
-	const argParser: Parser<{ k: string, v: string | true }> = syntax((ctx) => {
+	const argParser: Parser<{ k: string, v: string | true }> = cache((ctx) => {
 		return ctx.choice([
 
 			// key + value
-			createParser(() => {
+			() => {
 				const match = ctx.regex(/^([a-z0-9_]+)=([a-z0-9_.]+)/i);
 				if (!match.ok) {
 					return ctx.fail();
@@ -24,10 +24,10 @@ const argsParser: Parser<Record<string, string | true>> = syntax((ctx) => {
 					k: k,
 					v: v,
 				});
-			}),
+			},
 
 			// key
-			createParser(() => {
+			() => {
 				const match = ctx.regex(/^([a-z0-9_]+)/i);
 				if (!match.ok) {
 					return ctx.fail();
@@ -37,7 +37,7 @@ const argsParser: Parser<Record<string, string | true>> = syntax((ctx) => {
 					k: k,
 					v: true,
 				});
-			}),
+			},
 
 		]);
 	});
@@ -58,7 +58,7 @@ const argsParser: Parser<Record<string, string | true>> = syntax((ctx) => {
 	while (true) {
 		match = ctx.sequence([
 			// ","
-			createParser(() => ctx.char(CharCode.comma)),
+			() => ctx.char(CharCode.comma),
 			// arg
 			argParser,
 		]);

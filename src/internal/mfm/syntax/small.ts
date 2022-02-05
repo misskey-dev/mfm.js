@@ -1,5 +1,5 @@
 import { MfmInline, MfmSmall, SMALL } from '../../../node';
-import { cache, Parser, syntax } from '../../services/parser';
+import { Parser, syntax } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 

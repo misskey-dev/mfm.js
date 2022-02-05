@@ -1,5 +1,5 @@
 import { ITALIC, MfmInline, MfmItalic } from '../../../node';
-import { cache, Parser, syntax } from '../../services/parser';
+import { Parser, syntax } from '../../services/parser';
 import { isAllowedAsBackChar } from '../../services/matchingUtil';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';

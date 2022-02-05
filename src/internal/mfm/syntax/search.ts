@@ -1,5 +1,5 @@
 import { MfmSearch, SEARCH } from '../../../node';
-import { createParser, Parser, syntax } from '../../services/parser';
+import { Parser, syntax } from '../../services/parser';
 
 export const searchParser: Parser<MfmSearch> = syntax((ctx) => {
 
@@ -10,7 +10,7 @@ export const searchParser: Parser<MfmSearch> = syntax((ctx) => {
 	// query
 	let q = '';
 	while (true) {
-		if (ctx.matchParser(createParser(() => {
+		if (ctx.match(() => {
 			// spacing
 			if (!ctx.regex(/^[ \u3000\t\u00a0]/).ok) {
 				return ctx.fail();
@@ -22,7 +22,7 @@ export const searchParser: Parser<MfmSearch> = syntax((ctx) => {
 			}
 			// TODO: line-tail
 			return ctx.ok(null);
-		}))) break;
+		})) break;
 		// LF
 		if (ctx.matchRegex(/^(\r\n|[\r\n])/)) break;
 		// .

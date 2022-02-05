@@ -1,5 +1,5 @@
 import { MfmUrl, N_URL } from '../../../node';
-import { cache, Parser, syntax } from '../../services/parser';
+import { Parser, syntax } from '../../services/parser';
 import { CharCode } from '../../services/character';
 
 // TODO: urlParser 括弧のペア

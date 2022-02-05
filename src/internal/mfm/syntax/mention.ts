@@ -1,5 +1,5 @@
 import { MENTION, MfmMention } from '../../../node';
-import { cache, Parser, syntax } from '../../services/parser';
+import { Parser, syntax } from '../../services/parser';
 import { isAllowedAsBackChar } from '../../services/matchingUtil';
 import { CharCode } from '../../services/character';
 
