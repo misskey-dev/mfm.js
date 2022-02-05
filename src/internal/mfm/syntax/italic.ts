@@ -6,6 +6,9 @@ import { syntax } from '../services/syntaxParser';
 import { isAllowedAsBackChar } from '../services/utility';
 import { pushNode } from '../services/nodeTree';
 
+// TODO: italicAsta 前後文字のチェック
+// TODO: italicUnder 前後文字のチェック
+
 export const italicAstaParser: Parser<MfmItalic> = syntax('italicAsta', (ctx) => {
 	let matched;
 
