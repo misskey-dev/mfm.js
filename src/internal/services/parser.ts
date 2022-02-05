@@ -158,7 +158,29 @@ export class ParserContext {
 	// match
 
 	/**
-	 * match with parser (no-consuming)
+	 * match a string
+	*/
+	public matchStr(value: string): boolean {
+		return this.input.startsWith(value, this.pos);
+	}
+
+	/**
+	 * match a char
+	*/
+	public matchChar(charCode: number): boolean {
+		return (this.input.charCodeAt(this.pos) === charCode);
+	}
+
+	/**
+	 * match with regex
+	*/
+	public matchRegex(regex: RegExp): boolean {
+		const result = regex.exec(this.input.substr(this.pos));
+		return result != null;
+	}
+
+	/**
+	 * match with parser
 	*/
 	public match<T extends Parser<ParserResult<T>>>(parser: T): boolean {
 		const originPos = this.pos;
@@ -215,4 +237,8 @@ export function cache<T extends Parser<ParserResult<T>>>(parser: T): Parser<Pars
 
 		return match;
 	};
+}
+
+export function syntax<T extends Parser<ParserResult<T>>>(parse: T): Parser<ParserResult<T>> {
+	return cache(parse);
 }
