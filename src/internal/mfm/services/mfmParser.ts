@@ -219,7 +219,10 @@ export function fullParser(ctx: ParserContext): Result<MfmNode | string | null> 
 	// consume LF before block syntaxes
 	matched = ctx.matchSequence([
 		() => ctx.regex(/^(\r\n|[\r\n])/),
-		centerTagParser,
+		() => ctx.choice([
+			centerTagParser,
+			searchParser,
+		]),
 	]);
 	if (matched) {
 		ctx.regex(/^(\r\n|[\r\n])/); // ignore LF
