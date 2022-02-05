@@ -1,7 +1,7 @@
 import { MfmQuote, QUOTE } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { Parser, syntax } from '../../services/parser';
 
-export const quoteParser: Parser<MfmQuote> = cache((ctx) => {
+export const quoteParser: Parser<MfmQuote> = syntax((ctx) => {
 	// TODO
 
 	return ctx.ok(QUOTE([]));

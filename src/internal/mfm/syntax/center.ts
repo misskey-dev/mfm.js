@@ -1,9 +1,9 @@
 import { CENTER, MfmCenter, MfmInline } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { createParser, Parser, syntax } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 
-export const centerTagParser: Parser<MfmCenter> = cache((ctx) => {
+export const centerTagParser: Parser<MfmCenter> = syntax((ctx) => {
 	let match, isMatch;
 
 	// line-head
@@ -22,10 +22,10 @@ export const centerTagParser: Parser<MfmCenter> = cache((ctx) => {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		isMatch = ctx.match(() => {
+		isMatch = ctx.matchParser(createParser(() => {
 			ctx.regex(/^(\r\n|[\r\n])/);
 			return ctx.str('</center>');
-		});
+		}));
 		if (isMatch) break;
 
 		match = ctx.parser(inlineParser);

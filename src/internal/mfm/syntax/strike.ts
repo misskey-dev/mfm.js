@@ -1,10 +1,10 @@
 import { MfmInline, MfmStrike, STRIKE } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { cache, Parser, syntax } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
 
-export const strikeTagParser: Parser<MfmStrike> = cache((ctx) => {
+export const strikeTagParser: Parser<MfmStrike> = syntax((ctx) => {
 	let matched;
 
 	// "<s>"
@@ -15,9 +15,9 @@ export const strikeTagParser: Parser<MfmStrike> = cache((ctx) => {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.match(() => ctx.str('</s>'))) break;
+		if (ctx.matchStr('</s>')) break;
 		// LF
-		if (ctx.match(() => ctx.regex(/^(\r\n|[\r\n])/))) break;
+		if (ctx.matchRegex(/^(\r\n|[\r\n])/)) break;
 
 		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;
@@ -35,7 +35,7 @@ export const strikeTagParser: Parser<MfmStrike> = cache((ctx) => {
 	return ctx.ok(STRIKE(children));
 });
 
-export const strikeTildeParser: Parser<MfmStrike> = cache((ctx) => {
+export const strikeTildeParser: Parser<MfmStrike> = syntax((ctx) => {
 	let matched;
 
 	// "~~"
@@ -46,9 +46,9 @@ export const strikeTildeParser: Parser<MfmStrike> = cache((ctx) => {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.match(() => ctx.char(CharCode.tilde))) break;
+		if (ctx.matchChar(CharCode.tilde)) break;
 		// LF
-		if (ctx.match(() => ctx.regex(/^(\r\n|[\r\n])/))) break;
+		if (ctx.matchRegex(/^(\r\n|[\r\n])/)) break;
 
 		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;

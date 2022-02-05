@@ -1,9 +1,9 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { syntax, Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 
-export const bigParser: Parser<MfmFn> = cache((ctx) => {
+export const bigParser: Parser<MfmFn> = syntax((ctx) => {
 	// "***"
 	if (!ctx.str('***').ok) {
 		return ctx.fail();
@@ -12,7 +12,7 @@ export const bigParser: Parser<MfmFn> = cache((ctx) => {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.match(() => ctx.str('***'))) break;
+		if (ctx.matchStr('***')) break;
 
 		const matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;

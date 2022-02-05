@@ -1,18 +1,19 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { Parser } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
+import { createParser, syntax } from '../../services/parser';
 
-const argsParser: Parser<Record<string, string | true>> = cache((ctx) => {
+const argsParser: Parser<Record<string, string | true>> = syntax((ctx) => {
 	let match;
 	const args: Record<string, string | true> = {};
 
-	const argParser: Parser<{ k: string, v: string | true }> = cache((ctx) => {
+	const argParser: Parser<{ k: string, v: string | true }> = syntax((ctx) => {
 		return ctx.choice([
 
 			// key + value
-			() => {
+			createParser(() => {
 				const match = ctx.regex(/^([a-z0-9_]+)=([a-z0-9_.]+)/i);
 				if (!match.ok) {
 					return ctx.fail();
@@ -23,10 +24,10 @@ const argsParser: Parser<Record<string, string | true>> = cache((ctx) => {
 					k: k,
 					v: v,
 				});
-			},
+			}),
 
 			// key
-			() => {
+			createParser(() => {
 				const match = ctx.regex(/^([a-z0-9_]+)/i);
 				if (!match.ok) {
 					return ctx.fail();
@@ -36,7 +37,7 @@ const argsParser: Parser<Record<string, string | true>> = cache((ctx) => {
 					k: k,
 					v: true,
 				});
-			},
+			}),
 
 		]);
 	});
@@ -57,7 +58,7 @@ const argsParser: Parser<Record<string, string | true>> = cache((ctx) => {
 	while (true) {
 		match = ctx.sequence([
 			// ","
-			() => ctx.char(CharCode.comma),
+			createParser(() => ctx.char(CharCode.comma)),
 			// arg
 			argParser,
 		]);
@@ -70,7 +71,7 @@ const argsParser: Parser<Record<string, string | true>> = cache((ctx) => {
 	return ctx.ok(args);
 });
 
-export const fnParser: Parser<MfmFn> = cache((ctx) => {
+export const fnParser: Parser<MfmFn> = syntax((ctx) => {
 	let match;
 
 	// "$["
@@ -102,7 +103,7 @@ export const fnParser: Parser<MfmFn> = cache((ctx) => {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.match(() => ctx.char(CharCode.closeBracket))) break;
+		if (ctx.matchChar(CharCode.closeBracket)) break;
 
 		match = ctx.parser(inlineParser);
 		if (!match.ok) break;

@@ -1,9 +1,9 @@
 import { MENTION, MfmMention } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { cache, Parser, syntax } from '../../services/parser';
 import { isAllowedAsBackChar } from '../../services/matchingUtil';
 import { CharCode } from '../../services/character';
 
-const hostParser: Parser<string> = cache((ctx) => {
+const hostParser: Parser<string> = syntax((ctx) => {
 	// "@"
 	if (!ctx.char(CharCode.at).ok) {
 		return ctx.fail();
@@ -40,7 +40,7 @@ const hostParser: Parser<string> = cache((ctx) => {
 	return ctx.ok(name);
 });
 
-export const mentionParser: Parser<MfmMention> = cache((ctx) => {
+export const mentionParser: Parser<MfmMention> = syntax((ctx) => {
 	let matched;
 	const headPos = ctx.pos;
 

@@ -1,8 +1,8 @@
 import { EMOJI_CODE, MfmEmojiCode } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { Parser, syntax } from '../../services/parser';
 import { CharCode } from '../../services/character';
 
-export const emojiCodeParser: Parser<MfmEmojiCode> = cache((ctx) => {
+export const emojiCodeParser: Parser<MfmEmojiCode> = syntax((ctx) => {
 	// ":"
 	if (!ctx.char(CharCode.colon).ok) {
 		return ctx.fail();

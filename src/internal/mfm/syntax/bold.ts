@@ -1,9 +1,9 @@
 import { BOLD, MfmBold, MfmInline, TEXT } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { Parser, syntax } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 
-export const boldAstaParser: Parser<MfmBold> = cache((ctx) => {
+export const boldAstaParser: Parser<MfmBold> = syntax((ctx) => {
 	// "**"
 	if (!ctx.str('**').ok) {
 		return ctx.fail();
@@ -12,7 +12,7 @@ export const boldAstaParser: Parser<MfmBold> = cache((ctx) => {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.match(() => ctx.str('**'))) break;
+		if (ctx.matchStr('**')) break;
 
 		const match = ctx.parser(inlineParser);
 		if (!match.ok) break;
@@ -31,7 +31,7 @@ export const boldAstaParser: Parser<MfmBold> = cache((ctx) => {
 	return ctx.ok(BOLD(children));
 });
 
-export const boldUnderParser: Parser<MfmBold> = cache((ctx) => {
+export const boldUnderParser: Parser<MfmBold> = syntax((ctx) => {
 	// "__"
 	if (!ctx.str('__').ok) {
 		return ctx.fail();
@@ -52,7 +52,7 @@ export const boldUnderParser: Parser<MfmBold> = cache((ctx) => {
 	return ctx.ok(BOLD([TEXT(text)]));
 });
 
-export const boldTagParser: Parser<MfmBold> = cache((ctx) => {
+export const boldTagParser: Parser<MfmBold> = syntax((ctx) => {
 	// "<b>"
 	if (!ctx.str('<b>').ok) {
 		return ctx.fail();
@@ -61,7 +61,7 @@ export const boldTagParser: Parser<MfmBold> = cache((ctx) => {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.match(() => ctx.str('</b>'))) break;
+		if (ctx.matchStr('</b>')) break;
 
 		const match = ctx.parser(inlineParser);
 		if (!match.ok) break;

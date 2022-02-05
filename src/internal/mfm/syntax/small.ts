@@ -1,9 +1,9 @@
 import { MfmInline, MfmSmall, SMALL } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { cache, Parser, syntax } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 
-export const smallTagParser: Parser<MfmSmall> = cache((ctx) => {
+export const smallTagParser: Parser<MfmSmall> = syntax((ctx) => {
 	let matched;
 
 	// "<small>"
@@ -14,7 +14,7 @@ export const smallTagParser: Parser<MfmSmall> = cache((ctx) => {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.match(() => ctx.str('</small>'))) break;
+		if (ctx.matchStr('</small>')) break;
 
 		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;

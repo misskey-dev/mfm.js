@@ -1,11 +1,11 @@
 import { LINK, MfmInline, MfmLink } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { Parser, syntax } from '../../services/parser';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
 import { urlAltParser, urlParser } from './url';
 
-export const linkParser: Parser<MfmLink> = cache((ctx) => {
+export const linkParser: Parser<MfmLink> = syntax((ctx) => {
 	let matched;
 
 	// "?" (option)
@@ -20,7 +20,7 @@ export const linkParser: Parser<MfmLink> = cache((ctx) => {
 	// link label
 	const label: MfmInline[] = [];
 	while (true) {
-		if (ctx.match(() => ctx.char(CharCode.closeBracket))) break;
+		if (ctx.matchChar(CharCode.closeBracket)) break;
 
 		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;

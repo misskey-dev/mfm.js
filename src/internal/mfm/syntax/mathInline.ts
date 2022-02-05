@@ -1,7 +1,7 @@
 import { MATH_INLINE, MfmMathInline } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { Parser, syntax } from '../../services/parser';
 
-export const mathInlineParser: Parser<MfmMathInline> = cache((ctx) => {
+export const mathInlineParser: Parser<MfmMathInline> = syntax((ctx) => {
 	// "\("
 	if (!ctx.str('\\(').ok) {
 		return ctx.fail();
@@ -10,9 +10,9 @@ export const mathInlineParser: Parser<MfmMathInline> = cache((ctx) => {
 	// math
 	let math = '';
 	while (true) {
-		if (ctx.match(() => ctx.str('\\)'))) break;
+		if (ctx.matchStr('\\)')) break;
 		// LF
-		if (ctx.match(() => ctx.regex(/^(\r\n|[\r\n])/))) break;
+		if (ctx.matchRegex(/^(\r\n|[\r\n])/)) break;
 		// .
 		const match = ctx.anyChar();
 		if (!match.ok) break;

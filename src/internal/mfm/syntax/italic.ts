@@ -1,11 +1,11 @@
 import { ITALIC, MfmInline, MfmItalic } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { cache, Parser, syntax } from '../../services/parser';
 import { isAllowedAsBackChar } from '../../services/matchingUtil';
 import { pushNode } from '../../services/nodeTree';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
 
-export const italicAstaParser: Parser<MfmItalic> = cache((ctx) => {
+export const italicAstaParser: Parser<MfmItalic> = syntax((ctx) => {
 	let matched;
 
 	// check a back char
@@ -21,7 +21,7 @@ export const italicAstaParser: Parser<MfmItalic> = cache((ctx) => {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.match(() => ctx.char(CharCode.asterisk))) break;
+		if (ctx.matchChar(CharCode.asterisk)) break;
 
 		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;
@@ -39,7 +39,7 @@ export const italicAstaParser: Parser<MfmItalic> = cache((ctx) => {
 	return ctx.ok(ITALIC(children));
 });
 
-export const italicUnderParser: Parser<MfmItalic> = cache((ctx) => {
+export const italicUnderParser: Parser<MfmItalic> = syntax((ctx) => {
 	// let matched;
 
 	// check a back char
@@ -66,7 +66,7 @@ export const italicUnderParser: Parser<MfmItalic> = cache((ctx) => {
 	return ctx.ok(ITALIC([]));
 });
 
-export const italicTagParser: Parser<MfmItalic> = cache((ctx) => {
+export const italicTagParser: Parser<MfmItalic> = syntax((ctx) => {
 	let matched;
 
 	// "<i>"
@@ -77,7 +77,7 @@ export const italicTagParser: Parser<MfmItalic> = cache((ctx) => {
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
-		if (ctx.match(() => ctx.str('</i>'))) break;
+		if (ctx.matchStr('</i>')) break;
 
 		matched = ctx.parser(inlineParser);
 		if (!matched.ok) break;

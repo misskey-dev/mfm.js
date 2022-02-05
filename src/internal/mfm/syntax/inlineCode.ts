@@ -1,8 +1,8 @@
 import { INLINE_CODE, MfmInlineCode } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { Parser, syntax } from '../../services/parser';
 import { CharCode } from '../../services/character';
 
-export const inlineCodeParser: Parser<MfmInlineCode> = cache((ctx) => {
+export const inlineCodeParser: Parser<MfmInlineCode> = syntax((ctx) => {
 	// "`"
 	if (!ctx.char(CharCode.backtick).ok) {
 		return ctx.fail();
@@ -11,9 +11,9 @@ export const inlineCodeParser: Parser<MfmInlineCode> = cache((ctx) => {
 	// code
 	let code = '';
 	while (true) {
-		if (ctx.match(() => ctx.regex(/^[`´]/))) break;
+		if (ctx.matchRegex(/^[`´]/)) break;
 		// LF
-		if (ctx.match(() => ctx.regex(/^(\r\n|[\r\n])/))) break;
+		if (ctx.matchRegex(/^(\r\n|[\r\n])/)) break;
 		// .
 		const match = ctx.anyChar();
 		if (!match.ok) break;

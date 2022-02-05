@@ -1,7 +1,7 @@
 import { CODE_BLOCK, MfmCodeBlock } from '../../../node';
-import { cache, Parser } from '../../services/parser';
+import { Parser, syntax } from '../../services/parser';
 
-export const codeBlockParser: Parser<MfmCodeBlock> = cache((ctx) => {
+export const codeBlockParser: Parser<MfmCodeBlock> = syntax((ctx) => {
 	let matched;
 
 	// TODO: check line-head
@@ -15,7 +15,7 @@ export const codeBlockParser: Parser<MfmCodeBlock> = cache((ctx) => {
 	let lang = '';
 	while (true) {
 		// !LF
-		if (ctx.match(() => ctx.regex(/^(\r\n|[\r\n])/))) break;
+		if (ctx.matchRegex(/^(\r\n|[\r\n])/)) break;
 
 		// .
 		matched = ctx.anyChar();
