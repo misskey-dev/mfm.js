@@ -1,8 +1,7 @@
 import { MENTION, MfmMention } from '../../../node';
 import { Parser } from '../../services/parser';
-import { isAllowedAsBackChar } from '../../services/matchingUtil';
 import { CharCode } from '../../services/character';
-import { syntax } from '../services';
+import { isAllowedAsBackChar, syntax } from '../services';
 
 const hostParser: Parser<string> = (ctx) => {
 	// "@"

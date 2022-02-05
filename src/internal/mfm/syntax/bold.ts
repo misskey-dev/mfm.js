@@ -1,8 +1,7 @@
 import { BOLD, MfmBold, MfmInline, TEXT } from '../../../node';
 import { Parser } from '../../services/parser';
-import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
-import { syntax } from '../services';
+import { pushNode, syntax } from '../services';
 
 export const boldAstaParser: Parser<MfmBold> = syntax('boldAsta', (ctx) => {
 	// "**"
