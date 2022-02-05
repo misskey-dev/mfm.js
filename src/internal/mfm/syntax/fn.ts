@@ -1,8 +1,9 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
 import { Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
-import { inlineParser } from '../parser';
-import { syntax, pushNode } from '../services';
+import { inlineParser } from '../services/mfmParser';
+import { syntax } from '../services/syntaxParser';
+import { pushNode } from '../services/nodeTree';
 
 const argsParser: Parser<Record<string, string | true>> = (ctx) => {
 	let match;

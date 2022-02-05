@@ -1,6 +1,6 @@
 import { MATH_BLOCK, MfmMathBlock } from '../../../node';
 import { Parser } from '../../services/parser';
-import { syntax } from '../services';
+import { syntax } from '../services/syntaxParser';
 
 export const mathBlockParser: Parser<MfmMathBlock> = syntax('mathBlock', (ctx) => {
 	// TODO

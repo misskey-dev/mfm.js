@@ -1,23 +1,23 @@
-import { MfmInline, MfmNode, MfmPlainNode } from '../../node';
-import { ParserContext, Result } from '../services/parser';
-import { CharCode } from '../services/character';
+import { MfmInline, MfmNode, MfmPlainNode } from '../../../node';
+import { ParserContext, Result } from '../../services/parser';
+import { CharCode } from '../../services/character';
 
-import { bigParser } from './syntax/big';
-import { boldAstaParser, boldUnderParser, boldTagParser } from './syntax/bold';
-import { centerTagParser } from './syntax/center';
-import { emojiCodeParser } from './syntax/emojiCode';
-import { fnParser } from './syntax/fn';
-import { hashtagParser } from './syntax/hashtag';
-import { inlineCodeParser } from './syntax/inlineCode';
-import { italicAstaParser, italicTagParser, italicUnderParser } from './syntax/italic';
-import { linkParser } from './syntax/link';
-import { mathInlineParser } from './syntax/mathInline';
-import { mentionParser } from './syntax/mention';
-import { searchParser } from './syntax/search';
-import { smallTagParser } from './syntax/small';
-import { strikeTagParser, strikeTildeParser } from './syntax/strike';
-import { unicodeEmojiParser } from './syntax/unicodeEmoji';
-import { urlAltParser, urlParser } from './syntax/url';
+import { bigParser } from '../syntax/big';
+import { boldAstaParser, boldUnderParser, boldTagParser } from '../syntax/bold';
+import { centerTagParser } from '../syntax/center';
+import { emojiCodeParser } from '../syntax/emojiCode';
+import { fnParser } from '../syntax/fn';
+import { hashtagParser } from '../syntax/hashtag';
+import { inlineCodeParser } from '../syntax/inlineCode';
+import { italicAstaParser, italicTagParser, italicUnderParser } from '../syntax/italic';
+import { linkParser } from '../syntax/link';
+import { mathInlineParser } from '../syntax/mathInline';
+import { mentionParser } from '../syntax/mention';
+import { searchParser } from '../syntax/search';
+import { smallTagParser } from '../syntax/small';
+import { strikeTagParser, strikeTildeParser } from '../syntax/strike';
+import { unicodeEmojiParser } from '../syntax/unicodeEmoji';
+import { urlAltParser, urlParser } from '../syntax/url';
 
 // NOTE: MfmParser は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。

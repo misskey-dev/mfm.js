@@ -1,4 +1,4 @@
-import { CharCode } from "./character";
+import { CharCode } from './character';
 
 export type Parser<T> = (ctx: ParserContext) => Result<T>;
 

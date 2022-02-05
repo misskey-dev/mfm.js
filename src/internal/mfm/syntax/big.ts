@@ -1,7 +1,8 @@
 import { FN, MfmFn, MfmInline } from '../../../node';
 import { Parser } from '../../services/parser';
-import { inlineParser } from '../parser';
-import { pushNode, syntax } from '../services';
+import { inlineParser } from '../services/mfmParser';
+import { pushNode } from '../services/nodeTree';
+import { syntax } from '../services/syntaxParser';
 
 export const bigParser: Parser<MfmFn> = syntax('big', (ctx) => {
 	// "***"

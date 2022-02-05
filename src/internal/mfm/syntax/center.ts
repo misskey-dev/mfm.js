@@ -1,7 +1,9 @@
 import { CENTER, MfmCenter, MfmInline } from '../../../node';
 import { Parser } from '../../services/parser';
-import { inlineParser } from '../parser';
-import { lineEndParser, syntax, pushNode } from '../services';
+import { inlineParser } from '../services/mfmParser';
+import { pushNode } from '../services/nodeTree';
+import { syntax } from '../services/syntaxParser';
+import { lineEndParser } from '../services/utility';
 
 export const centerTagParser: Parser<MfmCenter> = syntax('centerTag', (ctx) => {
 	let match, isMatch;

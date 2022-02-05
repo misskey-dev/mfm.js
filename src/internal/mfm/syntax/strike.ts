@@ -1,8 +1,9 @@
 import { MfmInline, MfmStrike, STRIKE } from '../../../node';
 import { Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
-import { inlineParser } from '../parser';
-import { pushNode, syntax } from '../services';
+import { inlineParser } from '../services/mfmParser';
+import { syntax } from '../services/syntaxParser';
+import { pushNode } from '../services/nodeTree';
 
 export const strikeTagParser: Parser<MfmStrike> = syntax('strikeTag', (ctx) => {
 	let matched;

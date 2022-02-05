@@ -1,7 +1,7 @@
 import { EMOJI_CODE, MfmEmojiCode } from '../../../node';
 import { Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
-import { syntax } from '../services';
+import { syntax } from '../services/syntaxParser';
 
 export const emojiCodeParser: Parser<MfmEmojiCode> = syntax('emojiCode', (ctx) => {
 	// ":"
