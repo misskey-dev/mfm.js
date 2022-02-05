@@ -4,7 +4,7 @@ import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 import { syntax } from '../services';
 
-export const boldAstaParser: Parser<MfmBold> = syntax((ctx) => {
+export const boldAstaParser: Parser<MfmBold> = syntax('boldAsta', (ctx) => {
 	// "**"
 	if (!ctx.str('**').ok) {
 		return ctx.fail();
@@ -32,7 +32,7 @@ export const boldAstaParser: Parser<MfmBold> = syntax((ctx) => {
 	return ctx.ok(BOLD(children));
 });
 
-export const boldUnderParser: Parser<MfmBold> = syntax((ctx) => {
+export const boldUnderParser: Parser<MfmBold> = syntax('boldUnder', (ctx) => {
 	// "__"
 	if (!ctx.str('__').ok) {
 		return ctx.fail();
@@ -53,7 +53,7 @@ export const boldUnderParser: Parser<MfmBold> = syntax((ctx) => {
 	return ctx.ok(BOLD([TEXT(text)]));
 });
 
-export const boldTagParser: Parser<MfmBold> = syntax((ctx) => {
+export const boldTagParser: Parser<MfmBold> = syntax('boldTag', (ctx) => {
 	// "<b>"
 	if (!ctx.str('<b>').ok) {
 		return ctx.fail();

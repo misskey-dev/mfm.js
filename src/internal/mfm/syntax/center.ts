@@ -4,7 +4,7 @@ import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 import { syntax } from '../services';
 
-export const centerTagParser: Parser<MfmCenter> = syntax((ctx) => {
+export const centerTagParser: Parser<MfmCenter> = syntax('centerTag', (ctx) => {
 	let match, isMatch;
 
 	// line-head

@@ -6,7 +6,7 @@ import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
 import { syntax } from '../services';
 
-export const italicAstaParser: Parser<MfmItalic> = syntax((ctx) => {
+export const italicAstaParser: Parser<MfmItalic> = syntax('italicAsta', (ctx) => {
 	let matched;
 
 	// check a back char
@@ -40,7 +40,7 @@ export const italicAstaParser: Parser<MfmItalic> = syntax((ctx) => {
 	return ctx.ok(ITALIC(children));
 });
 
-export const italicUnderParser: Parser<MfmItalic> = syntax((ctx) => {
+export const italicUnderParser: Parser<MfmItalic> = syntax('italicUnder', (ctx) => {
 	// let matched;
 
 	// check a back char
@@ -67,7 +67,7 @@ export const italicUnderParser: Parser<MfmItalic> = syntax((ctx) => {
 	return ctx.ok(ITALIC([]));
 });
 
-export const italicTagParser: Parser<MfmItalic> = syntax((ctx) => {
+export const italicTagParser: Parser<MfmItalic> = syntax('italicTag', (ctx) => {
 	let matched;
 
 	// "<i>"

@@ -5,7 +5,7 @@ import { CharCode } from '../../services/character';
 import { inlineParser } from '../parser';
 import { syntax } from '../services';
 
-export const strikeTagParser: Parser<MfmStrike> = syntax((ctx) => {
+export const strikeTagParser: Parser<MfmStrike> = syntax('strikeTag', (ctx) => {
 	let matched;
 
 	// "<s>"
@@ -36,7 +36,7 @@ export const strikeTagParser: Parser<MfmStrike> = syntax((ctx) => {
 	return ctx.ok(STRIKE(children));
 });
 
-export const strikeTildeParser: Parser<MfmStrike> = syntax((ctx) => {
+export const strikeTildeParser: Parser<MfmStrike> = syntax('strikeTilde', (ctx) => {
 	let matched;
 
 	// "~~"

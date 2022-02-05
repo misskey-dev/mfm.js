@@ -4,7 +4,7 @@ import { syntax } from '../services';
 import emojiRegex from 'twemoji-parser/dist/lib/regex';
 const anchoredEmojiRegex = RegExp(`^(?:${emojiRegex.source})`);
 
-export const unicodeEmojiParser: Parser<MfmUnicodeEmoji> = syntax((ctx) => {
+export const unicodeEmojiParser: Parser<MfmUnicodeEmoji> = syntax('unicodeEmoji', (ctx) => {
 	const matched = ctx.regex(anchoredEmojiRegex);
 	if (!matched.ok) {
 		return ctx.fail();

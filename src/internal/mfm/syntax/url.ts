@@ -10,7 +10,7 @@ const schemes: string[] = [
 	'http',
 ];
 
-export const urlParser: Parser<MfmUrl> = syntax((ctx) => {
+export const urlParser: Parser<MfmUrl> = syntax('url', (ctx) => {
 	const urlHead = ctx.pos;
 
 	// scheme
@@ -58,7 +58,7 @@ export const urlParser: Parser<MfmUrl> = syntax((ctx) => {
 	return ctx.ok(N_URL(value));
 });
 
-export const urlAltParser: Parser<MfmUrl> = syntax((ctx) => {
+export const urlAltParser: Parser<MfmUrl> = syntax('urlAlt', (ctx) => {
 	// "<"
 	if (!ctx.char(CharCode.lessThan).ok) {
 		return ctx.fail();

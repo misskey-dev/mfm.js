@@ -3,7 +3,7 @@ import { Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
 import { syntax } from '../services';
 
-export const emojiCodeParser: Parser<MfmEmojiCode> = syntax((ctx) => {
+export const emojiCodeParser: Parser<MfmEmojiCode> = syntax('emojiCode', (ctx) => {
 	// ":"
 	if (!ctx.char(CharCode.colon).ok) {
 		return ctx.fail();

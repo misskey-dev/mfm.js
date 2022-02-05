@@ -2,7 +2,7 @@ import { MfmSearch, SEARCH } from '../../../node';
 import { Parser } from '../../services/parser';
 import { syntax } from '../services';
 
-export const searchParser: Parser<MfmSearch> = syntax((ctx) => {
+export const searchParser: Parser<MfmSearch> = syntax('search', (ctx) => {
 
 	// TODO: line-head
 

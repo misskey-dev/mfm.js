@@ -231,9 +231,6 @@ export function inlineParser(ctx: ParserContext): Result<MfmInline | string> {
 	if (ctx.depth < ctx.nestLimit) {
 		ctx.depth++;
 
-		// have some links in parent parsers
-		const inLink = ctx.stack.find(p => p === linkParser) != null;
-
 		switch (ctx.input.charCodeAt(ctx.pos)) {
 
 			case CharCode.asterisk: {
@@ -263,7 +260,7 @@ export function inlineParser(ctx: ParserContext): Result<MfmInline | string> {
 			}
 
 			case CharCode.question: {
-				if (!inLink) {
+				if (!ctx.inLink) {
 					// ?[silent link]()
 					matched = ctx.parser(linkParser);
 					if (matched.ok) {
@@ -289,7 +286,7 @@ export function inlineParser(ctx: ParserContext): Result<MfmInline | string> {
 					ctx.depth--;
 					return matched;
 				}
-				if (!inLink) {
+				if (!ctx.inLink) {
 					// <https://example.com>
 					matched = ctx.parser(urlAltParser);
 					if (matched.ok) {
@@ -301,7 +298,7 @@ export function inlineParser(ctx: ParserContext): Result<MfmInline | string> {
 			}
 
 			case CharCode.openBracket: {
-				if (!inLink) {
+				if (!ctx.inLink) {
 					// [link]()
 					matched = ctx.parser(linkParser);
 					if (matched.ok) {
@@ -367,7 +364,7 @@ export function inlineParser(ctx: ParserContext): Result<MfmInline | string> {
 			}
 
 			case CharCode.at: {
-				if (!inLink) {
+				if (!ctx.inLink) {
 					// @mention
 					matched = ctx.parser(mentionParser);
 					if (matched.ok) {
@@ -395,7 +392,7 @@ export function inlineParser(ctx: ParserContext): Result<MfmInline | string> {
 			ctx.depth--;
 			return matched;
 		}
-		if (!inLink) {
+		if (!ctx.inLink) {
 			// https://example.com
 			matched = ctx.parser(urlParser);
 			if (matched.ok) {

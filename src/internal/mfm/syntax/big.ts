@@ -4,7 +4,7 @@ import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 import { syntax } from '../services';
 
-export const bigParser: Parser<MfmFn> = syntax((ctx) => {
+export const bigParser: Parser<MfmFn> = syntax('big', (ctx) => {
 	// "***"
 	if (!ctx.str('***').ok) {
 		return ctx.fail();

@@ -2,7 +2,7 @@ import { CODE_BLOCK, MfmCodeBlock } from '../../../node';
 import { Parser } from '../../services/parser';
 import { syntax } from '../services';
 
-export const codeBlockParser: Parser<MfmCodeBlock> = syntax((ctx) => {
+export const codeBlockParser: Parser<MfmCodeBlock> = syntax('codeBlock', (ctx) => {
 	let matched;
 
 	// TODO: check line-head

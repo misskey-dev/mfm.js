@@ -6,7 +6,7 @@ import { inlineParser } from '../parser';
 import { urlAltParser, urlParser } from './url';
 import { syntax } from '../services';
 
-export const linkParser: Parser<MfmLink> = syntax((ctx) => {
+export const linkParser: Parser<MfmLink> = syntax('link', (ctx) => {
 	let matched;
 
 	// "?" (option)
@@ -20,6 +20,7 @@ export const linkParser: Parser<MfmLink> = syntax((ctx) => {
 
 	// link label
 	const label: MfmInline[] = [];
+	ctx.inLink = true;
 	while (true) {
 		if (ctx.matchChar(CharCode.closeBracket)) break;
 
@@ -27,6 +28,7 @@ export const linkParser: Parser<MfmLink> = syntax((ctx) => {
 		if (!matched.ok) break;
 		pushNode(matched.result, label);
 	}
+	ctx.inLink = false;
 	if (label.length < 1) {
 		return ctx.fail();
 	}

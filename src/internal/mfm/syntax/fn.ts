@@ -71,7 +71,7 @@ const argsParser: Parser<Record<string, string | true>> = (ctx) => {
 	return ctx.ok(args);
 };
 
-export const fnParser: Parser<MfmFn> = syntax((ctx) => {
+export const fnParser: Parser<MfmFn> = syntax('fn', (ctx) => {
 	let match;
 
 	// "$["

@@ -7,7 +7,7 @@ import { syntax } from '../services';
 // TODO: 「#」がUnicode絵文字の一部である場合があるので判定する
 // TODO: 括弧は対になっている時のみ内容に含めることができる。対象: `()` `[]` `「」`
 
-export const hashtagParser: Parser<MfmHashtag> = syntax((ctx) => {
+export const hashtagParser: Parser<MfmHashtag> = syntax('hashtag', (ctx) => {
 	// check a back char
 	if (!isAllowedAsBackChar(ctx)) {
 		return ctx.fail();

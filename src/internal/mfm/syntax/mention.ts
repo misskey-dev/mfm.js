@@ -4,7 +4,7 @@ import { isAllowedAsBackChar } from '../../services/matchingUtil';
 import { CharCode } from '../../services/character';
 import { syntax } from '../services';
 
-const hostParser: Parser<string> = syntax((ctx) => {
+const hostParser: Parser<string> = (ctx) => {
 	// "@"
 	if (!ctx.char(CharCode.at).ok) {
 		return ctx.fail();
@@ -39,9 +39,9 @@ const hostParser: Parser<string> = syntax((ctx) => {
 	ctx.pos += name.length;
 
 	return ctx.ok(name);
-});
+};
 
-export const mentionParser: Parser<MfmMention> = syntax((ctx) => {
+export const mentionParser: Parser<MfmMention> = syntax('mention', (ctx) => {
 	let matched;
 	const headPos = ctx.pos;
 

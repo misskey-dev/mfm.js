@@ -4,7 +4,7 @@ import { pushNode } from '../../services/nodeTree';
 import { inlineParser } from '../parser';
 import { syntax } from '../services';
 
-export const smallTagParser: Parser<MfmSmall> = syntax((ctx) => {
+export const smallTagParser: Parser<MfmSmall> = syntax('small', (ctx) => {
 	let matched;
 
 	// "<small>"

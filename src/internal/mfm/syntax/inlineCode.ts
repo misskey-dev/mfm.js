@@ -3,7 +3,7 @@ import { Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
 import { syntax } from '../services';
 
-export const inlineCodeParser: Parser<MfmInlineCode> = syntax((ctx) => {
+export const inlineCodeParser: Parser<MfmInlineCode> = syntax('inlineCode', (ctx) => {
 	// "`"
 	if (!ctx.char(CharCode.backtick).ok) {
 		return ctx.fail();

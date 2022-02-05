@@ -15,12 +15,14 @@ export type ParserResult<T> = T extends Parser<infer U> ? U : never;
 
 export type ParserResults<T> = T extends [infer U, ...infer V] ? [ParserResult<U>, ...ParserResults<V>] : [];
 
+export type CacheStorage = Map<Parser<any>, Map<number, CacheItem<any>>>;
+
 export type CacheItem<T> = {
 	pos: number;
 	result: T;
 };
 
-export type ContextOpts = Partial<{
+export type ParserOpts = Partial<{
 	fnNameList: string[];
 	nestLimit: number;
 }>;
@@ -31,17 +33,22 @@ export class ParserContext {
 	public stack: Parser<any>[] = [];
 	public debug = false;
 	// cache
-	public cache: Map<Parser<any>, Map<number, CacheItem<any>>> = new Map();
+	public cacheStorage: [CacheStorage, CacheStorage] = [
+		new Map(), // for general
+		new Map(), // for link label
+	];
 	// nesting control
 	public nestLimit: number;
 	public depth = 0;
 	// fn
 	public fnNameList: string[] | undefined;
+	// link
+	public inLink: boolean = false;
 
-	constructor(input: string, opts: ContextOpts) {
+	constructor(input: string, opts: ParserOpts) {
 		this.input = input;
-		this.fnNameList = opts.fnNameList;
 		this.nestLimit = opts.nestLimit || 20;
+		this.fnNameList = opts.fnNameList;
 	}
 
 	// result
@@ -55,14 +62,6 @@ export class ParserContext {
 
 	public fail(): Failure {
 		return failureObject;
-	}
-
-	public pushStack<T extends Parser<ParserResult<T>>>(parser: T): void {
-		this.stack.unshift(parser);
-	}
-
-	public popStack(): void {
-		this.stack.shift();
 	}
 
 	// scan
