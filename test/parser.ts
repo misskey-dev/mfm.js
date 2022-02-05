@@ -1279,6 +1279,12 @@ hoge`;
 		});
 	});
 
+	// describe('cache control', () => {
+	// 	it('re-evaluation', () => {
+	// 		"[**https://example.com/**"
+	// 	});
+	// });
+
 	it('composite', () => {
 		const input =
 `before

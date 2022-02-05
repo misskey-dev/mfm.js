@@ -231,8 +231,8 @@ export const inlineParser: Parser<MfmInline | string> = (ctx) => {
 	if (ctx.depth < ctx.nestLimit) {
 		ctx.depth++;
 
-		// have some links in parent matchers
-		const inLink = ctx.stack.find(m => m.name === 'link') != null;
+		// have some links in parent parsers
+		const inLink = ctx.stack.find(p => p === linkParser) != null;
 
 		switch (ctx.input.charCodeAt(ctx.pos)) {
 
