@@ -463,5 +463,5 @@ export function syntax<T extends Parser<ParserResult<T>>>(parser: T): Parser<Par
 		ctx.popStack();
 
 		return match;
-	}
+	};
 }
