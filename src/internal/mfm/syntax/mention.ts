@@ -2,7 +2,7 @@ import { MENTION, MfmMention } from '../../../node';
 import { Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
 import { syntax } from '../services/syntaxParser';
-import { isAllowedAsBackChar } from '../services/utility';
+import { ensureAllowedBackChar } from '../services/utility';
 
 const hostParser: Parser<string> = (ctx) => {
 	// "@"
@@ -46,7 +46,7 @@ export const mentionParser: Parser<MfmMention> = syntax('mention', (ctx) => {
 	const headPos = ctx.pos;
 
 	// check a back char
-	if (!isAllowedAsBackChar(ctx)) {
+	if (!ensureAllowedBackChar(ctx)) {
 		return ctx.fail();
 	}
 

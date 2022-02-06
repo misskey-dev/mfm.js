@@ -2,14 +2,14 @@ import { HASHTAG, MfmHashtag } from '../../../node';
 import { Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
 import { syntax } from '../services/syntaxParser';
-import { isAllowedAsBackChar } from '../services/utility';
+import { ensureAllowedBackChar } from '../services/utility';
 
 // TODO: 「#」がUnicode絵文字の一部である場合があるので判定する
 // TODO: 括弧は対になっている時のみ内容に含めることができる。対象: `()` `[]` `「」`
 
 export const hashtagParser: Parser<MfmHashtag> = syntax('hashtag', (ctx) => {
 	// check a back char
-	if (!isAllowedAsBackChar(ctx)) {
+	if (!ensureAllowedBackChar(ctx)) {
 		return ctx.fail();
 	}
 

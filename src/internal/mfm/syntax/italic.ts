@@ -3,15 +3,12 @@ import { Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../services/mfmParser';
 import { syntax } from '../services/syntaxParser';
-import { isAllowedAsBackChar } from '../services/utility';
+import { ensureAllowedBackChar, ensureAllowedNextChar } from '../services/utility';
 import { pushNode } from '../services/nodeTree';
-
-// TODO: italicAsta 前後文字のチェック
-// TODO: italicUnder 前後文字のチェック
 
 export const italicAstaParser: Parser<MfmItalic> = syntax('italicAsta', (ctx) => {
 	// check a back char
-	if (!isAllowedAsBackChar(ctx)) {
+	if (!ensureAllowedBackChar(ctx)) {
 		return ctx.fail();
 	}
 
@@ -29,6 +26,11 @@ export const italicAstaParser: Parser<MfmItalic> = syntax('italicAsta', (ctx) =>
 
 	// "*"
 	if (!ctx.char(CharCode.asterisk).ok) {
+		return ctx.fail();
+	}
+
+	// check a next char
+	if (!ensureAllowedNextChar(ctx)) {
 		return ctx.fail();
 	}
 
@@ -37,7 +39,7 @@ export const italicAstaParser: Parser<MfmItalic> = syntax('italicAsta', (ctx) =>
 
 export const italicUnderParser: Parser<MfmItalic> = syntax('italicUnder', (ctx) => {
 	// check a back char
-	if (!isAllowedAsBackChar(ctx)) {
+	if (!ensureAllowedBackChar(ctx)) {
 		return ctx.fail();
 	}
 
@@ -55,6 +57,11 @@ export const italicUnderParser: Parser<MfmItalic> = syntax('italicUnder', (ctx) 
 
 	// "_"
 	if (!ctx.char(CharCode.underscore).ok) {
+		return ctx.fail();
+	}
+
+	// check a next char
+	if (!ensureAllowedNextChar(ctx)) {
 		return ctx.fail();
 	}
 
