@@ -1,4 +1,4 @@
-import { ITALIC, MfmInline, MfmItalic } from '../../../node';
+import { ITALIC, MfmInline, MfmItalic, TEXT } from '../../../node';
 import { Parser } from '../../services/parser';
 import { CharCode } from '../../services/character';
 import { inlineParser } from '../services/mfmParser';
@@ -10,7 +10,7 @@ import { pushNode } from '../services/nodeTree';
 // TODO: italicUnder 前後文字のチェック
 
 export const italicAstaParser: Parser<MfmItalic> = syntax('italicAsta', (ctx) => {
-	let matched;
+	let match;
 
 	// check a back char
 	if (!isAllowedAsBackChar(ctx)) {
@@ -23,17 +23,11 @@ export const italicAstaParser: Parser<MfmItalic> = syntax('italicAsta', (ctx) =>
 	}
 
 	// children
-	const children: MfmInline[] = [];
-	while (true) {
-		if (ctx.matchChar(CharCode.asterisk)) break;
-
-		matched = ctx.parser(inlineParser);
-		if (!matched.ok) break;
-		pushNode(matched.result, children);
-	}
-	if (children.length < 1) {
+	match = ctx.regex(/^[a-z0-9 \u3000\t\u00a0]+/i);
+	if (!match.ok) {
 		return ctx.fail();
 	}
+	const children = [TEXT(match.result[0])];
 
 	// "*"
 	if (!ctx.char(CharCode.asterisk).ok) {
@@ -44,7 +38,7 @@ export const italicAstaParser: Parser<MfmItalic> = syntax('italicAsta', (ctx) =>
 });
 
 export const italicUnderParser: Parser<MfmItalic> = syntax('italicUnder', (ctx) => {
-	// let matched;
+	let match;
 
 	// check a back char
 	if (!isAllowedAsBackChar(ctx)) {
@@ -57,17 +51,18 @@ export const italicUnderParser: Parser<MfmItalic> = syntax('italicUnder', (ctx) 
 	}
 
 	// children
-
-	// TODO
-	// /^[a-z0-9]/i
-	// spacing
+	match = ctx.regex(/^[a-z0-9 \u3000\t\u00a0]+/i);
+	if (!match.ok) {
+		return ctx.fail();
+	}
+	const children = [TEXT(match.result[0])];
 
 	// "_"
 	if (!ctx.char(CharCode.underscore).ok) {
 		return ctx.fail();
 	}
 
-	return ctx.ok(ITALIC([]));
+	return ctx.ok(ITALIC(children));
 });
 
 export const italicTagParser: Parser<MfmItalic> = syntax('italicTag', (ctx) => {
