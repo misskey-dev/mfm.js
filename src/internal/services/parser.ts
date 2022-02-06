@@ -170,30 +170,43 @@ export class ParserContext {
 	/**
 	 * match a string
 	*/
-	public matchStr(value: string): boolean {
-		return this.input.startsWith(value, this.pos);
+	public matchStr(value: string, offset: number = 0): boolean {
+		if (this.pos + offset < 0 || this.pos + offset >= this.input.length) {
+			return false;
+		}
+		return this.input.startsWith(value, this.pos + offset);
 	}
 
 	/**
 	 * match a char
 	*/
-	public matchChar(charCode: number): boolean {
-		return (this.input.charCodeAt(this.pos) === charCode);
+	public matchChar(charCode: number, offset: number = 0): boolean {
+		if (this.pos + offset < 0 || this.pos + offset >= this.input.length) {
+			return false;
+		}
+		return (this.input.charCodeAt(this.pos + offset) === charCode);
 	}
 
 	/**
 	 * match with regex
 	*/
-	public matchRegex(regex: RegExp): boolean {
-		const result = regex.exec(this.input.substr(this.pos));
+	public matchRegex(regex: RegExp, offset: number = 0): boolean {
+		if (this.pos + offset < 0 || this.pos + offset >= this.input.length) {
+			return false;
+		}
+		const result = regex.exec(this.input.substr(this.pos + offset));
 		return result != null;
 	}
 
 	/**
 	 * match with parser
 	*/
-	public match<T extends Parser<ParserResult<T>>>(parser: T): boolean {
+	public match<T extends Parser<ParserResult<T>>>(parser: T, offset: number = 0): boolean {
+		if (this.pos + offset < 0 || this.pos + offset >= this.input.length) {
+			return false;
+		}
 		const originPos = this.pos;
+		this.pos += offset;
 		const match = parser(this);
 		this.pos = originPos;
 		return match.ok;
