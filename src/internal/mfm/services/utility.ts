@@ -13,21 +13,22 @@ export function lineEndParser(ctx: ParserContext): Result<null> {
 	return ctx.ok(null);
 }
 
-// 一つ前の文字が:
-// 無い OR 改行 OR スペース OR ![a-z0-9]i
-// の時にtrueを返します。
 export function isAllowedAsBackChar(ctx: ParserContext): boolean {
-	if (ctx.pos > 0) {
-		ctx.pos--;
-		if (
-			!ctx.matchRegex(/^(\r\n|[\r\n])/) &&
-			!ctx.matchRegex(/^[ \u3000\t\u00a0]/) &&
-			ctx.matchRegex(/^[a-z0-9]/i)
-		) {
-			ctx.pos++;
-			return false;
-		}
-		ctx.pos++;
+	// 一つ前の文字が:
+	// 無い OR 改行 OR スペース OR ![a-z0-9]i
+	// の時にtrueを返します。
+
+	if (ctx.pos === 0) {
+		return true;
 	}
-	return true;
+	if (ctx.pos >= 2 && ctx.matchStr('\r\n', -2)) {
+		return true;
+	}
+	if (ctx.matchRegex(/^[\r\n \u3000\t\u00a0]/, -1)) {
+		return true;
+	}
+	if (!ctx.matchRegex(/^[a-z0-9]/i, -1)) {
+		return true;
+	}
+	return false;
 }
