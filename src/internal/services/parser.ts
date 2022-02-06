@@ -17,7 +17,7 @@ export type ParserResult<T> = T extends Parser<infer U> ? U : never;
 
 export type ParserResults<T> = T extends [infer U, ...infer V] ? [ParserResult<U>, ...ParserResults<V>] : [];
 
-export type CacheStorage = Map<Parser<any>, Map<number, CacheItem<any>>>;
+export type CacheSource = Map<Parser<any>, Map<number, CacheItem<any>>>;
 
 export type CacheItem<T> = {
 	pos: number;
@@ -34,13 +34,17 @@ export type ParserOpts = Partial<{
 	nestLimit: number;
 }>;
 
+const failureObject: Failure = {
+	ok: false,
+};
+
 export class ParserContext {
 	public input: string;
 	public pos = 0;
 	public stack: Parser<any>[] = [];
 	public debug = false;
 	// cache
-	public cacheStorage: [CacheStorage, CacheStorage] = [
+	public cacheSources: [CacheSource, CacheSource] = [
 		new Map(), // for general
 		new Map(), // for link label
 	];
@@ -248,7 +252,3 @@ export class ParserContext {
 		}
 	}
 }
-
-const failureObject: Failure = {
-	ok: false,
-};

@@ -2,36 +2,36 @@ import { Parser, ParserResult } from '../../services/parser';
 
 export function syntax<T extends Parser<ParserResult<T>>>(name: string, parser: T): Parser<ParserResult<T>> {
 	return function syntaxParser(ctx) {
-		// select cache storage
-		let cacheStorage;
+		// select cache source
+		let cacheSource;
 		if (ctx.inLink) {
-			cacheStorage = ctx.cacheStorage[1]; // for link label
+			cacheSource = ctx.cacheSources[1]; // for link label
 		} else {
-			cacheStorage = ctx.cacheStorage[0]; // for general
+			cacheSource = ctx.cacheSources[0]; // for general
 		}
 
-		// select cache table
-		let cacheTable = cacheStorage.get(parser);
-		if (cacheTable == null) {
-			cacheTable = new Map();
-			cacheStorage.set(parser, cacheTable);
+		// get syntax cache
+		let syntaxCache = cacheSource.get(parser);
+		if (syntaxCache == null) {
+			syntaxCache = new Map();
+			cacheSource.set(parser, syntaxCache);
 		}
 
 		if (ctx.debug) {
 			let records = '';
-			for (const [pos] of cacheTable.entries()) {
+			for (const [pos] of syntaxCache.entries()) {
 				records += `${pos} `;
 			}
 			records = records.trim();
 			ctx.debugLog(`[check] syntax=${name} pos=${ctx.pos} inLink=${ctx.inLink} records=[${records}]`);
 		}
 
-		// get cache
-		const cache = cacheTable.get(ctx.pos);
-		if (cache != null) {
+		// get cache record
+		const cacheRecord = syntaxCache.get(ctx.pos);
+		if (cacheRecord != null) {
 			ctx.debugLog('[hit]');
-			ctx.pos = cache.pos;
-			return ctx.ok(cache.result);
+			ctx.pos = cacheRecord.pos;
+			return ctx.ok(cacheRecord.result);
 		} else {
 			ctx.debugLog('[miss]');
 		}
@@ -45,15 +45,15 @@ export function syntax<T extends Parser<ParserResult<T>>>(name: string, parser: 
 		// // pop stack
 		// ctx.stack.shift();
 
-		// set cache
+		// set cache record
 		if (match.ok) {
-			cacheTable.set(cachePos, {
+			syntaxCache.set(cachePos, {
 				pos: ctx.pos, // next pos
 				result: match.result,
 			});
 			if (ctx.debug) {
 				let records = '';
-				for (const [pos] of cacheTable.entries()) {
+				for (const [pos] of syntaxCache.entries()) {
 					records += `${pos} `;
 				}
 				records = records.trim();
