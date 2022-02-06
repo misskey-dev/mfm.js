@@ -19,6 +19,7 @@ import { strikeTagParser, strikeTildeParser } from '../syntax/strike';
 import { unicodeEmojiParser } from '../syntax/unicodeEmoji';
 import { urlAltParser, urlParser } from '../syntax/url';
 import { codeBlockParser } from '../syntax/codeBlock';
+import { mathBlockParser } from '../syntax/mathBlock';
 
 // NOTE: MfmParser は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。
@@ -135,15 +136,16 @@ export function fullParser(ctx: ParserContext): Result<MfmNode | string | null> 
 			}
 
 			case CharCode.backslash: {
-				// \(math inline\)
-				matched = ctx.parser(mathInlineParser);
+				matched = ctx.choice([
+					// \(math inline\)
+					mathInlineParser,
+					// \[math block\]
+					mathBlockParser,
+				]);
 				if (matched.ok) {
 					ctx.depth--;
 					return matched;
 				}
-
-				// \[math block\]
-				//mathBlockParser;
 				break;
 			}
 
@@ -224,6 +226,7 @@ export function fullParser(ctx: ParserContext): Result<MfmNode | string | null> 
 		() => ctx.choice([
 			centerTagParser,
 			codeBlockParser,
+			mathBlockParser,
 			searchParser,
 		]),
 	]);
