@@ -1,9 +1,48 @@
 import { MfmUrl, N_URL } from '../../../node';
-import { Parser } from '../../services/parser';
+import { Parser, ParserContext, Result } from '../../services/parser';
 import { CharCode } from '../../services/character';
 import { syntax } from '../services/syntaxParser';
 
-// TODO: urlParser 括弧は対になっている時のみ内容に含めることができる。
+const bracketTable = {
+	'(': ')',
+	'[': ']',
+};
+
+function contentParser(ctx: ParserContext): Result<string> {
+	const match = ctx.choice([
+		() => {
+			const openMatch = ctx.regex(/^[(\[]/);
+			if (!openMatch.ok) {
+				return ctx.fail();
+			}
+
+			let content = '';
+			while (true) {
+				const contentMatch = ctx.parser(contentParser);
+				if (!contentMatch.ok) break;
+				content += contentMatch.result;
+			}
+			if (content.length === 0) {
+				return ctx.fail();
+			}
+
+			const open = openMatch.result[0] as '(' | '[';
+			const close = bracketTable[open];
+			if (!ctx.str(close).ok) {
+				return ctx.fail();
+			}
+			return ctx.ok(`${open}${content}${close}`);
+		},
+		() => {
+			const match = ctx.regex(/^[.,a-z0-9_/:%#@$&?!~=+-]+/i);
+			if (!match.ok) {
+				return ctx.fail();
+			}
+			return ctx.ok(match.result[0]);
+		}
+	]);
+	return match;
+}
 
 const schemes: string[] = [
 	'https',
@@ -31,11 +70,17 @@ export const urlParser: Parser<MfmUrl> = syntax('url', (ctx) => {
 	}
 
 	// path
-	const matched = /^[.,a-z0-9_/:%#@$&?!~=+-]+/i.exec(ctx.input.substr(ctx.pos));
-	if (matched == null) {
+	let path = '';
+	const originPos = ctx.pos;
+	while (true) {
+		const contentMatch = ctx.parser(contentParser);
+		if (!contentMatch.ok) break;
+		path += contentMatch.result;
+	}
+	ctx.pos = originPos;
+	if (path.length === 0) {
 		return ctx.fail();
 	}
-	let path = matched[0];
 
 	// (path) last character must not be "." or ","
 	let length = path.length;
