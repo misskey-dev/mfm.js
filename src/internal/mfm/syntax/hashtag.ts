@@ -38,7 +38,7 @@ export const hashtagParser: Parser<MfmHashtag> = syntax('hashtag', (ctx) => {
 
 	// check bracket pair
 	const pairs: [string, string][] = [
-		['(', ')'], ['[', ']'], ['「', '」']
+		['(', ')'], ['[', ']'], ['「', '」'],
 	];
 	let valueLength = value.length;
 	for (const [open, close] of pairs) {
@@ -66,7 +66,7 @@ export const hashtagParser: Parser<MfmHashtag> = syntax('hashtag', (ctx) => {
 			valueLength = pairStack[0];
 		}
 	}
-	if (value.length != valueLength) {
+	if (value.length !== valueLength) {
 		ctx.pos -= (value.length - valueLength);
 		value = value.substr(0, valueLength);
 	}
