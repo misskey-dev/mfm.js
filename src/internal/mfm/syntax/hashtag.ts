@@ -4,8 +4,6 @@ import { CharCode } from '../../services/character';
 import { syntax } from '../services/syntaxParser';
 import { ensureAllowedBackChar } from '../services/utility';
 
-// TODO: 括弧は対になっている時のみ内容に含めることができる。対象: `()` `[]` `「」`
-
 export const hashtagParser: Parser<MfmHashtag> = syntax('hashtag', (ctx) => {
 	// check a back char
 	if (!ensureAllowedBackChar(ctx)) {
@@ -29,7 +27,7 @@ export const hashtagParser: Parser<MfmHashtag> = syntax('hashtag', (ctx) => {
 	// value
 	let value = '';
 	while (true) {
-		if (ctx.matchRegex(/^[ \u3000\t.,!?'"#:/[\]【】()「」<>]/)) break;
+		if (ctx.matchRegex(/^[ \u3000\t.,!?'"#:/【】<>]/)) break;
 		// LF
 		if (ctx.matchRegex(/^(\r\n|[\r\n])/)) break;
 		// .
@@ -37,6 +35,43 @@ export const hashtagParser: Parser<MfmHashtag> = syntax('hashtag', (ctx) => {
 		if (!match.ok) break;
 		value += match.result;
 	}
+
+	// check bracket pair
+	const pairs: [string, string][] = [
+		['(', ')'], ['[', ']'], ['「', '」']
+	];
+	let valueLength = value.length;
+	for (const [open, close] of pairs) {
+		const pairStack: number[] = [];
+		let p = 0;
+		while (p < valueLength) {
+			switch (value.charAt(p)) {
+				case open: {
+					pairStack.push(p);
+					break;
+				}
+				case close: {
+					// alone close
+					if (pairStack.length === 0) {
+						valueLength = p;
+						break;
+					}
+					pairStack.pop();
+					break;
+				}
+			}
+			p++;
+		}
+		if (pairStack.length > 0) {
+			valueLength = pairStack[0];
+		}
+	}
+	if (value.length != valueLength) {
+		ctx.pos -= (value.length - valueLength);
+		value = value.substr(0, valueLength);
+	}
+
+	// validate hashtag
 	if (value.length === 0 || /^[0-9]+$/.test(value)) {
 		return ctx.fail();
 	}
