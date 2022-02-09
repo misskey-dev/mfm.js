@@ -1,8 +1,58 @@
 import { HASHTAG, MfmHashtag } from '../../../node';
-import { Parser } from '../../services/parser';
+import { Parser, ParserContext, Result } from '../../services/parser';
 import { CharCode } from '../../services/character';
 import { syntax } from '../services/syntaxParser';
 import { ensureAllowedBackChar } from '../services/utility';
+
+const bracketTable = {
+	'(': ')',
+	'[': ']',
+	'「': '」',
+};
+
+function valueParser(ctx: ParserContext): Result<string> {
+	const match = ctx.choice([
+		() => {
+			const openMatch = ctx.regex(/^[(\[「]/);
+			if (!openMatch.ok) {
+				return ctx.fail();
+			}
+
+			let value = '';
+			while (true) {
+				const valueMatch = ctx.parser(valueParser);
+				if (!valueMatch.ok) break;
+				value += valueMatch.result;
+			}
+			if (value.length === 0) {
+				return ctx.fail();
+			}
+
+			const open = openMatch.result[0] as '(' | '[' | '「';
+			const close = bracketTable[open];
+			if (!ctx.str(close).ok) {
+				return ctx.fail();
+			}
+			return ctx.ok(`${open}${value}${close}`);
+		},
+		() => {
+			if (ctx.matchRegex(/^[ \u3000\t.,!?'"#:/[\]【】()「」<>]/)) {
+				return ctx.fail();
+			}
+			// LF
+			if (ctx.matchRegex(/^(\r\n|[\r\n])/)) {
+				return ctx.fail();
+			}
+			// .
+			const match = ctx.anyChar();
+			if (!match.ok) {
+				return ctx.fail();
+			}
+			return ctx.ok(match.result);
+		}
+	]);
+	return match;
+}
 
 export const hashtagParser: Parser<MfmHashtag> = syntax('hashtag', (ctx) => {
 	// check a back char
@@ -27,48 +77,9 @@ export const hashtagParser: Parser<MfmHashtag> = syntax('hashtag', (ctx) => {
 	// value
 	let value = '';
 	while (true) {
-		if (ctx.matchRegex(/^[ \u3000\t.,!?'"#:/【】<>]/)) break;
-		// LF
-		if (ctx.matchRegex(/^(\r\n|[\r\n])/)) break;
-		// .
-		const match = ctx.anyChar();
+		const match = ctx.parser(valueParser);
 		if (!match.ok) break;
 		value += match.result;
-	}
-
-	// check bracket pair
-	const pairs: [string, string][] = [
-		['(', ')'], ['[', ']'], ['「', '」'],
-	];
-	let valueLength = value.length;
-	for (const [open, close] of pairs) {
-		const pairStack: number[] = [];
-		let p = 0;
-		while (p < valueLength) {
-			switch (value.charAt(p)) {
-				case open: {
-					pairStack.push(p);
-					break;
-				}
-				case close: {
-					// alone close
-					if (pairStack.length === 0) {
-						valueLength = p;
-						break;
-					}
-					pairStack.pop();
-					break;
-				}
-			}
-			p++;
-		}
-		if (pairStack.length > 0) {
-			valueLength = pairStack[0];
-		}
-	}
-	if (value.length !== valueLength) {
-		ctx.pos -= (value.length - valueLength);
-		value = value.substr(0, valueLength);
 	}
 
 	// validate hashtag
