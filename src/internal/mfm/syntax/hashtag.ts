@@ -18,6 +18,15 @@ export const hashtagParser: Parser<MfmHashtag> = syntax('hashtag', (ctx) => {
 		return ctx.fail();
 	}
 
+	// ignore the keycap number sign
+	const keycap = ctx.match(() => {
+		ctx.str('\uFE0F'); // option
+		return ctx.str('\u20E3');
+	});
+	if (keycap) {
+		return ctx.fail();
+	}
+
 	// value
 	let value = '';
 	while (true) {
