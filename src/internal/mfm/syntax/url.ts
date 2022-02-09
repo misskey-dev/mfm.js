@@ -11,7 +11,7 @@ const bracketTable = {
 function contentParser(ctx: ParserContext): Result<string> {
 	const match = ctx.choice([
 		() => {
-			const openMatch = ctx.regex(/^[(\[]/);
+			const openMatch = ctx.regex(/^[([]/);
 			if (!openMatch.ok) {
 				return ctx.fail();
 			}
@@ -39,7 +39,7 @@ function contentParser(ctx: ParserContext): Result<string> {
 				return ctx.fail();
 			}
 			return ctx.ok(match.result[0]);
-		}
+		},
 	]);
 	return match;
 }
