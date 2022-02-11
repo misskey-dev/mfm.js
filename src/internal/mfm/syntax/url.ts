@@ -16,12 +16,17 @@ function contentParser(ctx: ParserContext): Result<string> {
 				return ctx.fail();
 			}
 
+			if (ctx.depth >= ctx.nestLimit) {
+				return ctx.fail();
+			}
+			ctx.depth++;
 			let content = '';
 			while (true) {
 				const contentMatch = ctx.parser(contentParser);
 				if (!contentMatch.ok) break;
 				content += contentMatch.result;
 			}
+			ctx.depth--;
 			if (content.length === 0) {
 				return ctx.fail();
 			}
