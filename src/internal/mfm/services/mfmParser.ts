@@ -20,6 +20,7 @@ import { unicodeEmojiParser } from '../syntax/unicodeEmoji';
 import { urlAltParser, urlParser } from '../syntax/url';
 import { codeBlockParser } from '../syntax/codeBlock';
 import { mathBlockParser } from '../syntax/mathBlock';
+import { quoteParser } from '../syntax/quote';
 
 // NOTE: MfmParser は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。
@@ -107,7 +108,11 @@ export function fullParser(ctx: ParserContext): Result<MfmNode | string | null> 
 
 			case CharCode.greaterThan: {
 				// > quote
-				// quoteParser
+				matched = ctx.parser(quoteParser);
+				if (matched.ok) {
+					ctx.depth--;
+					return matched;
+				}
 				break;
 			}
 
@@ -225,6 +230,7 @@ export function fullParser(ctx: ParserContext): Result<MfmNode | string | null> 
 		() => ctx.regex(/^(\r\n|[\r\n])/),
 		() => ctx.choice([
 			centerTagParser,
+			quoteParser,
 			codeBlockParser,
 			mathBlockParser,
 			searchParser,
