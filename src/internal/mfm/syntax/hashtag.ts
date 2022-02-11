@@ -18,12 +18,17 @@ function valueParser(ctx: ParserContext): Result<string> {
 				return ctx.fail();
 			}
 
+			if (ctx.depth >= ctx.nestLimit) {
+				return ctx.fail();
+			}
+			ctx.depth++;
 			let value = '';
 			while (true) {
 				const valueMatch = ctx.parser(valueParser);
 				if (!valueMatch.ok) break;
 				value += valueMatch.result;
 			}
+			ctx.depth--;
 			if (value.length === 0) {
 				return ctx.fail();
 			}
