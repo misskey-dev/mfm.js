@@ -398,6 +398,13 @@ hoge`;
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+		it('empty', () => {
+			const input = '<b></b>';
+			const output = [
+				TEXT('<b></b>'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('bold', () => {
@@ -433,6 +440,32 @@ hoge`;
 					]),
 					TEXT('\n123')
 				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+		it('empty', () => {
+			const input = '****';
+			const output = [
+				TEXT('****'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
+
+	describe('bold under', () => {
+		it('basic', () => {
+			const input = '__abc__';
+			const output = [
+				BOLD([
+					TEXT('abc')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+		it('empty', () => {
+			const input = '____';
+			const output = [
+				TEXT('____'),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
