@@ -61,7 +61,7 @@ export const quoteParser: Parser<MfmQuote> = syntax('quote', (ctx) => {
 
 	const children = fullMfmParser(lines.join('\n'), {
 		fnNameList: ctx.fnNameList,
-		nestLimit: ctx.nestLimit,
+		nestLimit: (ctx.nestLimit - ctx.depth),
 	});
 
 	return ctx.ok(QUOTE(children));

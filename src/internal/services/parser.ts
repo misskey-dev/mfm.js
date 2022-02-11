@@ -58,7 +58,7 @@ export class ParserContext {
 
 	constructor(input: string, opts: ParserOpts) {
 		this.input = input;
-		this.nestLimit = opts.nestLimit || 20;
+		this.nestLimit = (opts.nestLimit != null ? opts.nestLimit : 20);
 		this.fnNameList = opts.fnNameList;
 	}
 
