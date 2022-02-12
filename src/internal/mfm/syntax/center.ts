@@ -3,7 +3,7 @@ import { Parser } from '../../services/parser';
 import { inlineParser } from '../services/mfmParser';
 import { pushNode } from '../services/nodeTree';
 import { syntax } from '../services/syntaxParser';
-import { lineEndParser } from '../services/utility';
+import { LfParser, lineEndParser } from '../services/utility';
 
 export const centerTagParser: Parser<MfmCenter> = syntax('centerTag', (ctx) => {
 	let match, isMatch;
@@ -19,13 +19,13 @@ export const centerTagParser: Parser<MfmCenter> = syntax('centerTag', (ctx) => {
 	}
 
 	// optional LF
-	ctx.regex(/^(\r\n|[\r\n])/);
+	ctx.parser(LfParser);
 
 	// children
 	const children: MfmInline[] = [];
 	while (true) {
 		isMatch = ctx.match(() => {
-			ctx.regex(/^(\r\n|[\r\n])/); // option
+			ctx.parser(LfParser); // option
 			return ctx.str('</center>');
 		});
 		if (isMatch) break;
@@ -40,7 +40,7 @@ export const centerTagParser: Parser<MfmCenter> = syntax('centerTag', (ctx) => {
 	}
 
 	// optional LF
-	ctx.regex(/^(\r\n|[\r\n])/);
+	ctx.parser(LfParser);
 
 	// "</center>"
 	if (!ctx.str('</center>').ok) {

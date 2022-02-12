@@ -1,8 +1,12 @@
 import { ParserContext, Result } from '../../services/parser';
 
+export function LfParser(ctx: ParserContext): Result<RegExpExecArray> {
+	return ctx.regex(/^(\r\n|[\r\n])/);
+}
+
 export function lineEndParser(ctx: ParserContext): Result<null> {
 	const match = ctx.choice([
-		() => ctx.regex(/^(\r\n|[\r\n])/),
+		LfParser,
 		() => ctx.eof() ? ctx.ok(null) : ctx.fail(),
 	]);
 

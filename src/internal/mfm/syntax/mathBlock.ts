@@ -1,7 +1,7 @@
 import { MATH_BLOCK, MfmMathBlock } from '../../../node';
 import { Parser, ParserContext, Result } from '../../services/parser';
 import { syntax } from '../services/syntaxParser';
-import { lineEndParser } from '../services/utility';
+import { LfParser, lineEndParser } from '../services/utility';
 
 function lineParser(ctx: ParserContext): Result<string> {
 	let line = '';
@@ -35,7 +35,7 @@ export const mathBlockParser: Parser<MfmMathBlock> = syntax('mathBlock', (ctx) =
 	}
 
 	// optional LF
-	ctx.regex(/^(\r\n|[\r\n])/);
+	ctx.parser(LfParser);
 
 	// formula
 	const beginFormula = ctx.pos;
@@ -45,7 +45,7 @@ export const mathBlockParser: Parser<MfmMathBlock> = syntax('mathBlock', (ctx) =
 	}
 	while (true) {
 		match = ctx.sequence([
-			() => ctx.regex(/^(\r\n|[\r\n])/),
+			LfParser,
 			lineParser,
 		]);
 		if (!match.ok) break;
@@ -53,7 +53,7 @@ export const mathBlockParser: Parser<MfmMathBlock> = syntax('mathBlock', (ctx) =
 	const formula = ctx.input.substring(beginFormula, ctx.pos);
 
 	// optional LF
-	ctx.regex(/^(\r\n|[\r\n])/);
+	ctx.parser(LfParser);
 
 	// "\]"
 	if (!ctx.str('\\]').ok) {

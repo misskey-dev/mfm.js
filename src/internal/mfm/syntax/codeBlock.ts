@@ -1,7 +1,7 @@
 import { CODE_BLOCK, MfmCodeBlock } from '../../../node';
 import { Parser } from '../../services/parser';
 import { syntax } from '../services/syntaxParser';
-import { lineEndParser } from '../services/utility';
+import { LfParser, lineEndParser } from '../services/utility';
 
 export const codeBlockParser: Parser<MfmCodeBlock> = syntax('codeBlock', (ctx) => {
 	let match;
@@ -29,7 +29,7 @@ export const codeBlockParser: Parser<MfmCodeBlock> = syntax('codeBlock', (ctx) =
 	}
 
 	// LF
-	if (!ctx.regex(/^(\r\n|[\r\n])/).ok) {
+	if (!ctx.parser(LfParser).ok) {
 		return ctx.fail();
 	}
 
@@ -38,7 +38,7 @@ export const codeBlockParser: Parser<MfmCodeBlock> = syntax('codeBlock', (ctx) =
 	while (true) {
 		match = ctx.matchSequence([
 			// LF
-			() => ctx.regex(/^(\r\n|[\r\n])/),
+			LfParser,
 			// "```"
 			() => ctx.str('```'),
 			// end of line
@@ -52,7 +52,7 @@ export const codeBlockParser: Parser<MfmCodeBlock> = syntax('codeBlock', (ctx) =
 	}
 
 	// LF
-	if (!ctx.regex(/^(\r\n|[\r\n])/).ok) {
+	if (!ctx.parser(LfParser).ok) {
 		return ctx.fail();
 	}
 

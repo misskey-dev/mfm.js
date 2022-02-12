@@ -2,6 +2,7 @@ import { fullMfmParser } from '..';
 import { MfmQuote, QUOTE } from '../../../node';
 import { Parser, ParserContext } from '../../services/parser';
 import { syntax } from '../services/syntaxParser';
+import { LfParser } from '../services/utility';
 
 function lineParser(ctx: ParserContext) {
 	// begin of line
@@ -43,7 +44,7 @@ export const quoteParser: Parser<MfmQuote> = syntax('quote', (ctx) => {
 	lines.push(match.result);
 	while (true) {
 		match = ctx.sequence([
-			() => ctx.regex(/^(\r\n|[\r\n])/),
+			LfParser,
 			lineParser,
 		]);
 		if (!match.ok) break;
@@ -52,7 +53,7 @@ export const quoteParser: Parser<MfmQuote> = syntax('quote', (ctx) => {
 	}
 
 	// after option LF
-	ctx.regex(/^(\r\n|[\r\n])/);
+	ctx.parser(LfParser);
 
 	// failure if single line and the line is empty
 	if (lines.length === 1 && lines[0].length === 0) {

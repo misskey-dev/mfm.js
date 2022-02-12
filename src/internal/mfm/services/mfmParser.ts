@@ -21,6 +21,7 @@ import { urlAltParser, urlParser } from '../syntax/url';
 import { codeBlockParser } from '../syntax/codeBlock';
 import { mathBlockParser } from '../syntax/mathBlock';
 import { quoteParser } from '../syntax/quote';
+import { LfParser } from './utility';
 
 // NOTE: MfmParser は、対象となる全ての構文とマッチを試行し、マッチした場合はその構文のノードを生成、
 // いずれの構文にもマッチしなかった場合は長さ1のstring型のノードを生成します。
@@ -227,7 +228,7 @@ export function fullParser(ctx: ParserContext): Result<MfmNode | string | null> 
 
 	// consume LF before block syntaxes
 	matched = ctx.matchSequence([
-		() => ctx.regex(/^(\r\n|[\r\n])/),
+		LfParser,
 		() => ctx.choice([
 			centerTagParser,
 			quoteParser,
@@ -237,12 +238,12 @@ export function fullParser(ctx: ParserContext): Result<MfmNode | string | null> 
 		]),
 	]);
 	if (matched) {
-		ctx.regex(/^(\r\n|[\r\n])/); // ignore LF
+		ctx.parser(LfParser); // ignore LF
 		return ctx.ok(null);
 	}
 
 	// text node (LF or any char)
-	matched = ctx.regex(/^(\r\n|[\r\n])/);
+	matched = ctx.parser(LfParser);
 	if (matched.ok) {
 		return ctx.ok(matched.result[0]);
 	}
@@ -434,7 +435,7 @@ export function inlineParser(ctx: ParserContext): Result<MfmInline | string> {
 	}
 
 	// text node (LF or any char)
-	matched = ctx.regex(/^(\r\n|[\r\n])/);
+	matched = ctx.parser(LfParser);
 	if (matched.ok) {
 		return ctx.ok(matched.result[0]);
 	}
@@ -460,7 +461,7 @@ export function plainParser(ctx: ParserContext): Result<MfmPlainNode | string> {
 	}
 
 	// text node (LF or any char)
-	matched = ctx.regex(/^(\r\n|[\r\n])/);
+	matched = ctx.parser(LfParser);
 	if (matched.ok) {
 		return ctx.ok(matched.result[0]);
 	}
