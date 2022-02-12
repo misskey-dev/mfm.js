@@ -59,6 +59,8 @@ export class ParserContext {
 	// link
 	public inLink: boolean = false;
 
+	public locationCache: Map<number, Location> = new Map();
+
 	constructor(input: string, opts: ParserOpts) {
 		this.input = input;
 		this.nestLimit = (opts.nestLimit != null ? opts.nestLimit : 20);
@@ -241,25 +243,28 @@ export class ParserContext {
 	// other
 
 	public location(pos: number): Location {
-		// TODO: cache calculated location
-		const loc: Location = {
-			row: 0,
-			column: 0,
-		};
+		let loc = this.locationCache.get(pos);
+		if (loc != null) {
+			return loc;
+		}
+		let row = 0;
+		let column = 0;
 		let i = 0;
 		while (i < pos) {
 			if (this.input.charCodeAt(i) === CharCode.lf) {
-				loc.row++;
-				loc.column = 0;
+				row++;
+				column = 0;
 			} else {
-				loc.column++;
+				column++;
 			}
 			i++;
 		}
-		return {
-			row: loc.row,
-			column: loc.column,
+		loc = {
+			row: row,
+			column: column,
 		};
+		this.locationCache.set(pos, loc);
+		return loc;
 	}
 
 	public debugLog(log: string): void {
