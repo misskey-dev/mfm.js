@@ -20,8 +20,11 @@ export type ParserResults<T> = T extends [infer U, ...infer V] ? [ParserResult<U
 export type CacheSource = Map<Parser<any>, Map<number, CacheItem<any>>>;
 
 export type CacheItem<T> = {
+	ok: true,
 	pos: number;
 	result: T;
+} | {
+	ok: false,
 };
 
 export type Location = {

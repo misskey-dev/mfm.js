@@ -17,23 +17,23 @@ export function syntax<T extends Parser<ParserResult<T>>>(name: string, parser: 
 			cacheSource.set(parser, syntaxCache);
 		}
 
+		let records = '';
 		if (ctx.debug) {
-			let records = '';
 			for (const [pos] of syntaxCache.entries()) {
 				records += `${pos} `;
 			}
 			records = records.trim();
-			ctx.debugLog(`[check] syntax=${name} pos=${ctx.pos} inLink=${ctx.inLink} records=[${records}]`);
 		}
 
 		// get cache record
 		const cacheRecord = syntaxCache.get(ctx.pos);
 		if (cacheRecord != null) {
-			ctx.debugLog('[hit]');
-			ctx.pos = cacheRecord.pos;
-			return ctx.ok(cacheRecord.result);
-		} else {
-			ctx.debugLog('[miss]');
+			if (cacheRecord.ok) {
+				ctx.pos = cacheRecord.pos;
+				return ctx.ok(cacheRecord.result);
+			} else {
+				return ctx.fail();
+			}
 		}
 
 		// // push stack
@@ -48,6 +48,7 @@ export function syntax<T extends Parser<ParserResult<T>>>(name: string, parser: 
 		// set cache record
 		if (match.ok) {
 			syntaxCache.set(cachePos, {
+				ok: true,
 				pos: ctx.pos, // next pos
 				result: match.result,
 			});
@@ -57,8 +58,11 @@ export function syntax<T extends Parser<ParserResult<T>>>(name: string, parser: 
 					records += `${pos} `;
 				}
 				records = records.trim();
-				ctx.debugLog(`[set] syntax=${name} pos=${cachePos} next=${ctx.pos} inLink=${ctx.inLink} records=[${records}]`);
 			}
+		} else {
+			syntaxCache.set(cachePos, {
+				ok: false,
+			});
 		}
 
 		return match;
