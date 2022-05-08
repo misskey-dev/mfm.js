@@ -1073,6 +1073,17 @@ hoge`;
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		it('with brackets before', () => {
+			const input = '[test] foo [bar](https://example.com)';
+			const output = [
+				TEXT('[test] foo '),
+				LINK(false, 'https://example.com', [
+					TEXT('bar')
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('fn', () => {

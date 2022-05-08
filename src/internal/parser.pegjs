@@ -441,7 +441,7 @@ link
 }
 
 linkLabel
-	= (!"](" CHAR)+
+	= (!"]" CHAR)+
 {
 	const label = applyParser(text(), 'inlineParser', {
 		linkLabel: true
