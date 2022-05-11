@@ -7,7 +7,7 @@
   "scripts": {
     "build": "npm run tsc && npm run peg",
     "build-debug": "npm run tsc && npm run peg-debug",
-    "peg": "peggy --cache -o src/internal/parser.js --allowed-start-rules fullParser,inlineParser,plainParser src/internal/parser.pegjs && npm run peg-copy",
+    "peg": "peggy --cache -o src/internal/parser.js --allowed-start-rules fullParser,plainParser src/internal/parser.pegjs && npm run peg-copy",
     "peg-debug": "peggy --cache -o src/internal/parser.js --allowed-start-rules fullParser,inlineParser,plainParser --trace src/internal/parser.pegjs && npm run peg-copy",
     "peg-copy": "copyfiles -f src/internal/parser.js built/internal/",
     "tsc": "tsc",
