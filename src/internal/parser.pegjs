@@ -41,10 +41,6 @@
 		return parseFunc(input, parseOpts);
 	}
 
-	// link
-
-	const linkLabel = options.linkLabel || false;
-
 	// emoji
 
 	const emojiRegex = require('twemoji-parser/dist/lib/regex').default;
@@ -108,9 +104,6 @@ fullParser
 plainParser
 	= nodes:(&. @plain)* { return mergeText(nodes); }
 
-inlineParser
-	= nodes:(&. @inline)* { return mergeText(nodes); }
-
 //
 // syntax list
 //
@@ -153,6 +146,19 @@ inline
 	/ fn
 	/ link
 	/ inlineText
+
+L_inline
+	= emojiCode
+	/ unicodeEmoji
+	/ L_big
+	/ L_bold
+	/ L_small
+	/ L_italic
+	/ L_strike
+	/ inlineCode
+	/ mathInline
+	/ L_fn
+	/ L_inlineText
 
 plain
 	= emojiCode
@@ -277,6 +283,15 @@ big
 bigContent
 	= &{ return enterNest(); } @(@(!"***" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
+L_big
+	= "***" content:L_bigContent "***"
+{
+	return FN('tada', { }, mergeText(content));
+}
+
+L_bigContent
+	= &{ return enterNest(); } @(@(!"***" @L_inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
 // inline: bold
 
 bold
@@ -290,8 +305,7 @@ bold
 }
 	/ "__" content:$(!"__" @([a-z0-9]i / _))+ "__"
 {
-	const parsedContent = applyParser(content, 'inlineParser');
-	return BOLD(parsedContent);
+	return BOLD([TEXT(content)]);
 }
 
 boldContent
@@ -299,6 +313,26 @@ boldContent
 
 boldTagContent
 	= &{ return enterNest(); } @(@(!"</b>" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
+L_bold
+	= "**" content:L_boldContent "**"
+{
+	return BOLD(mergeText(content));
+}
+	/ "<b>" content:L_boldTagContent "</b>"
+{
+	return BOLD(mergeText(content));
+}
+	/ "__" content:$(!"__" @([a-z0-9]i / _))+ "__"
+{
+	return BOLD([TEXT(content)]);
+}
+
+L_boldContent
+	= &{ return enterNest(); } @(@(!"**" @L_inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
+L_boldTagContent
+	= &{ return enterNest(); } @(@(!"</b>" @L_inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 // inline: small
 
@@ -311,6 +345,15 @@ small
 smallContent
 	= &{ return enterNest(); } @(@(!"</small>" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
+L_small
+	= "<small>" content:L_smallContent "</small>"
+{
+	return SMALL(mergeText(content));
+}
+
+L_smallContent
+	= &{ return enterNest(); } @(@(!"</small>" @L_inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
 // inline: italic
 
 italic
@@ -320,20 +363,28 @@ italic
 }
 	/ italicAlt
 
-italicAlt
-	= "*" content:$(!"*" ([a-z0-9]i / _))+ "*" &(EOF / LF / _ / ![a-z0-9]i)
+L_italic
+	= "<i>" content:L_italicContent "</i>"
 {
-	const parsedContent = applyParser(content, 'inlineParser');
-	return ITALIC(parsedContent);
+	return ITALIC(mergeText(content));
 }
-	/ "_" content:$(!"_" ([a-z0-9]i / _))+ "_" &(EOF / LF / _ / ![a-z0-9]i)
+	/ italicAlt
+
+italicAlt
+	= "*" content:$([a-z0-9]i / _)+ "*" &(EOF / LF / _ / ![a-z0-9]i)
 {
-	const parsedContent = applyParser(content, 'inlineParser');
-	return ITALIC(parsedContent);
+	return ITALIC([TEXT(content)]);
+}
+	/ "_" content:$([a-z0-9]i / _)+ "_" &(EOF / LF / _ / ![a-z0-9]i)
+{
+	return ITALIC([TEXT(content)]);
 }
 
 italicContent
 	= &{ return enterNest(); } @(@(!"</i>" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
+L_italicContent
+	= &{ return enterNest(); } @(@(!"</i>" @L_inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 // inline: strike
 
@@ -352,6 +403,22 @@ strikeContent
 
 strikeTagContent
 	= &{ return enterNest(); } @(@(!("</s>" / LF) @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
+L_strike
+	= "~~" content:L_strikeContent "~~"
+{
+	return STRIKE(mergeText(content));
+}
+	/ "<s>" content:L_strikeTagContent "</s>"
+{
+	return STRIKE(mergeText(content));
+}
+
+L_strikeContent
+	= &{ return enterNest(); } @(@(!("~" / LF) @L_inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
+L_strikeTagContent
+	= &{ return enterNest(); } @(@(!("</s>" / LF) @L_inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 // inline: inlineCode
 
@@ -372,7 +439,7 @@ mathInline
 // inline: mention
 
 mention
-	= &{ return !linkLabel; } "@" name:mentionName host:("@" @mentionHost)?
+	= "@" name:mentionName host:("@" @mentionHost)?
 {
 	return MENTION(name, host, text());
 }
@@ -414,11 +481,11 @@ hashPairInner
 // inline: URL
 
 url
-	= &{ return !linkLabel; } "<" url:$("http" "s"? "://" (!(">" / _) CHAR)+) ">"
+	= "<" url:$("http" "s"? "://" (!(">" / _) CHAR)+) ">"
 {
 	return N_URL(url, true);
 }
-	/ &{ return !linkLabel; } "http" "s"? "://" (&([.,]+ urlContentPart) . / urlContentPart)+
+	/ "http" "s"? "://" (&([.,]+ urlContentPart) . / urlContentPart)+
 {
 	// NOTE: last char is neither "." nor ",".
 	return N_URL(text());
@@ -435,19 +502,13 @@ urlPairInner
 // inline: link
 
 link
-	= &{ return !linkLabel; } silent:"?"? "[" label:linkLabel "](" url:url ")"
+	= silent:"?"? "[" label:linkLabel "](" url:url ")"
 {
 	return LINK((silent != null), url.props.url, mergeText(label));
 }
 
 linkLabel
-	= (!"](" CHAR)+
-{
-	const label = applyParser(text(), 'inlineParser', {
-		linkLabel: true
-	});
-	return label;
-}
+	= (!"]" @L_inline)+
 
 // inline: fn
 
@@ -458,8 +519,18 @@ fn
 	return FN(name, args, mergeText(content));
 }
 
+L_fn
+	= "$[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:L_fnContent "]"
+{
+	args = args || {};
+	return FN(name, args, mergeText(content));
+}
+
 fnContent
 	= &{ return enterNest(); } @(@(!"]" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+
+L_fnContent
+	= &{ return enterNest(); } @(@(!"]" @L_inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 fnArgs
 	= "." head:fnArg tails:("," @fnArg)*
@@ -485,6 +556,10 @@ fnArg
 
 inlineText
 	= !(LF / _) [a-z0-9]i &(hashtag / mention / italicAlt) . { return text(); } // hashtag, mention, italic ignore
+	/ . /* text node */
+
+L_inlineText
+	= !(LF / _) [a-z0-9]i &italicAlt . { return text(); } // italic ignore
 	/ . /* text node */
 
 // inline: text (for plainParser)
