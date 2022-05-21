@@ -15,7 +15,7 @@ export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
 	}
 
 	for (const node of nodes) {
-		if (typeof node == 'string') {
+		if (typeof node === 'string') {
 			// Store the char.
 			storedChars.push(node);
 		}
@@ -131,13 +131,13 @@ export function stringifyTree(nodes: MfmNode[]): string {
 
 		let pushLf: boolean = true;
 		if (isMfmBlock(node)) {
-			if (state == stringifyState.none) {
+			if (state === stringifyState.none) {
 				pushLf = false;
 			}
 			state = stringifyState.block;
 		}
 		else {
-			if (state == stringifyState.none || state == stringifyState.inline) {
+			if (state === stringifyState.none || state === stringifyState.inline) {
 				pushLf = false;
 			}
 			state = stringifyState.inline;
