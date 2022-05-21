@@ -1265,17 +1265,59 @@ hoge`;
 			});
 		});
 
-		it('hashtag', () => {
-			const input = '<b><b>#abc(xyz)</b></b>';
-			const output = [
-				BOLD([
+		describe('hashtag', () => {
+			it('basic', () => {
+				const input = '<b><b>#abc(xyz)</b></b>';
+				const output = [
 					BOLD([
-						HASHTAG('abc'),
-						TEXT('(xyz)'),
+						BOLD([
+							HASHTAG('abc'),
+							TEXT('(xyz)'),
+						]),
 					]),
-				]),
-			];
-			assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+				];
+				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+			});
+
+			it('outside "()"', () => {
+				const input = '(#abc)';
+				const output = [
+					TEXT('('),
+					HASHTAG('abc'),
+					TEXT(')'),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
+
+			it('outside "[]"', () => {
+				const input = '[#abc]';
+				const output = [
+					TEXT('['),
+					HASHTAG('abc'),
+					TEXT(']'),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
+
+			it('outside "「」"', () => {
+				const input = '「#abc」';
+				const output = [
+					TEXT('「'),
+					HASHTAG('abc'),
+					TEXT('」'),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
+
+			it('outside "（）"', () => {
+				const input = '（#abc）';
+				const output = [
+					TEXT('（'),
+					HASHTAG('abc'),
+					TEXT('）'),
+				];
+				assert.deepStrictEqual(mfm.parse(input), output);
+			});
 		});
 
 		it('url', () => {
