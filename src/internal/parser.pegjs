@@ -246,7 +246,7 @@ mathBlockLine
 // block: center
 
 center
-	= BEGIN "<center>" LF? content:(!(LF? "</center>" END) @inline)+ LF? "</center>" END
+	= BEGIN "<center>" LF? content:(!(LF? "</center>" END) @inline)* LF? "</center>" END
 {
 	return CENTER(mergeText(content));
 }
@@ -402,7 +402,7 @@ strikeContent
 	= &{ return enterNest(); } @(@(!("~" / LF) @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 strikeTagContent
-	= &{ return enterNest(); } @(@(!("</s>" / LF) @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+	= &{ return enterNest(); } @(@(!"</s>" @inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 L_strike
 	= "~~" content:L_strikeContent "~~"
@@ -418,7 +418,7 @@ L_strikeContent
 	= &{ return enterNest(); } @(@(!("~" / LF) @L_inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 L_strikeTagContent
-	= &{ return enterNest(); } @(@(!("</s>" / LF) @L_inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
+	= &{ return enterNest(); } @(@(!"</s>" @L_inline)+ &{ return leaveNest(); } / &{ return fallbackNest(); })
 
 // inline: inlineCode
 
