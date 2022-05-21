@@ -473,7 +473,8 @@ hashtagContentPart
 	= "(" hashPairInner ")"
 	/ "[" hashPairInner "]"
 	/ "「" hashPairInner "」"
-	/ ![ 　\t.,!?'"#:\/\[\]【】()「」<>] CHAR
+	/ "（" hashPairInner "）"
+	/ ![ 　\t.,!?'"#:\/\[\]【】()「」（）<>] CHAR
 
 hashPairInner
 	= &{ return enterNest(); } @(@hashtagContentPart* &{ return leaveNest(); } / &{ return fallbackNest(); })
