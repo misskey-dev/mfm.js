@@ -11,6 +11,13 @@
 
 -->
 
+## 0.22.1
+
+npm: https://www.npmjs.com/package/mfm-js/v/0.22.1
+
+### Improvements
+- Removes a unnecessary built file
+
 ## 0.22.0
 
 npm: https://www.npmjs.com/package/mfm-js/v/0.22.0
