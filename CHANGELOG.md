@@ -11,6 +11,13 @@
 
 -->
 
+## 0.22.1
+
+npm: https://www.npmjs.com/package/mfm-js/v/0.22.1
+
+### Improvements
+- Removes a unnecessary built file
+
 ## 0.22.0
 
 npm: https://www.npmjs.com/package/mfm-js/v/0.22.0
@@ -22,6 +29,9 @@ npm: https://www.npmjs.com/package/mfm-js/v/0.22.0
 - `（）` pair is available on outside the hashtag (#111)
 - Changes specs the center tag and strike (#108, 100fb0b)
 - Improves link label parsing (#107)
+
+### Bugfixes
+- If there is a `[]` pair before the link, it will be mistakenly recognized as a part of link label. (#104)
 
 ## 0.21.0
 
