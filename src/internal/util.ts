@@ -103,6 +103,9 @@ export function stringifyNode(node: MfmNode): string {
 			const args = (argFields.length > 0) ? '.' + argFields.join(',') : '';
 			return `$[${ node.props.name }${ args } ${ stringifyTree(node.children) }]`;
 		}
+		case 'plain': {
+			return `<plain>\n${ stringifyTree(node.children) }\n</plain>`;
+		}
 		case 'text': {
 			return node.props.text;
 		}
