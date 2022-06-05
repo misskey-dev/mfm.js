@@ -238,7 +238,7 @@ export const N_URL: (value: string, brackets?: boolean | undefined) => NodeType<
 export type NodeType<T extends MfmNode['type']> = T extends 'quote' ? MfmQuote : T extends 'search' ? MfmSearch : T extends 'blockCode' ? MfmCodeBlock : T extends 'mathBlock' ? MfmMathBlock : T extends 'center' ? MfmCenter : T extends 'unicodeEmoji' ? MfmUnicodeEmoji : T extends 'emojiCode' ? MfmEmojiCode : T extends 'bold' ? MfmBold : T extends 'small' ? MfmSmall : T extends 'italic' ? MfmItalic : T extends 'strike' ? MfmStrike : T extends 'inlineCode' ? MfmInlineCode : T extends 'mathInline' ? MfmMathInline : T extends 'mention' ? MfmMention : T extends 'hashtag' ? MfmHashtag : T extends 'url' ? MfmUrl : T extends 'link' ? MfmLink : T extends 'fn' ? MfmFn : T extends 'plain' ? MfmNomfm : T extends 'text' ? MfmText : never;
 
 // @public (undocumented)
-export const NOMFM: (text: MfmText) => NodeType<'plain'>;
+export const NOMFM: (text: string) => NodeType<'plain'>;
 
 // @public (undocumented)
 export function parse(input: string, opts?: Partial<{
