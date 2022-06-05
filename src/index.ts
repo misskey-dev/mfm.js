@@ -35,6 +35,7 @@ export {
 	MfmUrl,
 	MfmLink,
 	MfmFn,
+	MfmNomfm,
 	MfmText,
 } from './node';
 
@@ -60,5 +61,6 @@ export {
 	N_URL,
 	LINK,
 	FN,
+	NOMFM,
 	TEXT,
 } from './node';
