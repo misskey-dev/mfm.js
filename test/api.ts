@@ -147,6 +147,16 @@ after`;
 			assert.strictEqual(mfm.toString(mfm.parse(input)), '$[spin.speed=1s,alternate Hello]');
 		});
 
+		it('nomfm', () => {
+			const input = 'a\n<plain>\nHello\nworld\n</plain>\nb';
+			assert.strictEqual(mfm.toString(mfm.parse(input)), 'a\n<plain>\nHello\nworld\n</plain>\nb');
+		});
+
+		it('1 line nomfm', () => {
+			const input = 'a\n<plain>Hello</plain>\nb';
+			assert.strictEqual(mfm.toString(mfm.parse(input)), 'a\n<plain>\nHello\n</plain>\nb');
+		});
+
 		it('preserve url brackets', () => {
 			const input1 = 'https://github.com/syuilo/ai';
 			assert.strictEqual(mfm.toString(mfm.parse(input1)), input1);

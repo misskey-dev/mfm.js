@@ -562,7 +562,7 @@ fnArg
 nomfm
 	= "<plain>" LF? content:nomfmContent LF? "</plain>"
 {
-	return NOMFM(TEXT(content));
+	return NOMFM(content);
 }
 
 nomfmContent

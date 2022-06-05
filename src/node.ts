@@ -178,7 +178,7 @@ export type MfmNomfm = {
 	props?: Record<string, unknown>;
 	children: MfmText[];
 };
-export const NOMFM = (text: MfmText): NodeType<'plain'> => { return { type: 'plain', children: [text] }; };
+export const NOMFM = (text: string): NodeType<'plain'> => { return { type: 'plain', children: [TEXT(text)] }; };
 
 export type MfmText = {
 	type: 'text';

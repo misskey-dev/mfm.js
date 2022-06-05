@@ -1,7 +1,7 @@
 import assert from 'assert';
 import * as mfm from '../src/index';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE, MATH_INLINE
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE, MATH_INLINE, NOMFM
 } from '../src/index';
 
 describe('PlainParser', () => {
@@ -1135,6 +1135,28 @@ hoge`;
 				TEXT('$[pope.speed=1.1s text]')
 			];
 			assert.deepStrictEqual(mfm.parse(input, { fnNameList: ['tada', 'spin'] }), output);
+		});
+	});
+
+	describe('nomfm', () => {
+		it('multiple line', () => {
+			const input = 'a\n<plain>\nHello\nworld\n</plain>\nb';
+			const output = [
+				TEXT('a\n'),
+				NOMFM('Hello\nworld'),
+				TEXT('\nb')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('single line', () => {
+			const input = 'a\n<plain>Hello world</plain>\nb';
+			const output = [
+				TEXT('a\n'),
+				NOMFM('Hello world'),
+				TEXT('\nb')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
 
