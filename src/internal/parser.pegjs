@@ -21,6 +21,7 @@
 		N_URL,
 		LINK,
 		FN,
+		NOMFM,
 		TEXT
 	} = require('../node');
 
@@ -126,6 +127,7 @@ full
 	/ hashtag
 	/ url
 	/ fn
+	/ nomfm
 	/ link
 	/ search // block
 	/ inlineText
@@ -144,6 +146,7 @@ inline
 	/ hashtag
 	/ url
 	/ fn
+	/ nomfm
 	/ link
 	/ inlineText
 
@@ -158,6 +161,7 @@ L_inline
 	/ inlineCode
 	/ mathInline
 	/ L_fn
+	/ nomfm
 	/ L_inlineText
 
 plain
@@ -551,6 +555,20 @@ fnArg
 	/ k:$([a-z0-9_]i)+
 {
 	return { k: k, v: true };
+}
+
+// inline: nomfm
+
+nomfm
+	= "<plain>" LF? content:nomfmContent LF? "</plain>"
+{
+	return NOMFM(TEXT(content));
+}
+
+nomfmContent
+	= (!(LF? "</plain>") .)+
+{
+	return text();
 }
 
 // inline: text
