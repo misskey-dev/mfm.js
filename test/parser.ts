@@ -1140,20 +1140,20 @@ hoge`;
 
 	describe('nomfm', () => {
 		it('multiple line', () => {
-			const input = 'a\n<plain>\nHello\nworld\n</plain>\nb';
+			const input = 'a\n<plain>\n**Hello**\nworld\n</plain>\nb';
 			const output = [
 				TEXT('a\n'),
-				NOMFM('Hello\nworld'),
+				NOMFM('**Hello**\nworld'),
 				TEXT('\nb')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
 		it('single line', () => {
-			const input = 'a\n<plain>Hello world</plain>\nb';
+			const input = 'a\n<plain>**Hello** world</plain>\nb';
 			const output = [
 				TEXT('a\n'),
-				NOMFM('Hello world'),
+				NOMFM('**Hello** world'),
 				TEXT('\nb')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
