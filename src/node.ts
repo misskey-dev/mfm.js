@@ -53,7 +53,7 @@ export type MfmCenter = {
 export const CENTER = (children: MfmInline[]): NodeType<'center'> => { return { type: 'center', children }; };
 
 export type MfmInline = MfmUnicodeEmoji | MfmEmojiCode | MfmBold | MfmSmall | MfmItalic | MfmStrike |
-	MfmInlineCode | MfmMathInline | MfmMention | MfmHashtag | MfmUrl | MfmLink | MfmFn | MfmNomfm | MfmText;
+	MfmInlineCode | MfmMathInline | MfmMention | MfmHashtag | MfmUrl | MfmLink | MfmFn | MfmPlain | MfmText;
 
 export type MfmUnicodeEmoji = {
 	type: 'unicodeEmoji';
@@ -173,12 +173,12 @@ export type MfmFn = {
 };
 export const FN = (name: string, args: MfmFn['props']['args'], children: MfmFn['children']): NodeType<'fn'> => { return { type: 'fn', props: { name, args }, children }; };
 
-export type MfmNomfm = {
+export type MfmPlain = {
 	type: 'plain';
 	props?: Record<string, unknown>;
 	children: MfmText[];
 };
-export const NOMFM = (text: string): NodeType<'plain'> => { return { type: 'plain', children: [TEXT(text)] }; };
+export const PLAIN = (text: string): NodeType<'plain'> => { return { type: 'plain', children: [TEXT(text)] }; };
 
 export type MfmText = {
 	type: 'text';
@@ -208,6 +208,6 @@ export type NodeType<T extends MfmNode['type']> =
 	T extends 'url' ? MfmUrl :
 	T extends 'link' ? MfmLink :
 	T extends 'fn' ? MfmFn :
-	T extends 'plain' ? MfmNomfm :
+	T extends 'plain' ? MfmPlain :
 	T extends 'text' ? MfmText :
 	never;

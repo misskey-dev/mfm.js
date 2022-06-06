@@ -147,12 +147,12 @@ after`;
 			assert.strictEqual(mfm.toString(mfm.parse(input)), '$[spin.speed=1s,alternate Hello]');
 		});
 
-		it('nomfm', () => {
+		it('plain', () => {
 			const input = 'a\n<plain>\nHello\nworld\n</plain>\nb';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), 'a\n<plain>\nHello\nworld\n</plain>\nb');
 		});
 
-		it('1 line nomfm', () => {
+		it('1 line plain', () => {
 			const input = 'a\n<plain>Hello</plain>\nb';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), 'a\n<plain>\nHello\n</plain>\nb');
 		});

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import * as mfm from '../src/index';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE, MATH_INLINE, NOMFM
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE, MATH_INLINE, PLAIN
 } from '../src/index';
 
 describe('SimpleParser', () => {
@@ -1138,12 +1138,12 @@ hoge`;
 		});
 	});
 
-	describe('nomfm', () => {
+	describe('plain', () => {
 		it('multiple line', () => {
 			const input = 'a\n<plain>\n**Hello**\nworld\n</plain>\nb';
 			const output = [
 				TEXT('a\n'),
-				NOMFM('**Hello**\nworld'),
+				PLAIN('**Hello**\nworld'),
 				TEXT('\nb')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
@@ -1153,7 +1153,7 @@ hoge`;
 			const input = 'a\n<plain>**Hello** world</plain>\nb';
 			const output = [
 				TEXT('a\n'),
-				NOMFM('**Hello** world'),
+				PLAIN('**Hello** world'),
 				TEXT('\nb')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);

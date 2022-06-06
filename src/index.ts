@@ -9,6 +9,7 @@ export {
 export {
 	NodeType,
 	MfmNode,
+	MfmSimpleNode,
 	MfmBlock,
 	MfmInline,
 } from './node';
@@ -35,7 +36,7 @@ export {
 	MfmUrl,
 	MfmLink,
 	MfmFn,
-	MfmNomfm,
+	MfmPlain,
 	MfmText,
 } from './node';
 
@@ -61,6 +62,6 @@ export {
 	N_URL,
 	LINK,
 	FN,
-	NOMFM,
+	PLAIN,
 	TEXT,
 } from './node';
