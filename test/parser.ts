@@ -4,24 +4,24 @@ import {
 	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE, MATH_INLINE, NOMFM
 } from '../src/index';
 
-describe('PlainParser', () => {
+describe('SimpleParser', () => {
 	describe('text', () => {
 		it('basic', () => {
 			const input = 'abc';
 			const output = [TEXT('abc')];
-			assert.deepStrictEqual(mfm.parsePlain(input), output);
+			assert.deepStrictEqual(mfm.parseSimple(input), output);
 		});
 
 		it('ignore hashtag', () => {
 			const input = 'abc#abc';
 			const output = [TEXT('abc#abc')];
-			assert.deepStrictEqual(mfm.parsePlain(input), output);
+			assert.deepStrictEqual(mfm.parseSimple(input), output);
 		});
 
 		it('keycap number sign', () => {
 			const input = 'abc#️⃣abc';
 			const output = [TEXT('abc'), UNI_EMOJI('#️⃣'), TEXT('abc')];
-			assert.deepStrictEqual(mfm.parsePlain(input), output);
+			assert.deepStrictEqual(mfm.parseSimple(input), output);
 		});
 	});
 
@@ -29,20 +29,20 @@ describe('PlainParser', () => {
 		it('basic', () => {
 			const input = ':foo:';
 			const output = [EMOJI_CODE('foo')];
-			assert.deepStrictEqual(mfm.parsePlain(input), output);
+			assert.deepStrictEqual(mfm.parseSimple(input), output);
 		});
 
 		it('between texts', () => {
 			const input = 'foo:bar:baz';
 			const output = [TEXT('foo'), EMOJI_CODE('bar'), TEXT('baz')];
-			assert.deepStrictEqual(mfm.parsePlain(input), output);
+			assert.deepStrictEqual(mfm.parseSimple(input), output);
 		});
 	});
 
 	it('disallow other syntaxes', () => {
 		const input = 'foo **bar** baz';
 		const output = [TEXT('foo **bar** baz')];
-		assert.deepStrictEqual(mfm.parsePlain(input), output);
+		assert.deepStrictEqual(mfm.parseSimple(input), output);
 	});
 });
 

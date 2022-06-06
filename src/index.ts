@@ -1,6 +1,6 @@
 export {
 	parse,
-	parsePlain,
+	parseSimple,
 	toString,
 	inspect,
 	extract,

@@ -102,8 +102,8 @@
 fullParser
 	= nodes:(&. @full)* { return mergeText(nodes); }
 
-plainParser
-	= nodes:(&. @plain)* { return mergeText(nodes); }
+simpleParser
+	= nodes:(&. @simple)* { return mergeText(nodes); }
 
 //
 // syntax list
@@ -164,10 +164,10 @@ L_inline
 	/ nomfm
 	/ L_inlineText
 
-plain
+simple
 	= emojiCode
 	/ unicodeEmoji
-	/ plainText
+	/ simpleText
 
 //
 // block rules
@@ -581,9 +581,9 @@ L_inlineText
 	= !(LF / _) [a-z0-9]i &italicAlt . { return text(); } // italic ignore
 	/ . /* text node */
 
-// inline: text (for plainParser)
+// inline: text (for simpleParser)
 
-plainText
+simpleText
 	= . /* text node */
 
 //

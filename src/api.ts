@@ -1,5 +1,5 @@
 import peg from 'peggy';
-import { MfmNode, MfmPlainNode } from './node';
+import { MfmNode, MfmSimpleNode } from './node';
 import { stringifyNode, stringifyTree, inspectOne } from './internal/util';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -18,10 +18,10 @@ export function parse(input: string, opts: Partial<{ fnNameList: string[]; nestL
 }
 
 /**
- * Generates a MfmNode tree of plain from the MFM string.
+ * Generates a MfmSimpleNode tree from the MFM string.
 */
-export function parsePlain(input: string): MfmPlainNode[] {
-	const nodes = parser.parse(input, { startRule: 'plainParser' });
+export function parseSimple(input: string): MfmSimpleNode[] {
+	const nodes = parser.parse(input, { startRule: 'simpleParser' });
 	return nodes;
 }
 
