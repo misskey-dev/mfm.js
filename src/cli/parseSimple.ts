@@ -1,9 +1,9 @@
 import { performance } from 'perf_hooks';
 import inputLine, { InputCanceledError } from './misc/inputLine';
-import { parsePlain } from '..';
+import { parseSimple } from '..';
 
 async function entryPoint() {
-	console.log('intaractive plain parser');
+	console.log('intaractive simple parser');
 
 	while (true) {
 		let input: string;
@@ -26,7 +26,7 @@ async function entryPoint() {
 
 		try {
 			const parseTimeStart = performance.now();
-			const result = parsePlain(input);
+			const result = parseSimple(input);
 			const parseTimeEnd = performance.now();
 			console.log(JSON.stringify(result));
 			const parseTime = (parseTimeEnd - parseTimeStart).toFixed(3);

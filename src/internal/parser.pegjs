@@ -21,6 +21,7 @@
 		N_URL,
 		LINK,
 		FN,
+		PLAIN,
 		TEXT
 	} = require('../node');
 
@@ -101,8 +102,8 @@
 fullParser
 	= nodes:(&. @full)* { return mergeText(nodes); }
 
-plainParser
-	= nodes:(&. @plain)* { return mergeText(nodes); }
+simpleParser
+	= nodes:(&. @simple)* { return mergeText(nodes); }
 
 //
 // syntax list
@@ -126,6 +127,7 @@ full
 	/ hashtag
 	/ url
 	/ fn
+	/ plain
 	/ link
 	/ search // block
 	/ inlineText
@@ -144,6 +146,7 @@ inline
 	/ hashtag
 	/ url
 	/ fn
+	/ plain
 	/ link
 	/ inlineText
 
@@ -158,12 +161,13 @@ L_inline
 	/ inlineCode
 	/ mathInline
 	/ L_fn
+	/ plain
 	/ L_inlineText
 
-plain
+simple
 	= emojiCode
 	/ unicodeEmoji
-	/ plainText
+	/ simpleText
 
 //
 // block rules
@@ -553,6 +557,20 @@ fnArg
 	return { k: k, v: true };
 }
 
+// inline: plain
+
+plain
+	= "<plain>" LF? content:plainContent LF? "</plain>"
+{
+	return PLAIN(content);
+}
+
+plainContent
+	= (!(LF? "</plain>") .)+
+{
+	return text();
+}
+
 // inline: text
 
 inlineText
@@ -563,9 +581,9 @@ L_inlineText
 	= !(LF / _) [a-z0-9]i &italicAlt . { return text(); } // italic ignore
 	/ . /* text node */
 
-// inline: text (for plainParser)
+// inline: text (for simpleParser)
 
-plainText
+simpleText
 	= . /* text node */
 
 //

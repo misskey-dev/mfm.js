@@ -1,6 +1,6 @@
 export {
 	parse,
-	parsePlain,
+	parseSimple,
 	toString,
 	inspect,
 	extract,
@@ -9,6 +9,7 @@ export {
 export {
 	NodeType,
 	MfmNode,
+	MfmSimpleNode,
 	MfmBlock,
 	MfmInline,
 } from './node';
@@ -35,6 +36,7 @@ export {
 	MfmUrl,
 	MfmLink,
 	MfmFn,
+	MfmPlain,
 	MfmText,
 } from './node';
 
@@ -60,5 +62,6 @@ export {
 	N_URL,
 	LINK,
 	FN,
+	PLAIN,
 	TEXT,
 } from './node';
