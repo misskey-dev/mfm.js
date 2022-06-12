@@ -7,16 +7,13 @@ const alphaAndNum = P.regexp(/[a-z0-9]/i);
 const LF = P.alt([P.str('\r\n'), P.str('\r'), P.str('\n')]);
 
 function nest<T>(parser: P.Parser<T>): P.Parser<T> {
-	return new P.Parser((input, index, ctx) => {
-		if (ctx.depth >= 20) {
+	return new P.Parser((input, index, state) => {
+		if (state.depth >= state.nestLimit) {
 			return P.failure();
 		}
-		ctx.depth++;
-		const result = parser.handler(input, index, ctx);
-		ctx.depth--;
-		if (!result.success) {
-			return P.failure();
-		}
+		state.depth++;
+		const result = parser.handler(input, index, state);
+		state.depth--;
 		return result;
 	});
 }
@@ -104,7 +101,11 @@ export type FullParserOpts = {
 };
 
 export function fullParser(input: string, opts: FullParserOpts): MfmNode[] {
-	const reply = lang.fullParser.handler(input, 0, { depth: 0 });
+	const reply = lang.fullParser.handler(input, 0, {
+		nestLimit: (opts.nestLimit != null) ? opts.nestLimit : 20,
+		fnNameList: opts.fnNameList,
+		depth: 0,
+	});
 	if (!reply.success) {
 		throw new Error('parsing error');
 	}
