@@ -33,12 +33,9 @@ const boldAstaMark = P.str('**');
 
 const boldAsta = P.seq([
 	boldAstaMark,
-	P.seq([P.notMatch(boldAstaMark), P.any]).map(result => result[1])
-		.atLeast(1),
+	P.seq([P.notMatch(boldAstaMark), P.any], 1).atLeast(1),
 	boldAstaMark,
-]).map(result => {
-	return BOLD(mergeText(result[1] as (MfmInline | string)[]));
-});
+]).map(result => BOLD(mergeText(result[1] as (MfmInline | string)[])));
 
 // text
 

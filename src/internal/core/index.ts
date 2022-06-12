@@ -80,7 +80,7 @@ export const str = (value: string): Parser => {
 	});
 };
 
-export const seq = (parsers: Parser[]): Parser => {
+export const seq = (parsers: Parser[], select?: number): Parser => {
 	return new Parser((input, index, state) => {
 		let result;
 		const accum = [];
@@ -92,7 +92,7 @@ export const seq = (parsers: Parser[]): Parser => {
 			index = result.index;
 			accum.push(result.value);
 		}
-		return success(index, accum);
+		return success(index, select != null ? accum[select] : accum);
 	});
 };
 
