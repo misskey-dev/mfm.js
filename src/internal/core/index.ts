@@ -1,15 +1,17 @@
 
-type Success = {
+type Success<T> = {
 	success: true;
-	value: any;
+	value: T;
 	index: number;
 };
 
 type Failure = { success: false };
 
-type Reply = Success | Failure;
+type Reply<T> = Success<T> | Failure;
 
-export function success(index: number, value: any): Success {
+type ParserHandler<T> = (input: string, index: number, state: any) => Reply<T>
+
+export function success<T>(index: number, value: T): Success<T> {
 	return {
 		success: true,
 		value: value,
@@ -21,16 +23,14 @@ export function failure(): Failure {
 	return { success: false };
 }
 
-type ParserHandler = (input: string, index: number, state: any) => Reply
+export class Parser<T> {
+	public handler: ParserHandler<T>;
 
-export class Parser {
-	public handler: ParserHandler;
-
-	constructor(handler: ParserHandler) {
+	constructor(handler: ParserHandler<T>) {
 		this.handler = handler;
 	}
 
-	map(fn: (value: any) => any): Parser {
+	map<U>(fn: (value: T) => U): Parser<U> {
 		return new Parser((input, index, state) => {
 			const result = this.handler(input, index, state);
 			if (!result.success) {
@@ -40,7 +40,7 @@ export class Parser {
 		});
 	}
 
-	atLeast(n: number) {
+	atLeast(n: number): Parser<any> {
 		return new Parser((input, index, state) => {
 			let result;
 			let accum = [];
@@ -68,7 +68,7 @@ export const any = new Parser((input, index, state) => {
 	return success(index + 1, value);
 });
 
-export const str = (value: string): Parser => {
+export const str = <T extends string>(value: T): Parser<T> => {
 	return new Parser((input, index, state) => {
 		if ((input.length - index) < value.length) {
 			return failure();
@@ -80,7 +80,7 @@ export const str = (value: string): Parser => {
 	});
 };
 
-export const seq = (parsers: Parser[], select?: number): Parser => {
+export const seq = (parsers: Parser<any>[], select?: number): Parser<any> => {
 	return new Parser((input, index, state) => {
 		let result;
 		const accum = [];
@@ -96,7 +96,7 @@ export const seq = (parsers: Parser[], select?: number): Parser => {
 	});
 };
 
-export const alt = (parsers: Parser[]): Parser => {
+export const alt = (parsers: Parser<any>[]): Parser<any> => {
 	return new Parser((input, index, state) => {
 		let result;
 		for (let i = 0; i < parsers.length; i++) {
@@ -109,7 +109,7 @@ export const alt = (parsers: Parser[]): Parser => {
 	});
 };
 
-export const match = (parser: Parser): Parser => {
+export const match = (parser: Parser<any>): Parser<null> => {
 	return new Parser((input, index, state) => {
 		const result = parser.handler(input, index, state);
 		return result.success
@@ -118,7 +118,7 @@ export const match = (parser: Parser): Parser => {
 	});
 };
 
-export const notMatch = (parser: Parser): Parser => {
+export const notMatch = (parser: Parser<any>): Parser<null> => {
 	return new Parser((input, index, state) => {
 		const result = parser.handler(input, index, state);
 		return !result.success
@@ -127,17 +127,18 @@ export const notMatch = (parser: Parser): Parser => {
 	});
 };
 
-export const lazy = (fn: () => Parser): Parser => {
-	const parser: Parser = new Parser((input, index, state) => {
-		console.log('eval');
+export const lazy = <T>(fn: () => Parser<T>): Parser<T> => {
+	const parser: Parser<T> = new Parser((input, index, state) => {
 		parser.handler = fn().handler;
 		return parser.handler(input, index, state);
 	});
 	return parser;
 };
 
-export function createLanguage(syntaxes: Record<string, ((rules: Record<string, Parser>) => Parser)>) {
-	const rules: Record<string, Parser> = {};
+type Syntax = (rules: any) => Parser<any>;
+
+export function createLanguage<T extends Record<string, Syntax>>(syntaxes: T): Record<string, Parser<any>> {
+	const rules: Record<string, Parser<any>> = {};
 	for (const key of Object.keys(syntaxes)) {
 		rules[key] = lazy(() => {
 			return syntaxes[key](rules);
