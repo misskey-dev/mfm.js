@@ -40,10 +40,10 @@ export class Parser<T> {
 		});
 	}
 
-	atLeast(n: number): Parser<any> {
+	atLeast(n: number): Parser<T[]> {
 		return new Parser((input, index, state) => {
 			let result;
-			let accum = [];
+			const accum: T[] = [];
 			while (index < input.length) {
 				result = this.handler(input, index, state);
 				if (!result.success) {
@@ -73,10 +73,21 @@ export const str = <T extends string>(value: T): Parser<T> => {
 		if ((input.length - index) < value.length) {
 			return failure();
 		}
-		if (input.substr(index, value.length) != value) {
+		if (input.substr(index, value.length) !== value) {
 			return failure();
 		}
 		return success(index + value.length, value);
+	});
+};
+
+export const regexp = <T extends RegExp>(pattern: T): Parser<string> => {
+	const re = RegExp(`^${pattern.source}`, pattern.flags);
+	return new Parser((input, index, state) => {
+		const result = re.exec(input.slice(index));
+		if (result == null) {
+			return failure();
+		}
+		return success(index + result[0].length, result[0]);
 	});
 };
 
@@ -135,7 +146,7 @@ export const lazy = <T>(fn: () => Parser<T>): Parser<T> => {
 	return parser;
 };
 
-type Syntax = (rules: any) => Parser<any>;
+type Syntax = (rules: Record<string, Parser<any>>) => Parser<any>;
 
 export function createLanguage<T extends Record<string, Syntax>>(syntaxes: T): Record<string, Parser<any>> {
 	const rules: Record<string, Parser<any>> = {};
