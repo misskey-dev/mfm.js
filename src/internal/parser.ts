@@ -4,7 +4,7 @@ import { mergeText } from './util';
 
 const space = P.regexp(/[\u0020\u3000\t]/);
 const alphaAndNum = P.regexp(/[a-z0-9]/i);
-const LF = P.alt([P.str(`\r\n`), P.str(`\r`), P.str(`\n`)]);
+const LF = P.alt([P.str('\r\n'), P.str('\r'), P.str('\n')]);
 
 function nest<T>(parser: P.Parser<T>): P.Parser<T> {
 	return new P.Parser((input, index, ctx) => {
