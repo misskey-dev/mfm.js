@@ -1,5 +1,6 @@
 import { BOLD, MfmNode, MfmSimpleNode, TEXT } from '../node';
 import * as P from './core';
+import { mergeText } from './util';
 
 type FullParserOpts = {
 	fnNameList?: string[];
@@ -9,11 +10,17 @@ type FullParserOpts = {
 export function fullParser(input: string, opts: FullParserOpts): MfmNode[] {
 	let reply;
 
-	reply = boldAsta.handler(input, 0, {});
+	const full = P.alt([
+		boldAsta,
+		text
+	]).atLeast(0);
+
+	reply = full.handler(input, 0, {});
 	if (!reply.success) {
 		throw new Error('parsing error');
 	}
-	return [reply.value];
+
+	return mergeText(reply.value);
 }
 
 export function simpleParser(input: string): MfmSimpleNode[] {
@@ -26,8 +33,13 @@ const boldAstaMark = P.str('**');
 
 const boldAsta = P.seq([
 	boldAstaMark,
-	P.str('abc'),
+	P.seq([P.notMatch(boldAstaMark), P.any]).map(result => result[1])
+		.atLeast(1).map(result => result.join('')),
 	boldAstaMark,
 ]).map(result => {
 	return BOLD([TEXT(result[1])]);
 });
+
+// text
+
+const text = P.any;

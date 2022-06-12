@@ -39,7 +39,34 @@ export class Parser {
 			return success(result.index, fn(result.value));
 		});
 	}
+
+	atLeast(n: number) {
+		return new Parser((input, index, state) => {
+			let result;
+			let accum = [];
+			while (index < input.length) {
+				result = this.handler(input, index, state);
+				if (!result.success) {
+					break;
+				}
+				index = result.index;
+				accum.push(result.value);
+			}
+			if (accum.length < n) {
+				return failure();
+			}
+			return success(index, accum);
+		});
+	}
 }
+
+export const any = new Parser((input, index, state) => {
+	if ((input.length - index) < 1) {
+		return failure();
+	}
+	const value = input.charAt(index);
+	return success(index + 1, value);
+});
 
 export const str = (value: string): Parser => {
 	return new Parser((input, index, state) => {
@@ -66,5 +93,36 @@ export const seq = (parsers: Parser[]): Parser => {
 			accum.push(result.value);
 		}
 		return success(index, accum);
+	});
+};
+
+export const alt = (parsers: Parser[]): Parser => {
+	return new Parser((input, index, state) => {
+		let result;
+		for (let i = 0; i < parsers.length; i++) {
+			result = parsers[i].handler(input, index, state);
+			if (result.success) {
+				return result;
+			}
+		}
+		return failure();
+	});
+};
+
+export const match = (parser: Parser): Parser => {
+	return new Parser((input, index, state) => {
+		const result = parser.handler(input, index, state);
+		return result.success
+			? success(index, null)
+			: failure();
+	});
+};
+
+export const notMatch = (parser: Parser): Parser => {
+	return new Parser((input, index, state) => {
+		const result = parser.handler(input, index, state);
+		return !result.success
+			? success(index, null)
+			: failure();
 	});
 };
