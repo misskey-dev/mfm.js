@@ -126,3 +126,22 @@ export const notMatch = (parser: Parser): Parser => {
 			: failure();
 	});
 };
+
+export const lazy = (fn: () => Parser): Parser => {
+	const parser: Parser = new Parser((input, index, state) => {
+		console.log('eval');
+		parser.handler = fn().handler;
+		return parser.handler(input, index, state);
+	});
+	return parser;
+};
+
+export function createLanguage(syntaxes: Record<string, ((rules: Record<string, Parser>) => Parser)>) {
+	const rules: Record<string, Parser> = {};
+	for (const key of Object.keys(syntaxes)) {
+		rules[key] = lazy(() => {
+			return syntaxes[key](rules);
+		});
+	}
+	return rules;
+}

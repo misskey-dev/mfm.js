@@ -10,12 +10,7 @@ type FullParserOpts = {
 export function fullParser(input: string, opts: FullParserOpts): MfmNode[] {
 	let reply;
 
-	const full = P.alt([
-		boldAsta,
-		text
-	]).atLeast(0);
-
-	reply = full.handler(input, 0, {});
+	reply = lang.full.handler(input, 0, {});
 	if (!reply.success) {
 		throw new Error('parsing error');
 	}
@@ -27,16 +22,20 @@ export function simpleParser(input: string): MfmSimpleNode[] {
 	return [];
 }
 
-// boldAsta
-
-const boldAstaMark = P.str('**');
-
-const boldAsta = P.seq([
-	boldAstaMark,
-	P.seq([P.notMatch(boldAstaMark), P.any], 1).atLeast(1),
-	boldAstaMark,
-]).map(result => BOLD(mergeText(result[1] as (MfmInline | string)[])));
-
-// text
-
-const text = P.any;
+const lang = P.createLanguage({
+	full: r => {
+		return P.alt([
+			r.boldAsta,
+			r.text
+		]).atLeast(0);
+	},
+	boldAsta: r => {
+		const boldAstaMark = P.str('**');
+		return P.seq([
+			boldAstaMark,
+			P.seq([P.notMatch(boldAstaMark), P.any], 1).atLeast(1),
+			boldAstaMark,
+		]).map(result => BOLD(mergeText(result[1] as (MfmInline | string)[])));
+	},
+	text: r => P.any,
+});
