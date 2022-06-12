@@ -1,4 +1,4 @@
-import { BOLD, MfmNode, MfmSimpleNode, TEXT } from '../node';
+import { BOLD, MfmInline, MfmNode, MfmSimpleNode } from '../node';
 import * as P from './core';
 import { mergeText } from './util';
 
@@ -34,10 +34,10 @@ const boldAstaMark = P.str('**');
 const boldAsta = P.seq([
 	boldAstaMark,
 	P.seq([P.notMatch(boldAstaMark), P.any]).map(result => result[1])
-		.atLeast(1).map(result => result.join('')),
+		.atLeast(1),
 	boldAstaMark,
 ]).map(result => {
-	return BOLD([TEXT(result[1])]);
+	return BOLD(mergeText(result[1] as (MfmInline | string)[]));
 });
 
 // text
