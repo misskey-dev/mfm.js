@@ -24,32 +24,10 @@ export function simpleParser(input: string): MfmSimpleNode[] {
 
 const boldAstaMark = P.str('**');
 
-const boldAsta = new P.Parser((input, index, state) => {
-	let reply;
-
-	reply = boldAstaMark.handler(input, index, state);
-	if (!reply.success) {
-		return P.failure();
-	}
-	index = reply.index;
-	const a = reply.value;
-
-	reply = P.str('abc').handler(input, index, state);
-	if (!reply.success) {
-		return P.failure();
-	}
-	index = reply.index;
-	const b = reply.value;
-	const content = [TEXT('abc')];
-
-	reply = boldAstaMark.handler(input, index, state);
-	if (!reply.success) {
-		return P.failure();
-	}
-	index = reply.index;
-	const c = reply.value;
-
-	return P.success(index, [a, b, c]);
-}).map(result => {
+const boldAsta = P.seq([
+	boldAstaMark,
+	P.str('abc'),
+	boldAstaMark,
+]).map(result => {
 	return BOLD([TEXT(result[1])]);
 });

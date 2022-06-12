@@ -52,3 +52,19 @@ export const str = (value: string): Parser => {
 		return success(index + value.length, value);
 	});
 };
+
+export const seq = (parsers: Parser[]): Parser => {
+	return new Parser((input, index, state) => {
+		let result;
+		const accum = [];
+		for (let i = 0; i < parsers.length; i++) {
+			result = parsers[i].handler(input, index, state);
+			if (!result.success) {
+				return result;
+			}
+			index = result.index;
+			accum.push(result.value);
+		}
+		return success(index, accum);
+	});
+};
