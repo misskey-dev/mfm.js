@@ -1,4 +1,5 @@
-import { BOLD, FN, MfmInline, MfmNode, MfmSimpleNode, SMALL } from '../node';
+import { BOLD, EMOJI_CODE, FN, ITALIC, MfmInline, MfmNode, MfmSimpleNode, SMALL, STRIKE, UNI_EMOJI } from '../node';
+import twemojiRegex from 'twemoji-parser/dist/lib/regex';
 import * as P from './core';
 import { mergeText } from './util';
 
@@ -25,22 +26,57 @@ const lang = P.createLanguage({
 
 	full: r => {
 		return P.alt([
-			r.big,
-			r.boldAsta,
-			r.boldUnder,
-			r.smallTag,
-			r.boldTag,
+			// r.quote,        // ">" block
+			// r.codeBlock,    // "```" block
+			// r.mathBlock,    // "\\[" block
+			// r.center,       // "<center>" block
+			r.unicodeEmoji, // Regexp
+			// r.fn,           // "$[""
+			r.big,          // "***"
+			r.boldAsta,     // "**"
+			r.italicAsta,   // "*"
+			r.boldUnder,    // "__"
+			r.italicUnder,  // "_"
+			// r.strikeWave,   // "~~"
+			r.smallTag,     // "<small>"
+			// r.plainTag,     // "<plain>"
+			r.boldTag,      // "<b>"
+			r.italicTag,    // "<i>"
+			r.strikeTag,    // "<s>"
+			// r.inlineCode,   // "`"
+			// r.mathInline,   // "\\("
+			// r.mention,      // "@"
+			// r.hashtag,      // "#"
+			r.emojiCode,    // ":"
+			// r.link,         // "?[" or "["
+			// r.url,
+			// r.search,       // block
 			r.text,
 		]);
 	},
 
 	inline: r => {
 		return P.alt([
-			r.big,
-			r.boldAsta,
-			r.boldUnder,
-			r.smallTag,
-			r.boldTag,
+			r.unicodeEmoji, // Regexp
+			// r.fn,           // "$[""
+			r.big,          // "***"
+			r.boldAsta,     // "**"
+			r.italicAsta,   // "*"
+			r.boldUnder,    // "__"
+			r.italicUnder,  // "_"
+			// r.strikeWave,   // "~~"
+			r.smallTag,     // "<small>"
+			// r.plainTag,     // "<plain>"
+			r.boldTag,      // "<b>"
+			r.italicTag,    // "<i>"
+			r.strikeTag,    // "<s>"
+			// r.inlineCode,   // "`"
+			// r.mathInline,   // "\\("
+			// r.mention,      // "@"
+			// r.hashtag,      // "#"
+			r.emojiCode,    // ":"
+			// r.link,         // "?[" or "["
+			// r.url,
 			r.text,
 		]);
 	},
@@ -79,7 +115,7 @@ const lang = P.createLanguage({
 			mark,
 			P.alt([alphaAndNum, space]).atLeast(1),
 			mark,
-		]).map(result => BOLD(mergeText(result[1] as (MfmInline | string)[])));
+		]).map(result => BOLD(mergeText(result[1] as string[])));
 	},
 
 	smallTag: r => {
@@ -90,6 +126,74 @@ const lang = P.createLanguage({
 			nest(P.seq([P.notMatch(close), r.inline], 1).atLeast(1)),
 			close,
 		]).map(result => SMALL(mergeText(result[1] as (MfmInline | string)[])));
+	},
+
+	italicTag: r => {
+		const open = P.str('<i>');
+		const close = P.str('</i>');
+		return P.seq([
+			open,
+			nest(P.seq([P.notMatch(close), r.inline], 1).atLeast(1)),
+			close,
+		]).map(result => ITALIC(mergeText(result[1] as (MfmInline | string)[])));
+	},
+
+	italicAsta: r => {
+		// TODO: check before and after
+		const mark = P.str('*');
+		return P.seq([
+			mark,
+			P.alt([alphaAndNum, space]).atLeast(1),
+			mark,
+		]).map(result => ITALIC(mergeText(result[1] as string[])));
+	},
+
+	italicUnder: r => {
+		// TODO: check before and after
+		const mark = P.str('_');
+		return P.seq([
+			mark,
+			P.alt([alphaAndNum, space]).atLeast(1),
+			mark,
+		]).map(result => ITALIC(mergeText(result[1] as string[])));
+	},
+
+	strikeTag: r => {
+		const open = P.str('<s>');
+		const close = P.str('</s>');
+		return P.seq([
+			open,
+			nest(P.seq([P.notMatch(close), r.inline], 1).atLeast(1)),
+			close,
+		]).map(result => STRIKE(mergeText(result[1] as (MfmInline | string)[])));
+	},
+
+	// TODO: strikeWave
+
+	unicodeEmoji: r => {
+		const emojiRegex = RegExp(twemojiRegex.source);
+		return P.regexp(emojiRegex).map(content => UNI_EMOJI(content));
+	},
+
+	// TODO: plainTag
+
+	// TODO: fn
+
+	// TODO: inlineCode
+
+	// TODO: mathInline
+
+	// TODO: mention
+
+	// TOOD: hashtag
+
+	emojiCode: r => {
+		const mark = P.str(':');
+		return P.seq([
+			mark,
+			P.regexp(/[a-z0-9_+-]+/i),
+			mark,
+		], 1).map(name => EMOJI_CODE(name as string));
 	},
 
 	text: r => P.any,
