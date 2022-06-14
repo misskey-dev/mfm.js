@@ -1,5 +1,6 @@
-import { isMfmBlock, MfmInline, MfmNode, TEXT } from '../node';
+import { isMfmBlock, MfmInline, MfmNode, MfmSimpleNode, TEXT } from '../node';
 
+export function mergeText(nodes: (MfmSimpleNode | string)[]): MfmSimpleNode[]
 export function mergeText(nodes: (MfmInline | string)[]): MfmInline[]
 export function mergeText(nodes: (MfmNode | string)[]): MfmNode[]
 export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {

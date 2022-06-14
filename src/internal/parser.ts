@@ -24,6 +24,10 @@ const lang = P.createLanguage({
 		return r.full.atLeast(0);
 	},
 
+	simpleParser: r => {
+		return r.simple.atLeast(0);
+	},
+
 	full: r => {
 		return P.alt([
 			// r.quote,        // ">" block
@@ -51,6 +55,14 @@ const lang = P.createLanguage({
 			// r.link,         // "?[" or "["
 			// r.url,
 			// r.search,       // block
+			r.text,
+		]);
+	},
+
+	simple: r => {
+		return P.alt([
+			r.unicodeEmoji, // Regexp
+			r.emojiCode,    // ":"
 			r.text,
 		]);
 	},
@@ -171,6 +183,7 @@ const lang = P.createLanguage({
 	// TODO: strikeWave
 
 	unicodeEmoji: r => {
+		// TODO: fix bug
 		const emojiRegex = RegExp(twemojiRegex.source);
 		return P.regexp(emojiRegex).map(content => UNI_EMOJI(content));
 	},
@@ -268,5 +281,10 @@ export function fullParser(input: string, opts: FullParserOpts): MfmNode[] {
 }
 
 export function simpleParser(input: string): MfmSimpleNode[] {
-	return [];
+	const reply = lang.simpleParser.handler(input, 0, { });
+	if (!reply.success) {
+		throw new Error('parsing error');
+	}
+
+	return mergeText(reply.value);
 }
