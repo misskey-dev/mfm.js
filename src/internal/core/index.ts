@@ -58,6 +58,16 @@ export class Parser<T> {
 			return success(index, accum);
 		});
 	}
+
+	sep1(separator: Parser<any>): Parser<T[]> {
+		return seq([
+			this,
+			seq([
+				separator,
+				this,
+			], 1).atLeast(0),
+		]).map(result => [result[0], ...result[1]]);
+	}
 }
 
 export const any = new Parser((input, index, state) => {
@@ -67,6 +77,12 @@ export const any = new Parser((input, index, state) => {
 	const value = input.charAt(index);
 	return success(index + 1, value);
 });
+
+export function succeeded<T>(value: T): Parser<T> {
+	return new Parser((input, index, state) => {
+		return success(index, value);
+	});
+}
 
 export const str = <T extends string>(value: T): Parser<T> => {
 	return new Parser((input, index, state) => {
@@ -119,6 +135,13 @@ export const alt = (parsers: Parser<any>[]): Parser<any> => {
 		return failure();
 	});
 };
+
+export function option<T>(parser: Parser<T>): Parser<T | null> {
+	return alt([
+		parser,
+		succeeded(null)
+	]);
+}
 
 export const match = (parser: Parser<any>): Parser<null> => {
 	return new Parser((input, index, state) => {

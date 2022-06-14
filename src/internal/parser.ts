@@ -31,7 +31,7 @@ const lang = P.createLanguage({
 			// r.mathBlock,    // "\\[" block
 			// r.center,       // "<center>" block
 			r.unicodeEmoji, // Regexp
-			// r.fn,           // "$[""
+			r.fn,           // "$[""
 			r.big,          // "***"
 			r.boldAsta,     // "**"
 			r.italicAsta,   // "*"
@@ -58,7 +58,7 @@ const lang = P.createLanguage({
 	inline: r => {
 		return P.alt([
 			r.unicodeEmoji, // Regexp
-			// r.fn,           // "$[""
+			r.fn,           // "$[""
 			r.big,          // "***"
 			r.boldAsta,     // "**"
 			r.italicAsta,   // "*"
@@ -177,7 +177,57 @@ const lang = P.createLanguage({
 
 	// TODO: plainTag
 
-	// TODO: fn
+	fn: r => {
+		type ArgPair = { k: string, v: string | true };
+		type Args = Record<string, string | true>;
+
+		const fnName = new P.Parser((input, index, state) => {
+			const result = P.regexp(/[a-z0-9_]+/i).handler(input, index, state);
+			if (!result.success) {
+				return result;
+			}
+			if (state.fnNameList != null && !state.fnNameList.includes(result.value)) {
+				return P.failure();
+			}
+			return P.success(result.index, result.value);
+		});
+		const arg: P.Parser<ArgPair> = P.seq([
+			P.regexp(/[a-z0-9_]+/i),
+			P.option(P.seq([
+				P.str('='),
+				P.regexp(/[a-z0-9_.]+/i),
+			], 1)),
+		]).map(result => {
+			return {
+				k: result[0],
+				v: (result[1] != null) ? result[1] : true,
+			};
+		});
+		const args = P.seq([
+			P.str('.'),
+			arg.sep1(P.str(',')),
+		], 1).map(pairs => {
+			const result: Args = { };
+			for (const pair of pairs) {
+				result[pair.k] = pair.v;
+			}
+			return result;
+		});
+		const fnClose = P.str(']');
+		return P.seq([
+			P.str('$['),
+			fnName,
+			P.option(args),
+			P.str(' '),
+			nest(P.seq([P.notMatch(fnClose), r.inline], 1).atLeast(1)),
+			fnClose,
+		]).map(result => {
+			const name = result[1];
+			const args = result[2] || {};
+			const content = result[4];
+			return FN(name, args, mergeText(content));
+		});
+	},
 
 	// TODO: inlineCode
 
