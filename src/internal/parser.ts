@@ -1,4 +1,4 @@
-import { BOLD, EMOJI_CODE, FN, INLINE_CODE, ITALIC, MATH_INLINE, MfmInline, MfmNode, MfmSimpleNode, PLAIN, SMALL, STRIKE, UNI_EMOJI } from '../node';
+import * as M from '..';
 import twemojiRegex from 'twemoji-parser/dist/lib/regex';
 import * as P from './core';
 import { mergeText } from './util';
@@ -49,7 +49,7 @@ const lang = P.createLanguage({
 			r.strikeTag,    // "<s>"
 			r.inlineCode,   // "`"
 			r.mathInline,   // "\\("
-			// r.mention,      // "@"
+			r.mention,      // "@"
 			// r.hashtag,      // "#"
 			r.emojiCode,    // ":"
 			// r.link,         // "?[" or "["
@@ -84,7 +84,7 @@ const lang = P.createLanguage({
 			r.strikeTag,    // "<s>"
 			r.inlineCode,   // "`"
 			r.mathInline,   // "\\("
-			// r.mention,      // "@"
+			r.mention,      // "@"
 			// r.hashtag,      // "#"
 			r.emojiCode,    // ":"
 			// r.link,         // "?[" or "["
@@ -99,7 +99,7 @@ const lang = P.createLanguage({
 			mark,
 			nest(P.seq([P.notMatch(mark), r.inline], 1).atLeast(1)),
 			mark,
-		]).map(result => FN('tada', {}, mergeText(result[1] as (MfmInline | string)[])));
+		]).map(result => M.FN('tada', {}, mergeText(result[1] as (M.MfmInline | string)[])));
 	},
 
 	boldAsta: r => {
@@ -108,7 +108,7 @@ const lang = P.createLanguage({
 			mark,
 			nest(P.seq([P.notMatch(mark), r.inline], 1).atLeast(1)),
 			mark,
-		]).map(result => BOLD(mergeText(result[1] as (MfmInline | string)[])));
+		]).map(result => M.BOLD(mergeText(result[1] as (M.MfmInline | string)[])));
 	},
 
 	boldTag: r => {
@@ -118,7 +118,7 @@ const lang = P.createLanguage({
 			open,
 			nest(P.seq([P.notMatch(close), r.inline], 1).atLeast(1)),
 			close,
-		]).map(result => BOLD(mergeText(result[1] as (MfmInline | string)[])));
+		]).map(result => M.BOLD(mergeText(result[1] as (M.MfmInline | string)[])));
 	},
 
 	boldUnder: r => {
@@ -127,7 +127,7 @@ const lang = P.createLanguage({
 			mark,
 			P.alt([alphaAndNum, space]).atLeast(1),
 			mark,
-		]).map(result => BOLD(mergeText(result[1] as string[])));
+		]).map(result => M.BOLD(mergeText(result[1] as string[])));
 	},
 
 	smallTag: r => {
@@ -137,7 +137,7 @@ const lang = P.createLanguage({
 			open,
 			nest(P.seq([P.notMatch(close), r.inline], 1).atLeast(1)),
 			close,
-		]).map(result => SMALL(mergeText(result[1] as (MfmInline | string)[])));
+		]).map(result => M.SMALL(mergeText(result[1] as (M.MfmInline | string)[])));
 	},
 
 	italicTag: r => {
@@ -147,7 +147,7 @@ const lang = P.createLanguage({
 			open,
 			nest(P.seq([P.notMatch(close), r.inline], 1).atLeast(1)),
 			close,
-		]).map(result => ITALIC(mergeText(result[1] as (MfmInline | string)[])));
+		]).map(result => M.ITALIC(mergeText(result[1] as (M.MfmInline | string)[])));
 	},
 
 	italicAsta: r => {
@@ -157,7 +157,7 @@ const lang = P.createLanguage({
 			mark,
 			P.alt([alphaAndNum, space]).atLeast(1),
 			mark,
-		]).map(result => ITALIC(mergeText(result[1] as string[])));
+		]).map(result => M.ITALIC(mergeText(result[1] as string[])));
 	},
 
 	italicUnder: r => {
@@ -167,7 +167,7 @@ const lang = P.createLanguage({
 			mark,
 			P.alt([alphaAndNum, space]).atLeast(1),
 			mark,
-		]).map(result => ITALIC(mergeText(result[1] as string[])));
+		]).map(result => M.ITALIC(mergeText(result[1] as string[])));
 	},
 
 	strikeTag: r => {
@@ -177,7 +177,7 @@ const lang = P.createLanguage({
 			open,
 			nest(P.seq([P.notMatch(close), r.inline], 1).atLeast(1)),
 			close,
-		]).map(result => STRIKE(mergeText(result[1] as (MfmInline | string)[])));
+		]).map(result => M.STRIKE(mergeText(result[1] as (M.MfmInline | string)[])));
 	},
 
 	strikeWave: r => {
@@ -186,13 +186,13 @@ const lang = P.createLanguage({
 			mark,
 			nest(P.seq([P.notMatch(P.alt([mark, LF])), r.inline], 1).atLeast(1)),
 			mark,
-		]).map(result => STRIKE(mergeText(result[1] as (MfmInline | string)[])));
+		]).map(result => M.STRIKE(mergeText(result[1] as (M.MfmInline | string)[])));
 	},
 
 	unicodeEmoji: r => {
 		// TODO: fix bug
 		const emojiRegex = RegExp(twemojiRegex.source);
-		return P.regexp(emojiRegex).map(content => UNI_EMOJI(content));
+		return P.regexp(emojiRegex).map(content => M.UNI_EMOJI(content));
 	},
 
 	plainTag: r => {
@@ -208,7 +208,7 @@ const lang = P.createLanguage({
 			], 1).atLeast(1)),
 			P.option(LF),
 			close,
-		]).map(result => PLAIN(result[2].join('')));
+		]).map(result => M.PLAIN(result[2].join('')));
 	},
 
 	fn: r => {
@@ -259,7 +259,7 @@ const lang = P.createLanguage({
 			const name = result[1];
 			const args = result[2] || {};
 			const content = result[4];
-			return FN(name, args, mergeText(content));
+			return M.FN(name, args, mergeText(content));
 		});
 	},
 
@@ -273,7 +273,7 @@ const lang = P.createLanguage({
 				P.any,
 			], 1).atLeast(1),
 			mark,
-		]).map(result => INLINE_CODE(result[1].join('')));
+		]).map(result => M.INLINE_CODE(result[1].join('')));
 	},
 
 	mathInline: r => {
@@ -287,10 +287,25 @@ const lang = P.createLanguage({
 				P.any,
 			], 1).atLeast(1),
 			close,
-		]).map(result => MATH_INLINE(result[1].join('')));
+		]).map(result => M.MATH_INLINE(result[1].join('')));
 	},
 
-	// TODO: mention
+	mention: r => {
+		// TODO: check deatail
+		return P.seq([
+			P.str('@'),
+			P.regexp(/[a-z0-9_-]+/i),
+			P.option(P.seq([
+				P.str('@'),
+				P.regexp(/[a-z0-9_.-]+/i)
+			], 1)),
+		]).map(result => {
+			const name = result[1];
+			const host = result[2];
+			const acct = host != null ? `@${name}@${host}` : `@${name}`;
+			M.MENTION(name, host, acct);
+		});
+	},
 
 	// TOOD: hashtag
 
@@ -300,7 +315,7 @@ const lang = P.createLanguage({
 			mark,
 			P.regexp(/[a-z0-9_+-]+/i),
 			mark,
-		], 1).map(name => EMOJI_CODE(name as string));
+		], 1).map(name => M.EMOJI_CODE(name as string));
 	},
 
 	text: r => P.any,
@@ -311,7 +326,7 @@ export type FullParserOpts = {
 	nestLimit?: number;
 };
 
-export function fullParser(input: string, opts: FullParserOpts): MfmNode[] {
+export function fullParser(input: string, opts: FullParserOpts): M.MfmNode[] {
 	const reply = lang.fullParser.handler(input, 0, {
 		nestLimit: (opts.nestLimit != null) ? opts.nestLimit : 20,
 		fnNameList: opts.fnNameList,
@@ -324,7 +339,7 @@ export function fullParser(input: string, opts: FullParserOpts): MfmNode[] {
 	return mergeText(reply.value);
 }
 
-export function simpleParser(input: string): MfmSimpleNode[] {
+export function simpleParser(input: string): M.MfmSimpleNode[] {
 	const reply = lang.simpleParser.handler(input, 0, { });
 	if (!reply.success) {
 		throw new Error('parsing error');
