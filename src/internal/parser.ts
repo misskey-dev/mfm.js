@@ -1,4 +1,4 @@
-import { BOLD, EMOJI_CODE, FN, ITALIC, MfmInline, MfmNode, MfmSimpleNode, SMALL, STRIKE, UNI_EMOJI } from '../node';
+import { BOLD, EMOJI_CODE, FN, INLINE_CODE, ITALIC, MATH_INLINE, MfmInline, MfmNode, MfmSimpleNode, PLAIN, SMALL, STRIKE, UNI_EMOJI } from '../node';
 import twemojiRegex from 'twemoji-parser/dist/lib/regex';
 import * as P from './core';
 import { mergeText } from './util';
@@ -41,14 +41,14 @@ const lang = P.createLanguage({
 			r.italicAsta,   // "*"
 			r.boldUnder,    // "__"
 			r.italicUnder,  // "_"
-			// r.strikeWave,   // "~~"
+			r.strikeWave,   // "~~"
 			r.smallTag,     // "<small>"
-			// r.plainTag,     // "<plain>"
+			r.plainTag,     // "<plain>"
 			r.boldTag,      // "<b>"
 			r.italicTag,    // "<i>"
 			r.strikeTag,    // "<s>"
-			// r.inlineCode,   // "`"
-			// r.mathInline,   // "\\("
+			r.inlineCode,   // "`"
+			r.mathInline,   // "\\("
 			// r.mention,      // "@"
 			// r.hashtag,      // "#"
 			r.emojiCode,    // ":"
@@ -76,14 +76,14 @@ const lang = P.createLanguage({
 			r.italicAsta,   // "*"
 			r.boldUnder,    // "__"
 			r.italicUnder,  // "_"
-			// r.strikeWave,   // "~~"
+			r.strikeWave,   // "~~"
 			r.smallTag,     // "<small>"
-			// r.plainTag,     // "<plain>"
+			r.plainTag,     // "<plain>"
 			r.boldTag,      // "<b>"
 			r.italicTag,    // "<i>"
 			r.strikeTag,    // "<s>"
-			// r.inlineCode,   // "`"
-			// r.mathInline,   // "\\("
+			r.inlineCode,   // "`"
+			r.mathInline,   // "\\("
 			// r.mention,      // "@"
 			// r.hashtag,      // "#"
 			r.emojiCode,    // ":"
@@ -180,7 +180,14 @@ const lang = P.createLanguage({
 		]).map(result => STRIKE(mergeText(result[1] as (MfmInline | string)[])));
 	},
 
-	// TODO: strikeWave
+	strikeWave: r => {
+		const mark = P.str('~~');
+		return P.seq([
+			mark,
+			nest(P.seq([P.notMatch(P.alt([mark, LF])), r.inline], 1).atLeast(1)),
+			mark,
+		]).map(result => STRIKE(mergeText(result[1] as (MfmInline | string)[])));
+	},
 
 	unicodeEmoji: r => {
 		// TODO: fix bug
@@ -188,7 +195,21 @@ const lang = P.createLanguage({
 		return P.regexp(emojiRegex).map(content => UNI_EMOJI(content));
 	},
 
-	// TODO: plainTag
+	plainTag: r => {
+		// plainTag = open LF? (!(LF? close) .)+ LF? close
+		const open = P.str('<plain>');
+		const close = P.str('</plain>');
+		return P.seq([
+			open,
+			P.option(LF),
+			nest(P.seq([
+				P.notMatch(P.seq([P.option(LF), close])),
+				P.any,
+			], 1).atLeast(1)),
+			P.option(LF),
+			close,
+		]).map(result => PLAIN(result[2].join('')));
+	},
 
 	fn: r => {
 		type ArgPair = { k: string, v: string | true };
@@ -242,9 +263,32 @@ const lang = P.createLanguage({
 		});
 	},
 
-	// TODO: inlineCode
+	inlineCode: r => {
+		// inlineCode = mark (!(mark / LF) .)+ mark
+		const mark = P.str('`');
+		return P.seq([
+			mark,
+			P.seq([
+				P.notMatch(P.alt([mark, LF])),
+				P.any,
+			], 1).atLeast(1),
+			mark,
+		]).map(result => INLINE_CODE(result[1].join('')));
+	},
 
-	// TODO: mathInline
+	mathInline: r => {
+		// mathInline = open (!(close / LF) .)+ close
+		const open = P.str('\\(');
+		const close = P.str('\\)');
+		return P.seq([
+			open,
+			P.seq([
+				P.notMatch(P.alt([close, LF])),
+				P.any,
+			], 1).atLeast(1),
+			close,
+		]).map(result => MATH_INLINE(result[1].join('')));
+	},
 
 	// TODO: mention
 
