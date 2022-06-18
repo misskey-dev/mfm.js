@@ -17,10 +17,14 @@ export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
 		}
 	}
 
-	for (const node of nodes) {
+	const flatten = nodes.flat(1);
+	for (const node of flatten) {
 		if (typeof node === 'string') {
 			// Store the char.
 			storedChars.push(node);
+		}
+		else if (!Array.isArray(node) && node.type == 'text') {
+			storedChars.push(node.props.text);
 		}
 		else {
 			generateText();

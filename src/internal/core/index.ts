@@ -24,10 +24,24 @@ export function failure(): Failure {
 }
 
 export class Parser<T> {
+	public name?: string;
 	public handler: ParserHandler<T>;
 
-	constructor(handler: ParserHandler<T>) {
-		this.handler = handler;
+	constructor(handler: ParserHandler<T>, name?: string) {
+		this.handler = (input, index, state) => {
+			if (state.trace && this.name != null) {
+				console.log(`${index} enter ${this.name}`);
+				const result = handler(input, index, state);
+				if (result.success) {
+					console.log(`${index} match ${this.name}`);
+				} else {
+					console.log(`${index} fail ${this.name}`);
+				}
+				return result;
+			}
+			return handler(input, index, state);
+		}
+		this.name = name;
 	}
 
 	map<U>(fn: (value: T) => U): Parser<U> {
@@ -133,7 +147,7 @@ export function seqPartial(parsers: Parser<any>[]): Parser<any[]> {
 		for (let i = 0 ; i < parsers.length; i++) {
 			const result = parsers[i].handler(input, latestIndex, state);
 			if (!result.success) {
-				return latestIndex != index ? success(latestIndex, accum) : failure();
+				return latestIndex !== index ? success(latestIndex, accum) : failure();
 			}
 			accum.push(result.value);
 			latestIndex = result.index;
@@ -158,7 +172,7 @@ export const alt = (parsers: Parser<any>[]): Parser<any> => {
 export function option<T>(parser: Parser<T>): Parser<T | null> {
 	return alt([
 		parser,
-		succeeded(null)
+		succeeded(null),
 	]);
 }
 
@@ -194,7 +208,9 @@ export function createLanguage<T extends Record<string, Syntax>>(syntaxes: T): R
 	const rules: Record<string, Parser<any>> = {};
 	for (const key of Object.keys(syntaxes)) {
 		rules[key] = lazy(() => {
-			return syntaxes[key](rules);
+			const parser = syntaxes[key](rules);
+			parser.name = key;
+			return parser;
 		});
 	}
 	return rules;

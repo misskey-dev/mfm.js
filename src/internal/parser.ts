@@ -7,15 +7,24 @@ const space = P.regexp(/[\u0020\u3000\t]/);
 const alphaAndNum = P.regexp(/[a-z0-9]/i);
 const LF = P.alt([P.str('\r\n'), P.str('\r'), P.str('\n')]);
 
-function nest<T>(parser: P.Parser<T>): P.Parser<T> {
+function nest<T>(parser: P.Parser<T>): P.Parser<T | string> {
 	return new P.Parser((input, index, state) => {
+		// nesting limited? -> No: specified parser, Yes: 1 char
 		if (state.depth >= state.nestLimit) {
-			return P.failure();
+			const result = P.any.handler(input, index, state);
+			if (!result.success) {
+				return result;
+			}
+			return P.success(result.index, result.value as T | string);
+		} else {
+			state.depth++;
+			const result = parser.handler(input, index, state);
+			state.depth--;
+			if (!result.success) {
+				return result;
+			}
+			return P.success(result.index, result.value as T | string);
 		}
-		state.depth++;
-		const result = parser.handler(input, index, state);
-		state.depth--;
-		return result;
 	});
 }
 
@@ -95,30 +104,42 @@ const lang = P.createLanguage({
 
 	big: r => {
 		const mark = P.str('***');
-		return P.seq([
+		return P.seqPartial([
 			mark,
-			nest(P.seq([P.notMatch(mark), r.inline], 1).atLeast(1)),
+			nest(P.seq([P.notMatch(mark), r.inline], 1)).atLeast(1),
 			mark,
-		]).map(result => M.FN('tada', {}, mergeText(result[1] as (M.MfmInline | string)[])));
+		]).map(result => {
+			if (result.length === 1) return result[0];
+			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			return M.FN('tada', {}, mergeText(result[1]));
+		});
 	},
 
 	boldAsta: r => {
 		const mark = P.str('**');
-		return P.seq([
+		return P.seqPartial([
 			mark,
-			nest(P.seq([P.notMatch(mark), r.inline], 1).atLeast(1)),
+			nest(P.seq([P.notMatch(mark), r.inline], 1)).atLeast(1),
 			mark,
-		]).map(result => M.BOLD(mergeText(result[1] as (M.MfmInline | string)[])));
+		]).map(result => {
+			if (result.length === 1) return result[0];
+			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			return M.BOLD(mergeText(result[1] as (M.MfmInline | string)[]));
+		});
 	},
 
 	boldTag: r => {
 		const open = P.str('<b>');
 		const close = P.str('</b>');
-		return P.seq([
+		return P.seqPartial([
 			open,
-			nest(P.seq([P.notMatch(close), r.inline], 1).atLeast(1)),
+			nest(P.seq([P.notMatch(close), r.inline], 1)).atLeast(1),
 			close,
-		]).map(result => M.BOLD(mergeText(result[1] as (M.MfmInline | string)[])));
+		]).map(result => {
+			if (result.length === 1) return result[0];
+			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			return M.BOLD(mergeText(result[1] as (M.MfmInline | string)[]));
+		});
 	},
 
 	boldUnder: r => {
@@ -133,21 +154,29 @@ const lang = P.createLanguage({
 	smallTag: r => {
 		const open = P.str('<small>');
 		const close = P.str('</small>');
-		return P.seq([
+		return P.seqPartial([
 			open,
-			nest(P.seq([P.notMatch(close), r.inline], 1).atLeast(1)),
+			nest(P.seq([P.notMatch(close), r.inline], 1)).atLeast(1),
 			close,
-		]).map(result => M.SMALL(mergeText(result[1] as (M.MfmInline | string)[])));
+		]).map(result => {
+			if (result.length === 1) return result[0];
+			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			return M.SMALL(mergeText(result[1] as (M.MfmInline | string)[]));
+		});
 	},
 
 	italicTag: r => {
 		const open = P.str('<i>');
 		const close = P.str('</i>');
-		return P.seq([
+		return P.seqPartial([
 			open,
-			nest(P.seq([P.notMatch(close), r.inline], 1).atLeast(1)),
+			nest(P.seq([P.notMatch(close), r.inline], 1)).atLeast(1),
 			close,
-		]).map(result => M.ITALIC(mergeText(result[1] as (M.MfmInline | string)[])));
+		]).map(result => {
+			if (result.length === 1) return result[0];
+			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			return M.ITALIC(mergeText(result[1] as (M.MfmInline | string)[]));
+		});
 	},
 
 	italicAsta: r => {
@@ -173,20 +202,28 @@ const lang = P.createLanguage({
 	strikeTag: r => {
 		const open = P.str('<s>');
 		const close = P.str('</s>');
-		return P.seq([
+		return P.seqPartial([
 			open,
-			nest(P.seq([P.notMatch(close), r.inline], 1).atLeast(1)),
+			nest(P.seq([P.notMatch(close), r.inline], 1)).atLeast(1),
 			close,
-		]).map(result => M.STRIKE(mergeText(result[1] as (M.MfmInline | string)[])));
+		]).map(result => {
+			if (result.length === 1) return result[0];
+			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			return M.STRIKE(mergeText(result[1] as (M.MfmInline | string)[]));
+		});
 	},
 
 	strikeWave: r => {
 		const mark = P.str('~~');
-		return P.seq([
+		return P.seqPartial([
 			mark,
-			nest(P.seq([P.notMatch(P.alt([mark, LF])), r.inline], 1).atLeast(1)),
+			nest(P.seq([P.notMatch(P.alt([mark, LF])), r.inline], 1)).atLeast(1),
 			mark,
-		]).map(result => M.STRIKE(mergeText(result[1] as (M.MfmInline | string)[])));
+		]).map(result => {
+			if (result.length === 1) return result[0];
+			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			return M.STRIKE(mergeText(result[1] as (M.MfmInline | string)[]));
+		});
 	},
 
 	unicodeEmoji: r => {
@@ -202,10 +239,10 @@ const lang = P.createLanguage({
 		return P.seq([
 			open,
 			P.option(LF),
-			nest(P.seq([
+			P.seq([
 				P.notMatch(P.seq([P.option(LF), close])),
 				P.any,
-			], 1).atLeast(1)),
+			], 1).atLeast(1),
 			P.option(LF),
 			close,
 		]).map(result => M.PLAIN(result[2].join('')));
@@ -253,7 +290,7 @@ const lang = P.createLanguage({
 			fnName,
 			P.option(args),
 			P.str(' '),
-			nest(P.seq([P.notMatch(fnClose), r.inline], 1).atLeast(1)),
+			nest(P.seq([P.notMatch(fnClose), r.inline], 1)).atLeast(1),
 			fnClose,
 		]).map(result => {
 			const name = result[1];
@@ -297,7 +334,7 @@ const lang = P.createLanguage({
 			P.regexp(/[a-z0-9_-]+/i),
 			P.option(P.seq([
 				P.str('@'),
-				P.regexp(/[a-z0-9_.-]+/i)
+				P.regexp(/[a-z0-9_.-]+/i),
 			], 1)),
 		]).map(result => {
 			const name = result[1];
@@ -328,9 +365,10 @@ export type FullParserOpts = {
 
 export function fullParser(input: string, opts: FullParserOpts): M.MfmNode[] {
 	const reply = lang.fullParser.handler(input, 0, {
-		nestLimit: (opts.nestLimit != null) ? opts.nestLimit : 20,
+		nestLimit: (opts.nestLimit != null) ? opts.nestLimit : 3,
 		fnNameList: opts.fnNameList,
 		depth: 0,
+		trace: true,
 	});
 	if (!reply.success) {
 		throw new Error('parsing error');
