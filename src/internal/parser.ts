@@ -336,12 +336,12 @@ const lang = P.createLanguage({
 	},
 
 	inlineCode: r => {
-		// inlineCode = mark (!(mark / NewLine) .)+ mark
+		// inlineCode = "`" (!("`" / "´" / NewLine) .)+ "`"
 		const mark = P.str('`');
 		return P.seq([
 			mark,
 			P.seq([
-				P.notMatch(P.alt([mark, newLine])),
+				P.notMatch(P.alt([mark, P.str('´'), newLine])),
 				P.any,
 			], 1).atLeast(1),
 			mark,
