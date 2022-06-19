@@ -7,9 +7,9 @@ type Success<T> = {
 
 type Failure = { success: false };
 
-type Reply<T> = Success<T> | Failure;
+type Result<T> = Success<T> | Failure;
 
-type ParserHandler<T> = (input: string, index: number, state: any) => Reply<T>
+type ParserHandler<T> = (input: string, index: number, state: any) => Result<T>
 
 export function success<T>(index: number, value: T): Success<T> {
 	return {
