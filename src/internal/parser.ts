@@ -109,10 +109,10 @@ const lang = P.createLanguage({
 			mark,
 			P.seq([P.notMatch(newLine), P.any], 1).atLeast(0),
 			newLine,
-			P.seq([P.notMatch(P.seq([newLine, mark, P.option(newLine)])), P.any], 1).atLeast(1),
+			P.seq([P.notMatch(P.seq([newLine, mark, P.alt([newLine, P.lineEnd])])), P.any], 1).atLeast(1),
 			newLine,
 			mark,
-			P.option(newLine),
+			P.alt([newLine, P.lineEnd]),
 		]).map(result => {
 			const lang = (result[2] as string[]).join('').trim();
 			const code = (result[4] as string[]).join('');
