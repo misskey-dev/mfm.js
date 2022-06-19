@@ -10,7 +10,7 @@ const newLine = P.alt([P.crlf, P.cr, P.lf]);
 function nest<T>(parser: P.Parser<T>): P.Parser<T | string> {
 	return new P.Parser((input, index, state) => {
 		// nesting limited? -> No: specified parser, Yes: 1 char
-		if (state.depth >= state.nestLimit) {
+		if (state.depth + 1 >= state.nestLimit) {
 			const result = P.any.handler(input, index, state);
 			if (!result.success) {
 				return result;
@@ -144,7 +144,7 @@ const lang = P.createLanguage({
 			P.alt([newLine, P.lineBegin]),
 			open,
 			P.option(newLine),
-			nest(P.seq([P.notMatch(P.seq([P.option(newLine), close])), r.inline], 1)).atLeast(1),
+			P.seq([P.notMatch(P.seq([P.option(newLine), close])), nest(r.inline)], 1).atLeast(1),
 			P.option(newLine),
 			close,
 			P.alt([newLine, P.lineEnd]),
@@ -157,7 +157,7 @@ const lang = P.createLanguage({
 		const mark = P.str('***');
 		return P.seqPartial([
 			mark,
-			nest(P.seq([P.notMatch(mark), r.inline], 1)).atLeast(1),
+			P.seq([P.notMatch(mark), nest(r.inline)], 1).atLeast(1),
 			mark,
 		]).map(result => {
 			if (result.length === 1) return result[0];
@@ -170,7 +170,7 @@ const lang = P.createLanguage({
 		const mark = P.str('**');
 		return P.seqPartial([
 			mark,
-			nest(P.seq([P.notMatch(mark), r.inline], 1)).atLeast(1),
+			P.seq([P.notMatch(mark), nest(r.inline)], 1).atLeast(1),
 			mark,
 		]).map(result => {
 			if (result.length === 1) return result[0];
@@ -184,7 +184,7 @@ const lang = P.createLanguage({
 		const close = P.str('</b>');
 		return P.seqPartial([
 			open,
-			nest(P.seq([P.notMatch(close), r.inline], 1)).atLeast(1),
+			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
 			close,
 		]).map(result => {
 			if (result.length === 1) return result[0];
@@ -207,7 +207,7 @@ const lang = P.createLanguage({
 		const close = P.str('</small>');
 		return P.seqPartial([
 			open,
-			nest(P.seq([P.notMatch(close), r.inline], 1)).atLeast(1),
+			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
 			close,
 		]).map(result => {
 			if (result.length === 1) return result[0];
@@ -221,7 +221,7 @@ const lang = P.createLanguage({
 		const close = P.str('</i>');
 		return P.seqPartial([
 			open,
-			nest(P.seq([P.notMatch(close), r.inline], 1)).atLeast(1),
+			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
 			close,
 		]).map(result => {
 			if (result.length === 1) return result[0];
@@ -255,7 +255,7 @@ const lang = P.createLanguage({
 		const close = P.str('</s>');
 		return P.seqPartial([
 			open,
-			nest(P.seq([P.notMatch(close), r.inline], 1)).atLeast(1),
+			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
 			close,
 		]).map(result => {
 			if (result.length === 1) return result[0];
@@ -268,7 +268,7 @@ const lang = P.createLanguage({
 		const mark = P.str('~~');
 		return P.seqPartial([
 			mark,
-			nest(P.seq([P.notMatch(P.alt([mark, newLine])), r.inline], 1)).atLeast(1),
+			P.seq([P.notMatch(P.alt([mark, newLine])), nest(r.inline)], 1).atLeast(1),
 			mark,
 		]).map(result => {
 			if (result.length === 1) return result[0];
@@ -342,7 +342,7 @@ const lang = P.createLanguage({
 			fnName,
 			P.option(args),
 			P.str(' '),
-			nest(P.seq([P.notMatch(fnClose), r.inline], 1)).atLeast(1),
+			P.seq([P.notMatch(fnClose), nest(r.inline)], 1).atLeast(1),
 			fnClose,
 		]).map(result => {
 			const name = result[1];
@@ -428,7 +428,7 @@ export type FullParserOpts = {
 
 export function fullParser(input: string, opts: FullParserOpts): M.MfmNode[] {
 	const reply = lang.fullParser.handler(input, 0, {
-		nestLimit: (opts.nestLimit != null) ? opts.nestLimit : 3,
+		nestLimit: (opts.nestLimit != null) ? opts.nestLimit : 20,
 		fnNameList: opts.fnNameList,
 		depth: 0,
 		trace: false,
