@@ -59,7 +59,7 @@ const lang = P.createLanguage({
 			r.inlineCode,   // "`"
 			r.mathInline,   // "\\("
 			r.mention,      // "@"
-			// r.hashtag,      // "#"
+			r.hashtag,      // "#"
 			r.emojiCode,    // ":"
 			// r.link,         // "?[" or "["
 			// r.url,
@@ -94,7 +94,7 @@ const lang = P.createLanguage({
 			r.inlineCode,   // "`"
 			r.mathInline,   // "\\("
 			r.mention,      // "@"
-			// r.hashtag,      // "#"
+			r.hashtag,      // "#"
 			r.emojiCode,    // ":"
 			// r.link,         // "?[" or "["
 			// r.url,
@@ -340,11 +340,21 @@ const lang = P.createLanguage({
 			const name = result[1];
 			const host = result[2];
 			const acct = host != null ? `@${name}@${host}` : `@${name}`;
-			M.MENTION(name, host, acct);
+			return M.MENTION(name, host, acct);
 		});
 	},
 
-	// TOOD: hashtag
+	hashtag: r => {
+		// TODO: check deatail
+		const mark = P.str('#');
+		return P.seq([
+			mark,
+			P.seq([
+				P.notMatch(P.alt([P.regexp(/[ 　\t.,!?'"#:\/\[\]【】()「」（）<>]/), space, LF])),
+				P.any,
+			], 1).atLeast(1),
+		], 1).map(value => M.HASHTAG(value.join('')));
+	},
 
 	emojiCode: r => {
 		const mark = P.str(':');
@@ -368,7 +378,7 @@ export function fullParser(input: string, opts: FullParserOpts): M.MfmNode[] {
 		nestLimit: (opts.nestLimit != null) ? opts.nestLimit : 3,
 		fnNameList: opts.fnNameList,
 		depth: 0,
-		trace: true,
+		trace: false,
 	});
 	if (!reply.success) {
 		throw new Error('parsing error');
