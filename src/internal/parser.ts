@@ -5,7 +5,7 @@ import { mergeText } from './util';
 
 const space = P.regexp(/[\u0020\u3000\t]/);
 const alphaAndNum = P.regexp(/[a-z0-9]/i);
-const LF = P.alt([P.str('\r\n'), P.str('\r'), P.str('\n')]);
+const newLine = P.alt([P.crlf, P.cr, P.lf]);
 
 function nest<T>(parser: P.Parser<T>): P.Parser<T | string> {
 	return new P.Parser((input, index, state) => {
@@ -217,7 +217,7 @@ const lang = P.createLanguage({
 		const mark = P.str('~~');
 		return P.seqPartial([
 			mark,
-			nest(P.seq([P.notMatch(P.alt([mark, LF])), r.inline], 1)).atLeast(1),
+			nest(P.seq([P.notMatch(P.alt([mark, newLine])), r.inline], 1)).atLeast(1),
 			mark,
 		]).map(result => {
 			if (result.length === 1) return result[0];
@@ -233,17 +233,17 @@ const lang = P.createLanguage({
 	},
 
 	plainTag: r => {
-		// plainTag = open LF? (!(LF? close) .)+ LF? close
+		// plainTag = open NewLine? (!(NewLine? close) .)+ NewLine? close
 		const open = P.str('<plain>');
 		const close = P.str('</plain>');
 		return P.seq([
 			open,
-			P.option(LF),
+			P.option(newLine),
 			P.seq([
-				P.notMatch(P.seq([P.option(LF), close])),
+				P.notMatch(P.seq([P.option(newLine), close])),
 				P.any,
 			], 1).atLeast(1),
-			P.option(LF),
+			P.option(newLine),
 			close,
 		]).map(result => M.PLAIN(result[2].join('')));
 	},
@@ -301,12 +301,12 @@ const lang = P.createLanguage({
 	},
 
 	inlineCode: r => {
-		// inlineCode = mark (!(mark / LF) .)+ mark
+		// inlineCode = mark (!(mark / NewLine) .)+ mark
 		const mark = P.str('`');
 		return P.seq([
 			mark,
 			P.seq([
-				P.notMatch(P.alt([mark, LF])),
+				P.notMatch(P.alt([mark, newLine])),
 				P.any,
 			], 1).atLeast(1),
 			mark,
@@ -314,13 +314,13 @@ const lang = P.createLanguage({
 	},
 
 	mathInline: r => {
-		// mathInline = open (!(close / LF) .)+ close
+		// mathInline = open (!(close / NewLine) .)+ close
 		const open = P.str('\\(');
 		const close = P.str('\\)');
 		return P.seq([
 			open,
 			P.seq([
-				P.notMatch(P.alt([close, LF])),
+				P.notMatch(P.alt([close, newLine])),
 				P.any,
 			], 1).atLeast(1),
 			close,
@@ -350,7 +350,7 @@ const lang = P.createLanguage({
 		return P.seq([
 			mark,
 			P.seq([
-				P.notMatch(P.alt([P.regexp(/[ 　\t.,!?'"#:\/\[\]【】()「」（）<>]/), space, LF])),
+				P.notMatch(P.alt([P.regexp(/[ 　\t.,!?'"#:\/\[\]【】()「」（）<>]/), space, newLine])),
 				P.any,
 			], 1).atLeast(1),
 		], 1).map(value => M.HASHTAG(value.join('')));

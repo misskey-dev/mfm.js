@@ -87,21 +87,13 @@ export class Parser<T> {
 	}
 }
 
-export const any = new Parser((input, index, state) => {
-	if ((input.length - index) < 1) {
-		return failure();
-	}
-	const value = input.charAt(index);
-	return success(index + 1, value);
-});
-
 export function succeeded<T>(value: T): Parser<T> {
 	return new Parser((input, index, state) => {
 		return success(index, value);
 	});
 }
 
-export const str = <T extends string>(value: T): Parser<T> => {
+export function str<T extends string>(value: T): Parser<T> {
 	return new Parser((input, index, state) => {
 		if ((input.length - index) < value.length) {
 			return failure();
@@ -111,9 +103,9 @@ export const str = <T extends string>(value: T): Parser<T> => {
 		}
 		return success(index + value.length, value);
 	});
-};
+}
 
-export const regexp = <T extends RegExp>(pattern: T): Parser<string> => {
+export function regexp<T extends RegExp>(pattern: T): Parser<string> {
 	const re = RegExp(`^${pattern.source}`, pattern.flags);
 	return new Parser((input, index, state) => {
 		const result = re.exec(input.slice(index));
@@ -122,9 +114,9 @@ export const regexp = <T extends RegExp>(pattern: T): Parser<string> => {
 		}
 		return success(index + result[0].length, result[0]);
 	});
-};
+}
 
-export const seq = (parsers: Parser<any>[], select?: number): Parser<any> => {
+export function seq(parsers: Parser<any>[], select?: number): Parser<any> {
 	return new Parser((input, index, state) => {
 		let result;
 		const accum = [];
@@ -138,7 +130,7 @@ export const seq = (parsers: Parser<any>[], select?: number): Parser<any> => {
 		}
 		return success(index, select != null ? accum[select] : accum);
 	});
-};
+}
 
 /**
  * Partially consumes the sequence.
@@ -159,7 +151,7 @@ export function seqPartial(parsers: Parser<any>[]): Parser<any[]> {
 	});
 }
 
-export const alt = (parsers: Parser<any>[]): Parser<any> => {
+export function alt(parsers: Parser<any>[]): Parser<any> {
 	return new Parser((input, index, state) => {
 		let result;
 		for (let i = 0; i < parsers.length; i++) {
@@ -170,7 +162,7 @@ export const alt = (parsers: Parser<any>[]): Parser<any> => {
 		}
 		return failure();
 	});
-};
+}
 
 export function option<T>(parser: Parser<T>): Parser<T | null> {
 	return alt([
@@ -179,31 +171,69 @@ export function option<T>(parser: Parser<T>): Parser<T | null> {
 	]);
 }
 
-export const match = (parser: Parser<any>): Parser<null> => {
+export function match(parser: Parser<any>): Parser<null> {
 	return new Parser((input, index, state) => {
 		const result = parser.handler(input, index, state);
 		return result.success
 			? success(index, null)
 			: failure();
 	});
-};
+}
 
-export const notMatch = (parser: Parser<any>): Parser<null> => {
+export function notMatch(parser: Parser<any>): Parser<null> {
 	return new Parser((input, index, state) => {
 		const result = parser.handler(input, index, state);
 		return !result.success
 			? success(index, null)
 			: failure();
 	});
-};
+}
 
-export const lazy = <T>(fn: () => Parser<T>): Parser<T> => {
+export function lazy<T>(fn: () => Parser<T>): Parser<T> {
 	const parser: Parser<T> = new Parser((input, index, state) => {
 		parser.handler = fn().handler;
 		return parser.handler(input, index, state);
 	});
 	return parser;
-};
+}
+
+export const cr = str('\r');
+export const lf = str('\n');
+export const crlf = str('\r\n');
+
+export const any = new Parser((input, index, state) => {
+	if ((input.length - index) < 1) {
+		return failure();
+	}
+	const value = input.charAt(index);
+	return success(index + 1, value);
+});
+
+export const lineBegin = new Parser((input, index, state) => {
+	if (index === 0) {
+		return success(index, null);
+	}
+	if (cr.handler(input, index-1, state).success) {
+		return success(index, null);
+	}
+	if (lf.handler(input, index-1, state).success) {
+		return success(index, null);
+	}
+	return failure();
+});
+
+export const lineEnd = new Parser((input, index, state) => {
+	if (index === input.length) {
+		return success(index, null);
+	}
+	if (cr.handler(input, index+1, state).success) {
+		return success(index, null);
+	}
+	if (lf.handler(input, index+1, state).success) {
+		return success(index, null);
+	}
+	return failure();
+});
 
 type Syntax = (rules: Record<string, Parser<any>>) => Parser<any>;
 
