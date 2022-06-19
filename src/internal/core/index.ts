@@ -106,9 +106,10 @@ export function str<T extends string>(value: T): Parser<T> {
 }
 
 export function regexp<T extends RegExp>(pattern: T): Parser<string> {
-	const re = RegExp(`^${pattern.source}`, pattern.flags);
+	const re = RegExp(`^(?:${pattern.source})`, pattern.flags);
 	return new Parser((input, index, state) => {
-		const result = re.exec(input.slice(index));
+		const text = input.slice(index);
+		const result = re.exec(text);
 		if (result == null) {
 			return failure();
 		}

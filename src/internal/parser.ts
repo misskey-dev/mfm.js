@@ -278,10 +278,9 @@ const lang = P.createLanguage({
 	},
 
 	unicodeEmoji: r => {
-		// TODO: fix bug
 		// TODO: keycap number sign
-		const emojiRegex = RegExp(twemojiRegex.source);
-		return P.regexp(emojiRegex).map(content => M.UNI_EMOJI(content));
+		const emoji = RegExp(twemojiRegex.source);
+		return P.regexp(emoji).map(content => M.UNI_EMOJI(content));
 	},
 
 	plainTag: r => {
