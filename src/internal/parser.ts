@@ -63,7 +63,7 @@ const lang = P.createLanguage({
 			r.emojiCode,    // ":"
 			// r.link,         // "?[" or "["
 			// r.url,
-			// r.search,       // block
+			r.search,       // block
 			r.text,
 		]);
 	},
@@ -414,6 +414,23 @@ const lang = P.createLanguage({
 			P.regexp(/[a-z0-9_+-]+/i),
 			mark,
 		], 1).map(name => M.EMOJI_CODE(name as string));
+	},
+
+	search: r => {
+		const button = P.alt([
+			P.regexp(/\[(検索|search)\]/i),
+			P.regexp(/(検索|search)/i),
+		]);
+		return P.seq([
+			P.alt([newLine, P.lineBegin]),
+			P.seq([P.notMatch(P.alt([newLine, P.seq([space, button, P.alt([newLine, P.lineEnd])])])), P.any], 1).atLeast(1),
+			space,
+			button,
+			P.alt([newLine, P.lineEnd]),
+		]).map(result => {
+			const query = result[1].join('');
+			return M.SEARCH(query, `${query}${result[2]}${result[3]}`);
+		});
 	},
 
 	text: r => P.any,
