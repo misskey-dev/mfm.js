@@ -40,7 +40,7 @@ const lang = P.createLanguage({
 	full: r => {
 		return P.alt([
 			// r.quote,        // ">" block
-			// r.codeBlock,    // "```" block
+			r.codeBlock,    // "```" block
 			// r.mathBlock,    // "\\[" block
 			// r.center,       // "<center>" block
 			r.unicodeEmoji, // Regexp
@@ -100,6 +100,23 @@ const lang = P.createLanguage({
 			// r.url,
 			r.text,
 		]);
+	},
+
+	codeBlock: r => {
+		const mark = P.str('```');
+		return P.seq([
+			mark,
+			P.seq([P.notMatch(newLine), P.any], 1).atLeast(0),
+			newLine,
+			P.seq([P.notMatch(P.seq([newLine, mark, P.lineEnd])), P.any], 1).atLeast(1),
+			newLine,
+			mark,
+			P.lineEnd,
+		]).map(result => {
+			const lang = (result[1] as string[]).join('').trim();
+			const code = (result[3] as string[]).join('');
+			return M.CODE_BLOCK(code, (lang.length > 0 ? lang : null));
+		});
 	},
 
 	big: r => {

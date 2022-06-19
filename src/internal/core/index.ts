@@ -226,10 +226,10 @@ export const lineEnd = new Parser((input, index, state) => {
 	if (index === input.length) {
 		return success(index, null);
 	}
-	if (cr.handler(input, index+1, state).success) {
+	if (cr.handler(input, index, state).success) {
 		return success(index, null);
 	}
-	if (lf.handler(input, index+1, state).success) {
+	if (lf.handler(input, index, state).success) {
 		return success(index, null);
 	}
 	return failure();
