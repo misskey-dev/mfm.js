@@ -42,7 +42,7 @@ const lang = P.createLanguage({
 			// r.quote,        // ">" block
 			r.codeBlock,    // "```" block
 			r.mathBlock,    // "\\[" block
-			// r.center,       // "<center>" block
+			r.centerTag,    // "<center>" block
 			r.unicodeEmoji, // Regexp
 			r.fn,           // "$[""
 			r.big,          // "***"
@@ -134,6 +134,22 @@ const lang = P.createLanguage({
 		]).map(result => {
 			const formula = (result[3] as string[]).join('');
 			return M.MATH_BLOCK(formula);
+		});
+	},
+
+	centerTag: r => {
+		const open = P.str('<center>');
+		const close = P.str('</center>');
+		return P.seq([
+			P.alt([newLine, P.lineBegin]),
+			open,
+			P.option(newLine),
+			nest(P.seq([P.notMatch(P.seq([P.option(newLine), close])), r.inline], 1)).atLeast(1),
+			P.option(newLine),
+			close,
+			P.alt([newLine, P.lineEnd]),
+		]).map(result => {
+			return M.CENTER(mergeText(result[3]));
 		});
 	},
 
