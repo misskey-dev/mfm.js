@@ -124,13 +124,13 @@ const lang = P.createLanguage({
 		const open = P.str('\\[');
 		const close = P.str('\\]');
 		return P.seq([
-			P.lineBegin,
+			P.alt([newLine, P.lineBegin]),
 			open,
 			P.option(newLine),
 			P.seq([P.notMatch(P.seq([P.option(newLine), close])), P.any], 1).atLeast(1),
 			P.option(newLine),
 			close,
-			P.lineEnd,
+			P.alt([newLine, P.lineEnd]),
 		]).map(result => {
 			const formula = (result[3] as string[]).join('');
 			return M.MATH_BLOCK(formula);
