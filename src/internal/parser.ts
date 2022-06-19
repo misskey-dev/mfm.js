@@ -385,7 +385,7 @@ const lang = P.createLanguage({
 		return P.seq([
 			mark,
 			P.seq([
-				P.notMatch(P.alt([P.regexp(/[ 　\t.,!?'"#:\/\[\]【】()「」（）<>]/), space, newLine])),
+				P.notMatch(P.alt([P.regexp(/[ \u3000\t.,!?'"#:/[\]【】()「」（）<>]/), space, newLine])),
 				P.any,
 			], 1).atLeast(1),
 		], 1).map(value => M.HASHTAG(value.join('')));

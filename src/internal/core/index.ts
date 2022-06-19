@@ -43,7 +43,7 @@ export class Parser<T> {
 				return result;
 			}
 			return handler(input, index, state);
-		}
+		};
 		this.name = name;
 	}
 
@@ -213,10 +213,10 @@ export const lineBegin = new Parser((input, index, state) => {
 	if (index === 0) {
 		return success(index, null);
 	}
-	if (cr.handler(input, index-1, state).success) {
+	if (cr.handler(input, index - 1, state).success) {
 		return success(index, null);
 	}
-	if (lf.handler(input, index-1, state).success) {
+	if (lf.handler(input, index - 1, state).success) {
 		return success(index, null);
 	}
 	return failure();

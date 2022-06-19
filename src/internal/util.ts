@@ -23,7 +23,7 @@ export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
 			// Store the char.
 			storedChars.push(node);
 		}
-		else if (!Array.isArray(node) && node.type == 'text') {
+		else if (!Array.isArray(node) && node.type === 'text') {
 			storedChars.push(node.props.text);
 		}
 		else {
