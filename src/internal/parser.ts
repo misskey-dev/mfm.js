@@ -423,7 +423,13 @@ const lang = P.createLanguage({
 		]);
 		return P.seq([
 			P.alt([newLine, P.lineBegin]),
-			P.seq([P.notMatch(P.alt([newLine, P.seq([space, button, P.alt([newLine, P.lineEnd])])])), P.any], 1).atLeast(1),
+			P.seq([
+				P.notMatch(P.alt([
+					newLine,
+					P.seq([space, button, P.alt([newLine, P.lineEnd])]),
+				])),
+				P.any,
+			], 1).atLeast(1),
 			space,
 			button,
 			P.alt([newLine, P.lineEnd]),
