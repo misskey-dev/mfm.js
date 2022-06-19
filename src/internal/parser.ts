@@ -41,7 +41,7 @@ const lang = P.createLanguage({
 		return P.alt([
 			// r.quote,        // ">" block
 			r.codeBlock,    // "```" block
-			// r.mathBlock,    // "\\[" block
+			r.mathBlock,    // "\\[" block
 			// r.center,       // "<center>" block
 			r.unicodeEmoji, // Regexp
 			r.fn,           // "$[""
@@ -105,6 +105,7 @@ const lang = P.createLanguage({
 	codeBlock: r => {
 		const mark = P.str('```');
 		return P.seq([
+			P.lineBegin,
 			mark,
 			P.seq([P.notMatch(newLine), P.any], 1).atLeast(0),
 			newLine,
@@ -113,9 +114,26 @@ const lang = P.createLanguage({
 			mark,
 			P.lineEnd,
 		]).map(result => {
-			const lang = (result[1] as string[]).join('').trim();
-			const code = (result[3] as string[]).join('');
+			const lang = (result[2] as string[]).join('').trim();
+			const code = (result[4] as string[]).join('');
 			return M.CODE_BLOCK(code, (lang.length > 0 ? lang : null));
+		});
+	},
+
+	mathBlock: r => {
+		const open = P.str('\\[');
+		const close = P.str('\\]');
+		return P.seq([
+			P.lineBegin,
+			open,
+			P.option(newLine),
+			P.seq([P.notMatch(P.seq([P.option(newLine), close])), P.any], 1).atLeast(1),
+			P.option(newLine),
+			close,
+			P.lineEnd,
+		]).map(result => {
+			const formula = (result[3] as string[]).join('');
+			return M.MATH_BLOCK(formula);
 		});
 	},
 
