@@ -30,12 +30,15 @@ export class Parser<T> {
 	constructor(handler: ParserHandler<T>, name?: string) {
 		this.handler = (input, index, state) => {
 			if (state.trace && this.name != null) {
-				console.log(`${index} enter ${this.name}`);
+				const pos = `${index}`;
+				console.log(`${pos.padEnd(6, ' ')}enter ${this.name}`);
 				const result = handler(input, index, state);
 				if (result.success) {
-					console.log(`${index} match ${this.name}`);
+					const pos = `${index}:${result.index}`;
+					console.log(`${pos.padEnd(6, ' ')}match ${this.name}`);
 				} else {
-					console.log(`${index} fail ${this.name}`);
+					const pos = `${index}`;
+					console.log(`${pos.padEnd(6, ' ')}fail ${this.name}`);
 				}
 				return result;
 			}
