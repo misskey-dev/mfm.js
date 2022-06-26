@@ -3,9 +3,32 @@ import twemojiRegex from 'twemoji-parser/dist/lib/regex';
 import * as P from './core';
 import { mergeText } from './util';
 
+type ArgPair = { k: string, v: string | true };
+type Args = Record<string, string | true>;
+
 const space = P.regexp(/[\u0020\u3000\t]/);
 const alphaAndNum = P.regexp(/[a-z0-9]/i);
 const newLine = P.alt([P.crlf, P.cr, P.lf]);
+
+function seqOrText(parsers: P.Parser<any>[]): P.Parser<any[] | string> {
+	return new P.Parser<any[] | string>((input, index, state) => {
+		const accum: any[] = [];
+		let latestIndex = index;
+		for (let i = 0 ; i < parsers.length; i++) {
+			const result = parsers[i].handler(input, latestIndex, state);
+			if (!result.success) {
+				if (latestIndex === index) {
+					return P.failure();
+				} else {
+					return P.success(latestIndex, input.slice(index, latestIndex));
+				}
+			}
+			accum.push(result.value);
+			latestIndex = result.index;
+		}
+		return P.success(latestIndex, accum);
+	});
+}
 
 function nest<T>(parser: P.Parser<T>): P.Parser<T | string> {
 	return new P.Parser((input, index, state) => {
@@ -155,26 +178,24 @@ const lang = P.createLanguage({
 
 	big: r => {
 		const mark = P.str('***');
-		return P.seqPartial([
+		return seqOrText([
 			mark,
 			P.seq([P.notMatch(mark), nest(r.inline)], 1).atLeast(1),
 			mark,
 		]).map(result => {
-			if (result.length === 1) return result[0];
-			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			if (typeof result == 'string') return result;
 			return M.FN('tada', {}, mergeText(result[1]));
 		});
 	},
 
 	boldAsta: r => {
 		const mark = P.str('**');
-		return P.seqPartial([
+		return seqOrText([
 			mark,
 			P.seq([P.notMatch(mark), nest(r.inline)], 1).atLeast(1),
 			mark,
 		]).map(result => {
-			if (result.length === 1) return result[0];
-			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			if (typeof result == 'string') return result;
 			return M.BOLD(mergeText(result[1] as (M.MfmInline | string)[]));
 		});
 	},
@@ -182,13 +203,12 @@ const lang = P.createLanguage({
 	boldTag: r => {
 		const open = P.str('<b>');
 		const close = P.str('</b>');
-		return P.seqPartial([
+		return seqOrText([
 			open,
 			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
 			close,
 		]).map(result => {
-			if (result.length === 1) return result[0];
-			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			if (typeof result == 'string') return result;
 			return M.BOLD(mergeText(result[1] as (M.MfmInline | string)[]));
 		});
 	},
@@ -205,13 +225,12 @@ const lang = P.createLanguage({
 	smallTag: r => {
 		const open = P.str('<small>');
 		const close = P.str('</small>');
-		return P.seqPartial([
+		return seqOrText([
 			open,
 			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
 			close,
 		]).map(result => {
-			if (result.length === 1) return result[0];
-			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			if (typeof result == 'string') return result;
 			return M.SMALL(mergeText(result[1] as (M.MfmInline | string)[]));
 		});
 	},
@@ -219,13 +238,12 @@ const lang = P.createLanguage({
 	italicTag: r => {
 		const open = P.str('<i>');
 		const close = P.str('</i>');
-		return P.seqPartial([
+		return seqOrText([
 			open,
 			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
 			close,
 		]).map(result => {
-			if (result.length === 1) return result[0];
-			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			if (typeof result == 'string') return result;
 			return M.ITALIC(mergeText(result[1] as (M.MfmInline | string)[]));
 		});
 	},
@@ -253,26 +271,24 @@ const lang = P.createLanguage({
 	strikeTag: r => {
 		const open = P.str('<s>');
 		const close = P.str('</s>');
-		return P.seqPartial([
+		return seqOrText([
 			open,
 			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
 			close,
 		]).map(result => {
-			if (result.length === 1) return result[0];
-			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			if (typeof result == 'string') return result;
 			return M.STRIKE(mergeText(result[1] as (M.MfmInline | string)[]));
 		});
 	},
 
 	strikeWave: r => {
 		const mark = P.str('~~');
-		return P.seqPartial([
+		return seqOrText([
 			mark,
 			P.seq([P.notMatch(P.alt([mark, newLine])), nest(r.inline)], 1).atLeast(1),
 			mark,
 		]).map(result => {
-			if (result.length === 1) return result[0];
-			if (result.length === 2) return mergeText([result[0], ...result[1]]);
+			if (typeof result == 'string') return result;
 			return M.STRIKE(mergeText(result[1] as (M.MfmInline | string)[]));
 		});
 	},
@@ -299,9 +315,6 @@ const lang = P.createLanguage({
 	},
 
 	fn: r => {
-		type ArgPair = { k: string, v: string | true };
-		type Args = Record<string, string | true>;
-
 		const fnName = new P.Parser((input, index, state) => {
 			const result = P.regexp(/[a-z0-9_]+/i).handler(input, index, state);
 			if (!result.success) {
@@ -335,7 +348,7 @@ const lang = P.createLanguage({
 			return result;
 		});
 		const fnClose = P.str(']');
-		return P.seq([
+		return seqOrText([
 			P.str('$['),
 			fnName,
 			P.option(args),
@@ -343,6 +356,7 @@ const lang = P.createLanguage({
 			P.seq([P.notMatch(fnClose), nest(r.inline)], 1).atLeast(1),
 			fnClose,
 		]).map(result => {
+			if (typeof result == 'string') return result;
 			const name = result[1];
 			const args = result[2] || {};
 			const content = result[4];

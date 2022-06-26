@@ -133,25 +133,6 @@ export function seq(parsers: Parser<any>[], select?: number): Parser<any> {
 	});
 }
 
-/**
- * Partially consumes the sequence.
-*/
-export function seqPartial(parsers: Parser<any>[]): Parser<any[]> {
-	return new Parser<any[]>((input, index, state) => {
-		const accum: any[] = [];
-		let latestIndex = index;
-		for (let i = 0 ; i < parsers.length; i++) {
-			const result = parsers[i].handler(input, latestIndex, state);
-			if (!result.success) {
-				return latestIndex !== index ? success(latestIndex, accum) : failure();
-			}
-			accum.push(result.value);
-			latestIndex = result.index;
-		}
-		return success(latestIndex, accum);
-	});
-}
-
 export function alt(parsers: Parser<any>[]): Parser<any> {
 	return new Parser((input, index, state) => {
 		let result;
