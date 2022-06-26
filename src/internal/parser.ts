@@ -3,6 +3,8 @@ import * as M from '..';
 import * as P from './core';
 import { mergeText } from './util';
 
+// TODO: stateful parsing rules for link label
+
 type ArgPair = { k: string, v: string | true };
 type Args = Record<string, string | true>;
 
@@ -78,7 +80,7 @@ export const language = P.createLanguage({
 			r.mention,      // "@"
 			r.hashtag,      // "#"
 			r.emojiCode,    // ":"
-			// r.link,         // "?[" or "["
+			r.link,         // "?[" or "["
 			r.urlAlt,       // <http
 			r.url,          // http
 			r.search,       // block
@@ -114,7 +116,7 @@ export const language = P.createLanguage({
 			r.mention,      // "@"
 			r.hashtag,      // "#"
 			r.emojiCode,    // ":"
-			// r.link,         // "?[" or "["
+			r.link,         // "?[" or "["
 			r.urlAlt,       // <http
 			r.url,          // http
 			r.text,
@@ -422,6 +424,32 @@ export const language = P.createLanguage({
 			P.regexp(/[a-z0-9_+-]+/i),
 			mark,
 		], 1).map(name => M.EMOJI_CODE(name as string));
+	},
+
+	link: r => {
+		const labelInline = new P.Parser((input, index, state) => {
+			state.linkLabel = true;
+			const result = r.inline.handler(input, index, state);
+			state.linkLabel = false;
+			return result;
+		});
+		const closeLabel = P.str(']');
+		return P.seq([
+			P.alt([P.str('?['), P.str('[')]),
+			P.seq([
+				P.notMatch(P.alt([closeLabel, newLine])),
+				labelInline,
+			], 1).atLeast(1),
+			closeLabel,
+			P.str('('),
+			P.alt([r.urlAlt, r.url]),
+			P.str(')'),
+		]).map(result => {
+			const silent = (result[0] === '?[');
+			const label = result[1];
+			const url: M.MfmUrl = result[4];
+			return M.LINK(silent, url.props.url, label);
+		});
 	},
 
 	url: r => {

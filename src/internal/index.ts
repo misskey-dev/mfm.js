@@ -12,6 +12,7 @@ export function fullParser(input: string, opts: FullParserOpts): M.MfmNode[] {
 		nestLimit: (opts.nestLimit != null) ? opts.nestLimit : 20,
 		fnNameList: opts.fnNameList,
 		depth: 0,
+		linkLabel: false,
 		trace: false,
 	});
 	if (!result.success) {
