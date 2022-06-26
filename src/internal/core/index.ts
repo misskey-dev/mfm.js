@@ -1,3 +1,6 @@
+//
+// Parsimmon-like simple parser combinators
+//
 
 type Success<T> = {
 	success: true;

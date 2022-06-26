@@ -1,5 +1,5 @@
-import * as M from '..';
 import twemojiRegex from 'twemoji-parser/dist/lib/regex';
+import * as M from '..';
 import * as P from './core';
 import { mergeText } from './util';
 
@@ -45,7 +45,7 @@ function nest<T>(parser: P.Parser<T>, fallback?: P.Parser<string>) {
 	});
 }
 
-const lang = P.createLanguage({
+export const language = P.createLanguage({
 	fullParser: r => {
 		return r.full.atLeast(0);
 	},
@@ -498,31 +498,3 @@ const lang = P.createLanguage({
 
 	text: r => P.any,
 });
-
-export type FullParserOpts = {
-	fnNameList?: string[];
-	nestLimit?: number;
-};
-
-export function fullParser(input: string, opts: FullParserOpts): M.MfmNode[] {
-	const reply = lang.fullParser.handler(input, 0, {
-		nestLimit: (opts.nestLimit != null) ? opts.nestLimit : 20,
-		fnNameList: opts.fnNameList,
-		depth: 0,
-		trace: false,
-	});
-	if (!reply.success) {
-		throw new Error('parsing error');
-	}
-
-	return mergeText(reply.value);
-}
-
-export function simpleParser(input: string): M.MfmSimpleNode[] {
-	const reply = lang.simpleParser.handler(input, 0, { });
-	if (!reply.success) {
-		throw new Error('parsing error');
-	}
-
-	return mergeText(reply.value);
-}
