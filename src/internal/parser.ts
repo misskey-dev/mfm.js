@@ -461,10 +461,10 @@ export const language = P.createLanguage({
 		const urlChar = P.regexp(/[.,a-z0-9_/:%#@$&?!~=+-]/i);
 		const innerItem: P.Parser<any> = P.lazy(() => P.alt([
 			P.seq([
-				P.str('('), nest(innerItem.atLeast(0), urlChar), P.str(')'),
+				P.str('('), nest(innerItem, urlChar).atLeast(0), P.str(')'),
 			]),
 			P.seq([
-				P.str('['), nest(innerItem.atLeast(0), urlChar), P.str(']'),
+				P.str('['), nest(innerItem, urlChar).atLeast(0), P.str(']'),
 			]),
 			urlChar,
 		]));
