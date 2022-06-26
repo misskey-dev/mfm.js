@@ -30,24 +30,31 @@ function seqOrText(parsers: P.Parser<any>[]): P.Parser<any[] | string> {
 	});
 }
 
+const notLinkLabel = new P.Parser((input, index, state) => {
+	return (!state.linkLabel)
+		? P.success(index, null)
+		: P.failure();
+});
+
+const nestable = new P.Parser((input, index, state) => {
+	return (state.depth < state.nestLimit)
+		? P.success(index, null)
+		: P.failure();
+});
+
 function nest<T>(parser: P.Parser<T>, fallback?: P.Parser<string>) {
+	// nesting limited? -> No: specified parser, Yes: fallback parser (default = P.any)
+	const inner = P.alt([
+		P.seq([nestable, parser], 1),
+		(fallback != null) ? fallback : P.any,
+	]);
 	return new P.Parser<T | string>((input, index, state) => {
-		// nesting limited? -> No: specified parser, Yes: fallback parser (default = P.any)
-		if (state.depth + 1 >= state.nestLimit) {
-			if (fallback == null) fallback = P.any;
-			return fallback.handler(input, index, state);
-		} else {
-			state.depth++;
-			const result = parser.handler(input, index, state);
-			state.depth--;
-			return result;
-		}
+		state.depth++;
+		const result = inner.handler(input, index, state);
+		state.depth--;
+		return result;
 	});
 }
-
-const notLinkLabel = new P.Parser((input, index, state) => {
-	return (state.linkLabel) ? P.failure() : P.success(index, null);
-});
 
 export const language = P.createLanguage({
 	fullParser: r => {
