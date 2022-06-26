@@ -461,10 +461,10 @@ export const language = P.createLanguage({
 		const urlChar = P.regexp(/[.,a-z0-9_/:%#@$&?!~=+-]/i);
 		const innerItem: P.Parser<any> = P.lazy(() => P.alt([
 			P.seq([
-				P.str('('), nest(innerItem.atLeast(0), urlChar), P.str(')')
+				P.str('('), nest(innerItem.atLeast(0), urlChar), P.str(')'),
 			]),
 			P.seq([
-				P.str('['), nest(innerItem.atLeast(0), urlChar), P.str(']')
+				P.str('['), nest(innerItem.atLeast(0), urlChar), P.str(']'),
 			]),
 			urlChar,
 		]));
@@ -475,8 +475,7 @@ export const language = P.createLanguage({
 		]).text();
 		return new P.Parser((input, index, state) => {
 			// TODO: check ".,"
-			let result;
-			result = parser.handler(input, index, state);
+			const result = parser.handler(input, index, state);
 			if (!result.success) {
 				return P.failure();
 			}
@@ -495,8 +494,7 @@ export const language = P.createLanguage({
 			close,
 		]).text();
 		return new P.Parser((input, index, state) => {
-			let result;
-			result = parser.handler(input, index, state);
+			const result = parser.handler(input, index, state);
 			if (!result.success) {
 				return P.failure();
 			}
