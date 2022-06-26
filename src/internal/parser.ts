@@ -3,8 +3,6 @@ import * as M from '..';
 import * as P from './core';
 import { mergeText } from './util';
 
-// TODO: stateful parsing rules for link label
-
 type ArgPair = { k: string, v: string | true };
 type Args = Record<string, string | true>;
 
@@ -46,6 +44,10 @@ function nest<T>(parser: P.Parser<T>, fallback?: P.Parser<string>) {
 		}
 	});
 }
+
+const notLinkLabel = new P.Parser((input, index, state) => {
+	return (state.linkLabel) ? P.failure() : P.success(index, null);
+});
 
 export const language = P.createLanguage({
 	fullParser: r => {
@@ -390,6 +392,7 @@ export const language = P.createLanguage({
 	mention: r => {
 		// TODO: check deatail
 		return P.seq([
+			notLinkLabel,
 			P.str('@'),
 			P.regexp(/[a-z0-9_-]+/i),
 			P.option(P.seq([
@@ -397,8 +400,8 @@ export const language = P.createLanguage({
 				P.regexp(/[a-z0-9_.-]+/i),
 			], 1)),
 		]).map(result => {
-			const name = result[1];
-			const host = result[2];
+			const name = result[2];
+			const host = result[3];
 			const acct = host != null ? `@${name}@${host}` : `@${name}`;
 			return M.MENTION(name, host, acct);
 		});
@@ -409,12 +412,13 @@ export const language = P.createLanguage({
 		// TODO: bracket pair
 		const mark = P.str('#');
 		return P.seq([
+			notLinkLabel,
 			mark,
 			P.seq([
 				P.notMatch(P.alt([P.regexp(/[ \u3000\t.,!?'"#:/[\]【】()「」（）<>]/), space, newLine])),
 				P.any,
 			], 1).atLeast(1),
-		], 1).map(value => M.HASHTAG(value.join('')));
+		], 2).map(value => M.HASHTAG(value.join('')));
 	},
 
 	emojiCode: r => {
@@ -435,6 +439,7 @@ export const language = P.createLanguage({
 		});
 		const closeLabel = P.str(']');
 		return P.seq([
+			notLinkLabel,
 			P.alt([P.str('?['), P.str('[')]),
 			P.seq([
 				P.notMatch(P.alt([closeLabel, newLine])),
@@ -445,10 +450,10 @@ export const language = P.createLanguage({
 			P.alt([r.urlAlt, r.url]),
 			P.str(')'),
 		]).map(result => {
-			const silent = (result[0] === '?[');
-			const label = result[1];
-			const url: M.MfmUrl = result[4];
-			return M.LINK(silent, url.props.url, label);
+			const silent = (result[1] === '?[');
+			const label = result[2];
+			const url: M.MfmUrl = result[5];
+			return M.LINK(silent, url.props.url, mergeText(label));
 		});
 	},
 
@@ -464,6 +469,7 @@ export const language = P.createLanguage({
 			urlChar,
 		]));
 		const parser = P.seq([
+			notLinkLabel,
 			P.regexp(/https?:\/\//),
 			innerItem.atLeast(1),
 		]).text();
@@ -482,6 +488,7 @@ export const language = P.createLanguage({
 		const open = P.str('<');
 		const close = P.str('>');
 		const parser = P.seq([
+			notLinkLabel,
 			open,
 			P.regexp(/https?:\/\//),
 			P.seq([P.notMatch(P.alt([close, space])), P.any], 1).atLeast(1),
