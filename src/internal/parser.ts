@@ -443,7 +443,7 @@ export const language = P.createLanguage({
 			P.alt([P.str('?['), P.str('[')]),
 			P.seq([
 				P.notMatch(P.alt([closeLabel, newLine])),
-				labelInline,
+				nest(labelInline),
 			], 1).atLeast(1),
 			closeLabel,
 			P.str('('),
