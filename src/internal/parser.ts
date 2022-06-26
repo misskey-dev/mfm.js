@@ -361,7 +361,6 @@ export const language = P.createLanguage({
 	},
 
 	inlineCode: r => {
-		// inlineCode = "`" (!("`" / "´" / NewLine) .)+ "`"
 		const mark = P.str('`');
 		return P.seq([
 			mark,
@@ -374,7 +373,6 @@ export const language = P.createLanguage({
 	},
 
 	mathInline: r => {
-		// mathInline = open (!(close / NewLine) .)+ close
 		const open = P.str('\\(');
 		const close = P.str('\\)');
 		return P.seq([
@@ -440,7 +438,7 @@ export const language = P.createLanguage({
 		const parser = P.seq([
 			P.regexp(/https?:\/\//),
 			innerItem.atLeast(1),
-		]);
+		]).text();
 		return new P.Parser((input, index, state) => {
 			// TODO: check ".,"
 			let result;
@@ -448,8 +446,7 @@ export const language = P.createLanguage({
 			if (!result.success) {
 				return P.failure();
 			}
-			const text = input.slice(index, result.index);
-			return P.success(result.index, M.N_URL(text, false));
+			return P.success(result.index, M.N_URL(result.value, false));
 		});
 	},
 
@@ -461,14 +458,14 @@ export const language = P.createLanguage({
 			P.regexp(/https?:\/\//),
 			P.seq([P.notMatch(P.alt([close, space])), P.any], 1).atLeast(1),
 			close,
-		]);
+		]).text();
 		return new P.Parser((input, index, state) => {
 			let result;
 			result = parser.handler(input, index, state);
 			if (!result.success) {
 				return P.failure();
 			}
-			const text = input.slice((index + 1), (result.index - 1));
+			const text = result.value.slice(1, (result.value.length - 1));
 			return P.success(result.index, M.N_URL(text, true));
 		});
 	},

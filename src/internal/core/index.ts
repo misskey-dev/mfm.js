@@ -60,6 +60,17 @@ export class Parser<T> {
 		});
 	}
 
+	text(): Parser<string> {
+		return new Parser((input, index, state) => {
+			const result = this.handler(input, index, state);
+			if (!result.success) {
+				return result;
+			}
+			const text = input.slice(index, result.index);
+			return success(result.index, text);
+		});
+	}
+
 	atLeast(n: number): Parser<T[]> {
 		return new Parser((input, index, state) => {
 			let result;
