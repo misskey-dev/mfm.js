@@ -183,7 +183,7 @@ const lang = P.createLanguage({
 			P.seq([P.notMatch(mark), nest(r.inline)], 1).atLeast(1),
 			mark,
 		]).map(result => {
-			if (typeof result == 'string') return result;
+			if (typeof result === 'string') return result;
 			return M.FN('tada', {}, mergeText(result[1]));
 		});
 	},
@@ -195,7 +195,7 @@ const lang = P.createLanguage({
 			P.seq([P.notMatch(mark), nest(r.inline)], 1).atLeast(1),
 			mark,
 		]).map(result => {
-			if (typeof result == 'string') return result;
+			if (typeof result === 'string') return result;
 			return M.BOLD(mergeText(result[1] as (M.MfmInline | string)[]));
 		});
 	},
@@ -208,7 +208,7 @@ const lang = P.createLanguage({
 			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
 			close,
 		]).map(result => {
-			if (typeof result == 'string') return result;
+			if (typeof result === 'string') return result;
 			return M.BOLD(mergeText(result[1] as (M.MfmInline | string)[]));
 		});
 	},
@@ -230,7 +230,7 @@ const lang = P.createLanguage({
 			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
 			close,
 		]).map(result => {
-			if (typeof result == 'string') return result;
+			if (typeof result === 'string') return result;
 			return M.SMALL(mergeText(result[1] as (M.MfmInline | string)[]));
 		});
 	},
@@ -243,7 +243,7 @@ const lang = P.createLanguage({
 			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
 			close,
 		]).map(result => {
-			if (typeof result == 'string') return result;
+			if (typeof result === 'string') return result;
 			return M.ITALIC(mergeText(result[1] as (M.MfmInline | string)[]));
 		});
 	},
@@ -276,7 +276,7 @@ const lang = P.createLanguage({
 			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
 			close,
 		]).map(result => {
-			if (typeof result == 'string') return result;
+			if (typeof result === 'string') return result;
 			return M.STRIKE(mergeText(result[1] as (M.MfmInline | string)[]));
 		});
 	},
@@ -288,7 +288,7 @@ const lang = P.createLanguage({
 			P.seq([P.notMatch(P.alt([mark, newLine])), nest(r.inline)], 1).atLeast(1),
 			mark,
 		]).map(result => {
-			if (typeof result == 'string') return result;
+			if (typeof result === 'string') return result;
 			return M.STRIKE(mergeText(result[1] as (M.MfmInline | string)[]));
 		});
 	},
@@ -356,7 +356,7 @@ const lang = P.createLanguage({
 			P.seq([P.notMatch(fnClose), nest(r.inline)], 1).atLeast(1),
 			fnClose,
 		]).map(result => {
-			if (typeof result == 'string') return result;
+			if (typeof result === 'string') return result;
 			const name = result[1];
 			const args = result[2] || {};
 			const content = result[4];
