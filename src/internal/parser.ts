@@ -30,23 +30,17 @@ function seqOrText(parsers: P.Parser<any>[]): P.Parser<any[] | string> {
 	});
 }
 
-function nest<T>(parser: P.Parser<T>): P.Parser<T | string> {
-	return new P.Parser((input, index, state) => {
-		// nesting limited? -> No: specified parser, Yes: 1 char
+function nest<T>(parser: P.Parser<T>, fallback?: P.Parser<string>) {
+	return new P.Parser<T | string>((input, index, state) => {
+		// nesting limited? -> No: specified parser, Yes: fallback parser (default = P.any)
 		if (state.depth + 1 >= state.nestLimit) {
-			const result = P.any.handler(input, index, state);
-			if (!result.success) {
-				return result;
-			}
-			return P.success(result.index, result.value as T | string);
+			if (fallback == null) fallback = P.any;
+			return fallback.handler(input, index, state);
 		} else {
 			state.depth++;
 			const result = parser.handler(input, index, state);
 			state.depth--;
-			if (!result.success) {
-				return result;
-			}
-			return P.success(result.index, result.value as T | string);
+			return result;
 		}
 	});
 }
@@ -85,7 +79,8 @@ const lang = P.createLanguage({
 			r.hashtag,      // "#"
 			r.emojiCode,    // ":"
 			// r.link,         // "?[" or "["
-			// r.url,
+			r.urlAlt,       // <http
+			r.url,          // http
 			r.search,       // block
 			r.text,
 		]);
@@ -120,7 +115,8 @@ const lang = P.createLanguage({
 			r.hashtag,      // "#"
 			r.emojiCode,    // ":"
 			// r.link,         // "?[" or "["
-			// r.url,
+			r.urlAlt,       // <http
+			r.url,          // http
 			r.text,
 		]);
 	},
@@ -428,6 +424,53 @@ const lang = P.createLanguage({
 			P.regexp(/[a-z0-9_+-]+/i),
 			mark,
 		], 1).map(name => M.EMOJI_CODE(name as string));
+	},
+
+	url: r => {
+		const urlChar = P.regexp(/[.,a-z0-9_/:%#@$&?!~=+-]/i);
+		const innerItem: P.Parser<any> = P.lazy(() => P.alt([
+			P.seq([
+				P.str('('), nest(innerItem.atLeast(0), urlChar), P.str(')')
+			]),
+			P.seq([
+				P.str('['), nest(innerItem.atLeast(0), urlChar), P.str(']')
+			]),
+			urlChar,
+		]));
+		const parser = P.seq([
+			P.regexp(/https?:\/\//),
+			innerItem.atLeast(1),
+		]);
+		return new P.Parser((input, index, state) => {
+			// TODO: check ".,"
+			let result;
+			result = parser.handler(input, index, state);
+			if (!result.success) {
+				return P.failure();
+			}
+			const text = input.slice(index, result.index);
+			return P.success(result.index, M.N_URL(text, false));
+		});
+	},
+
+	urlAlt: r => {
+		const open = P.str('<');
+		const close = P.str('>');
+		const parser = P.seq([
+			open,
+			P.regexp(/https?:\/\//),
+			P.seq([P.notMatch(P.alt([close, space])), P.any], 1).atLeast(1),
+			close,
+		]);
+		return new P.Parser((input, index, state) => {
+			let result;
+			result = parser.handler(input, index, state);
+			if (!result.success) {
+				return P.failure();
+			}
+			const text = input.slice((index + 1), (result.index - 1));
+			return P.success(result.index, M.N_URL(text, true));
+		});
 	},
 
 	search: r => {
