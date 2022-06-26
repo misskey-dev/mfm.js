@@ -1,5 +1,5 @@
 //
-// Parsimmon-like simple parser combinators
+// Parsimmon-like stateful parser combinators
 //
 
 type Success<T> = {
