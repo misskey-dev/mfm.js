@@ -102,13 +102,13 @@ export class Parser<T> {
 }
 
 export function succeeded<T>(value: T): Parser<T> {
-	return new Parser((input, index, state) => {
+	return new Parser((_input, index, _state) => {
 		return success(index, value);
 	});
 }
 
 export function str<T extends string>(value: T): Parser<T> {
-	return new Parser((input, index, state) => {
+	return new Parser((input, index, _state) => {
 		if ((input.length - index) < value.length) {
 			return failure();
 		}
@@ -121,7 +121,7 @@ export function str<T extends string>(value: T): Parser<T> {
 
 export function regexp<T extends RegExp>(pattern: T): Parser<string> {
 	const re = RegExp(`^(?:${pattern.source})`, pattern.flags);
-	return new Parser((input, index, state) => {
+	return new Parser((input, index, _state) => {
 		const text = input.slice(index);
 		const result = re.exec(text);
 		if (result == null) {
@@ -143,7 +143,7 @@ export function seq(parsers: Parser<any>[], select?: number): Parser<any> {
 			index = result.index;
 			accum.push(result.value);
 		}
-		return success(index, select != null ? accum[select] : accum);
+		return success(index, (select != null ? accum[select] : accum));
 	});
 }
 
@@ -197,7 +197,7 @@ export const cr = str('\r');
 export const lf = str('\n');
 export const crlf = str('\r\n');
 
-export const any = new Parser((input, index, state) => {
+export const any = new Parser((input, index, _state) => {
 	if ((input.length - index) < 1) {
 		return failure();
 	}

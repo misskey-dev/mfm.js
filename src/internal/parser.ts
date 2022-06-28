@@ -30,13 +30,13 @@ function seqOrText(parsers: P.Parser<any>[]): P.Parser<any[] | string> {
 	});
 }
 
-const notLinkLabel = new P.Parser((input, index, state) => {
+const notLinkLabel = new P.Parser((_input, index, state) => {
 	return (!state.linkLabel)
 		? P.success(index, null)
 		: P.failure();
 });
 
-const nestable = new P.Parser((input, index, state) => {
+const nestable = new P.Parser((_input, index, state) => {
 	return (state.depth < state.nestLimit)
 		? P.success(index, null)
 		: P.failure();
