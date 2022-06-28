@@ -42,7 +42,7 @@ const nestable = new P.Parser((_input, index, state) => {
 		: P.failure();
 });
 
-function nest<T>(parser: P.Parser<T>, fallback?: P.Parser<string>) {
+function nest<T>(parser: P.Parser<T>, fallback?: P.Parser<string>): P.Parser<T | string> {
 	// nesting limited? -> No: specified parser, Yes: fallback parser (default = P.any)
 	const inner = P.alt([
 		P.seq([nestable, parser], 1),

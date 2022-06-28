@@ -74,19 +74,20 @@ export class Parser<T> {
 	atLeast(n: number): Parser<T[]> {
 		return new Parser((input, index, state) => {
 			let result;
+			let latestIndex = index;
 			const accum: T[] = [];
-			while (index < input.length) {
-				result = this.handler(input, index, state);
+			while (latestIndex < input.length) {
+				result = this.handler(input, latestIndex, state);
 				if (!result.success) {
 					break;
 				}
-				index = result.index;
+				latestIndex = result.index;
 				accum.push(result.value);
 			}
 			if (accum.length < n) {
 				return failure();
 			}
-			return success(index, accum);
+			return success(latestIndex, accum);
 		});
 	}
 
@@ -134,16 +135,17 @@ export function regexp<T extends RegExp>(pattern: T): Parser<string> {
 export function seq(parsers: Parser<any>[], select?: number): Parser<any> {
 	return new Parser((input, index, state) => {
 		let result;
+		let latestIndex = index;
 		const accum = [];
 		for (let i = 0; i < parsers.length; i++) {
-			result = parsers[i].handler(input, index, state);
+			result = parsers[i].handler(input, latestIndex, state);
 			if (!result.success) {
 				return result;
 			}
-			index = result.index;
+			latestIndex = result.index;
 			accum.push(result.value);
 		}
-		return success(index, (select != null ? accum[select] : accum));
+		return success(latestIndex, (select != null ? accum[select] : accum));
 	});
 }
 
