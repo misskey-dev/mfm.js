@@ -1107,6 +1107,14 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
+		it('invalid fn name', () => {
+			const input = '$[関数 text]';
+			const output = [
+				TEXT('$[関数 text]')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
 		it('nest', () => {
 			const input = '$[spin.speed=1.1s $[shake a]]';
 			const output = [
