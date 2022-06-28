@@ -67,7 +67,7 @@ export const language = P.createLanguage({
 
 	full: r => {
 		return P.alt([
-			// r.quote,        // ">" block
+			r.quote,        // ">" block
 			r.codeBlock,    // "```" block
 			r.mathBlock,    // "\\[" block
 			r.centerTag,    // "<center>" block
@@ -130,6 +130,35 @@ export const language = P.createLanguage({
 			r.url,          // http
 			r.text,
 		]);
+	},
+
+	quote: r => {
+		// WIP
+
+		const line: P.Parser<string> = P.seq([
+			P.alt([newLine, P.lineBegin]),
+			P.str('>'),
+			P.option(space),
+			P.seq([P.notMatch(P.alt([newLine, P.lineEnd])), P.any], 1).atLeast(0).text(),
+			P.alt([newLine, P.lineEnd]),
+		], 3);
+
+		const lines = line.atLeast(1);
+
+		return new P.Parser((input, index, state) => {
+			const result = lines.handler(input, index, state);
+			if (!result.success) {
+				return result;
+			}
+			const inner = result.value;
+
+			// disallow empty content if single line
+			if (inner.length == 1 && inner[0].length === 0) {
+				return P.failure();
+			}
+
+			return P.success(result.index, M.QUOTE([M.TEXT(inner.join('\n'))]));
+		});
 	},
 
 	codeBlock: r => {
