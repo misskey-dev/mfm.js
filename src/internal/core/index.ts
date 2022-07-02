@@ -2,17 +2,17 @@
 // Parsimmon-like stateful parser combinators
 //
 
-type Success<T> = {
+export type Success<T> = {
 	success: true;
 	value: T;
 	index: number;
 };
 
-type Failure = { success: false };
+export type Failure = { success: false };
 
-type Result<T> = Success<T> | Failure;
+export type Result<T> = Success<T> | Failure;
 
-type ParserHandler<T> = (input: string, index: number, state: any) => Result<T>
+export type ParserHandler<T> = (input: string, index: number, state: any) => Result<T>
 
 export function success<T>(index: number, value: T): Success<T> {
 	return {
@@ -169,15 +169,6 @@ export function option<T>(parser: Parser<T>): Parser<T | null> {
 	]);
 }
 
-// export function match(parser: Parser<any>): Parser<null> {
-// 	return new Parser((input, index, state) => {
-// 		const result = parser.handler(input, index, state);
-// 		return result.success
-// 			? success(index, null)
-// 			: failure();
-// 	});
-// }
-
 export function notMatch(parser: Parser<any>): Parser<null> {
 	return new Parser((input, index, state) => {
 		const result = parser.handler(input, index, state);
@@ -233,9 +224,10 @@ export const lineEnd = new Parser((input, index, state) => {
 	return failure();
 });
 
-type Syntax = (rules: Record<string, Parser<any>>) => Parser<any>;
+type Syntax<T> = (rules: Record<string, Parser<any>>) => Parser<T>;
+type SyntaxReturn<T> = T extends (rules: Record<string, Parser<any>>) => infer R ? R : never;
 
-export function createLanguage<T extends Record<string, Syntax>>(syntaxes: T): Record<string, Parser<any>> {
+export function createLanguage<T extends Record<string, Syntax<any>>>(syntaxes: T): { [K in keyof T]: SyntaxReturn<T[K]> } {
 	const rules: Record<string, Parser<any>> = {};
 	for (const key of Object.keys(syntaxes)) {
 		rules[key] = lazy(() => {
@@ -244,5 +236,5 @@ export function createLanguage<T extends Record<string, Syntax>>(syntaxes: T): R
 			return parser;
 		});
 	}
-	return rules;
+	return rules as { [K in keyof T]: SyntaxReturn<T[K]> };
 }

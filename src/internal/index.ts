@@ -1,6 +1,7 @@
 import * as M from '..';
 import { language } from './parser';
 import { mergeText } from './util';
+import * as P from './core';
 
 export type FullParserOpts = {
 	fnNameList?: string[];
@@ -14,17 +15,11 @@ export function fullParser(input: string, opts: FullParserOpts): M.MfmNode[] {
 		depth: 0,
 		linkLabel: false,
 		trace: false,
-	});
-	if (!result.success) {
-		throw new Error('parsing error');
-	}
+	}) as P.Success<any>;
 	return mergeText(result.value);
 }
 
 export function simpleParser(input: string): M.MfmSimpleNode[] {
-	const result = language.simpleParser.handler(input, 0, { });
-	if (!result.success) {
-		throw new Error('parsing error');
-	}
+	const result = language.simpleParser.handler(input, 0, { }) as P.Success<any>;
 	return mergeText(result.value);
 }
