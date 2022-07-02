@@ -458,14 +458,26 @@ export const language = P.createLanguage({
 		// TODO: check deatail
 		// TODO: bracket pair
 		const mark = P.str('#');
-		return P.seq([
+		const parser = P.seq([
 			notLinkLabel,
 			mark,
 			P.seq([
 				P.notMatch(P.alt([P.regexp(/[ \u3000\t.,!?'"#:/[\]【】()「」（）<>]/), space, newLine])),
 				P.any,
-			], 1).atLeast(1),
-		], 2).map(value => M.HASHTAG(value.join('')));
+			], 1).atLeast(1).text(),
+		], 2);
+		return new P.Parser((input, index, state) => {
+			const result = parser.handler(input, index, state);
+			if (!result.success) {
+				return P.failure();
+			}
+			const value = result.value;
+			// disallow number only
+			if (/^[0-9]+$/.test(value)) {
+				return P.failure();
+			}
+			return P.success(result.index, M.HASHTAG(value));
+		});
 	},
 
 	emojiCode: r => {
