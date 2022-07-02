@@ -143,6 +143,24 @@ hoge`;
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+		it('2つの引用行の間に空行がある場合は2つの引用ブロックが生成される', () => {
+			const input = `
+> foo
+
+> bar
+
+hoge`;
+			const output = [
+				QUOTE([
+					TEXT('foo')
+				]),
+				QUOTE([
+					TEXT('bar')
+				]),
+				TEXT('hoge'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('search', () => {
