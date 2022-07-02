@@ -67,30 +67,30 @@ export const language = P.createLanguage({
 
 	full: r => {
 		return P.alt([
-			r.quote,        // ">" block
-			r.codeBlock,    // "```" block
-			r.mathBlock,    // "\\[" block
-			r.centerTag,    // "<center>" block
 			r.unicodeEmoji, // Regexp
-			r.fn,           // "$[""
-			r.big,          // "***"
-			r.boldAsta,     // "**"
-			r.italicAsta,   // "*"
-			r.boldUnder,    // "__"
-			r.italicUnder,  // "_"
-			r.strikeWave,   // "~~"
+			r.centerTag,    // "<center>" block
 			r.smallTag,     // "<small>"
 			r.plainTag,     // "<plain>"
 			r.boldTag,      // "<b>"
 			r.italicTag,    // "<i>"
 			r.strikeTag,    // "<s>"
+			r.urlAlt,       // "<http"
+			r.big,          // "***"
+			r.boldAsta,     // "**"
+			r.italicAsta,   // "*"
+			r.boldUnder,    // "__"
+			r.italicUnder,  // "_"
+			r.codeBlock,    // "```" block
 			r.inlineCode,   // "`"
+			r.quote,        // ">" block
+			r.mathBlock,    // "\\[" block
 			r.mathInline,   // "\\("
+			r.strikeWave,   // "~~"
+			r.fn,           // "$[""
 			r.mention,      // "@"
 			r.hashtag,      // "#"
 			r.emojiCode,    // ":"
 			r.link,         // "?[" or "["
-			r.urlAlt,       // <http
 			r.url,          // http
 			r.search,       // block
 			r.text,
@@ -108,25 +108,25 @@ export const language = P.createLanguage({
 	inline: r => {
 		return P.alt([
 			r.unicodeEmoji, // Regexp
-			r.fn,           // "$[""
-			r.big,          // "***"
-			r.boldAsta,     // "**"
-			r.italicAsta,   // "*"
-			r.boldUnder,    // "__"
-			r.italicUnder,  // "_"
-			r.strikeWave,   // "~~"
 			r.smallTag,     // "<small>"
 			r.plainTag,     // "<plain>"
 			r.boldTag,      // "<b>"
 			r.italicTag,    // "<i>"
 			r.strikeTag,    // "<s>"
+			r.urlAlt,       // <http
+			r.big,          // "***"
+			r.boldAsta,     // "**"
+			r.italicAsta,   // "*"
+			r.boldUnder,    // "__"
+			r.italicUnder,  // "_"
 			r.inlineCode,   // "`"
 			r.mathInline,   // "\\("
+			r.strikeWave,   // "~~"
+			r.fn,           // "$[""
 			r.mention,      // "@"
 			r.hashtag,      // "#"
 			r.emojiCode,    // ":"
 			r.link,         // "?[" or "["
-			r.urlAlt,       // <http
 			r.url,          // http
 			r.text,
 		]);
@@ -172,7 +172,8 @@ export const language = P.createLanguage({
 	codeBlock: r => {
 		const mark = P.str('```');
 		return P.seq([
-			P.alt([newLine, P.lineBegin]),
+			P.option(newLine),
+			P.lineBegin,
 			mark,
 			P.seq([P.notMatch(newLine), P.any], 1).atLeast(0),
 			newLine,
@@ -181,8 +182,8 @@ export const language = P.createLanguage({
 			mark,
 			P.alt([newLine, P.lineEnd]),
 		]).map(result => {
-			const lang = (result[2] as string[]).join('').trim();
-			const code = (result[4] as string[]).join('');
+			const lang = (result[3] as string[]).join('').trim();
+			const code = (result[5] as string[]).join('');
 			return M.CODE_BLOCK(code, (lang.length > 0 ? lang : null));
 		});
 	},
@@ -191,7 +192,8 @@ export const language = P.createLanguage({
 		const open = P.str('\\[');
 		const close = P.str('\\]');
 		return P.seq([
-			P.alt([newLine, P.lineBegin]),
+			P.option(newLine),
+			P.lineBegin,
 			open,
 			P.option(newLine),
 			P.seq([P.notMatch(P.seq([P.option(newLine), close])), P.any], 1).atLeast(1),
@@ -199,7 +201,7 @@ export const language = P.createLanguage({
 			close,
 			P.alt([newLine, P.lineEnd]),
 		]).map(result => {
-			const formula = (result[3] as string[]).join('');
+			const formula = (result[4] as string[]).join('');
 			return M.MATH_BLOCK(formula);
 		});
 	},
@@ -208,7 +210,8 @@ export const language = P.createLanguage({
 		const open = P.str('<center>');
 		const close = P.str('</center>');
 		return P.seq([
-			P.alt([newLine, P.lineBegin]),
+			P.option(newLine),
+			P.lineBegin,
 			open,
 			P.option(newLine),
 			P.seq([P.notMatch(P.seq([P.option(newLine), close])), nest(r.inline)], 1).atLeast(1),
@@ -216,7 +219,7 @@ export const language = P.createLanguage({
 			close,
 			P.alt([newLine, P.lineEnd]),
 		]).map(result => {
-			return M.CENTER(mergeText(result[3]));
+			return M.CENTER(mergeText(result[4]));
 		});
 	},
 
@@ -553,7 +556,8 @@ export const language = P.createLanguage({
 			P.regexp(/(検索|search)/i),
 		]);
 		return P.seq([
-			P.alt([newLine, P.lineBegin]),
+			P.option(newLine),
+			P.lineBegin,
 			P.seq([
 				P.notMatch(P.alt([
 					newLine,
@@ -565,8 +569,8 @@ export const language = P.createLanguage({
 			button,
 			P.alt([newLine, P.lineEnd]),
 		]).map(result => {
-			const query = result[1].join('');
-			return M.SEARCH(query, `${query}${result[2]}${result[3]}`);
+			const query = result[2].join('');
+			return M.SEARCH(query, `${query}${result[3]}${result[4]}`);
 		});
 	},
 
