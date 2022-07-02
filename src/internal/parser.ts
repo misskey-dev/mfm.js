@@ -298,21 +298,35 @@ export const language = P.createLanguage({
 	italicAsta: r => {
 		// TODO: check before and after
 		const mark = P.str('*');
-		return P.seq([
+		const parser = P.seq([
 			mark,
 			P.alt([alphaAndNum, space]).atLeast(1),
 			mark,
-		]).map(result => M.ITALIC(mergeText(result[1] as string[])));
+		]);
+		return new P.Parser((input, index, state) => {
+			const result = parser.handler(input, index, state);
+			if (!result.success) {
+				return P.failure();
+			}
+			return P.success(result.index, M.ITALIC(mergeText(result.value[1] as string[])));
+		});
 	},
 
 	italicUnder: r => {
 		// TODO: check before and after
 		const mark = P.str('_');
-		return P.seq([
+		const parser = P.seq([
 			mark,
 			P.alt([alphaAndNum, space]).atLeast(1),
 			mark,
-		]).map(result => M.ITALIC(mergeText(result[1] as string[])));
+		]);
+		return new P.Parser((input, index, state) => {
+			const result = parser.handler(input, index, state);
+			if (!result.success) {
+				return P.failure();
+			}
+			return P.success(result.index, M.ITALIC(mergeText(result.value[1] as string[])));
+		});
 	},
 
 	strikeTag: r => {
@@ -346,7 +360,6 @@ export const language = P.createLanguage({
 	},
 
 	plainTag: r => {
-		// plainTag = open NewLine? (!(NewLine? close) .)+ NewLine? close
 		const open = P.str('<plain>');
 		const close = P.str('</plain>');
 		return P.seq([
@@ -355,10 +368,10 @@ export const language = P.createLanguage({
 			P.seq([
 				P.notMatch(P.seq([P.option(newLine), close])),
 				P.any,
-			], 1).atLeast(1),
+			], 1).atLeast(1).text(),
 			P.option(newLine),
 			close,
-		]).map(result => M.PLAIN(result[2].join('')));
+		], 2).map(result => M.PLAIN(result));
 	},
 
 	fn: r => {
@@ -437,8 +450,7 @@ export const language = P.createLanguage({
 	},
 
 	mention: r => {
-		// TODO: check deatail
-		return P.seq([
+		const parser = P.seq([
 			notLinkLabel,
 			P.str('@'),
 			P.regexp(/[a-z0-9_-]+/i),
@@ -446,16 +458,21 @@ export const language = P.createLanguage({
 				P.str('@'),
 				P.regexp(/[a-z0-9_.-]+/i),
 			], 1)),
-		]).map(result => {
-			const name = result[2];
-			const host = result[3];
+		]);
+		return new P.Parser((input, index, state) => {
+			// TODO: check deatail
+			const result = parser.handler(input, index, state);
+			if (!result.success) {
+				return P.failure();
+			}
+			const name = result.value[2];
+			const host = result.value[3];
 			const acct = host != null ? `@${name}@${host}` : `@${name}`;
-			return M.MENTION(name, host, acct);
+			return P.success(result.index, M.MENTION(name, host, acct));
 		});
 	},
 
 	hashtag: r => {
-		// TODO: check deatail
 		// TODO: bracket pair
 		const mark = P.str('#');
 		const parser = P.seq([
@@ -467,6 +484,7 @@ export const language = P.createLanguage({
 			], 1).atLeast(1).text(),
 		], 2);
 		return new P.Parser((input, index, state) => {
+			// TODO: check deatail
 			const result = parser.handler(input, index, state);
 			if (!result.success) {
 				return P.failure();
