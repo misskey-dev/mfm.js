@@ -133,31 +133,39 @@ export const language = P.createLanguage({
 	},
 
 	quote: r => {
-		// WIP
-
-		const line: P.Parser<string> = P.seq([
-			P.alt([newLine, P.lineBegin]),
+		const lines: P.Parser<string[]> = P.seq([
 			P.str('>'),
 			P.option(space),
-			P.seq([P.notMatch(P.alt([newLine, P.lineEnd])), P.any], 1).atLeast(0).text(),
-			P.alt([newLine, P.lineEnd]),
+			P.seq([P.notMatch(newLine), P.any], 1).atLeast(0).text(),
+		], 2).sep1(newLine);
+		const parser = P.seq([
+			P.option(newLine),
+			P.option(newLine),
+			P.lineBegin,
+			lines,
+			P.option(newLine),
+			P.option(newLine),
 		], 3);
-
-		const lines = line.atLeast(1);
-
 		return new P.Parser((input, index, state) => {
-			const result = lines.handler(input, index, state);
+			let result;
+			// parse quote
+			result = parser.handler(input, index, state);
 			if (!result.success) {
 				return result;
 			}
-			const inner = result.value;
-
+			const contents = result.value;
+			const quoteIndex = result.index;
 			// disallow empty content if single line
-			if (inner.length == 1 && inner[0].length === 0) {
+			if (contents.length == 1 && contents[0].length === 0) {
 				return P.failure();
 			}
-
-			return P.success(result.index, M.QUOTE([M.TEXT(inner.join('\n'))]));
+			// parse inner content
+			const contentParser = nest(r.fullParser).atLeast(0);
+			result = contentParser.handler(contents.join('\n'), 0, state);
+			if (!result.success) {
+				return result;
+			}
+			return P.success(quoteIndex, M.QUOTE(mergeText(result.value)));
 		});
 	},
 
