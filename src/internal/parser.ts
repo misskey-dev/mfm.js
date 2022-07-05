@@ -177,10 +177,11 @@ export const language = P.createLanguage({
 			mark,
 			P.seq([P.notMatch(newLine), P.any], 1).atLeast(0),
 			newLine,
-			P.seq([P.notMatch(P.seq([newLine, mark, P.alt([newLine, P.lineEnd])])), P.any], 1).atLeast(1),
+			P.seq([P.notMatch(P.seq([newLine, mark, P.lineEnd])), P.any], 1).atLeast(1),
 			newLine,
 			mark,
-			P.alt([newLine, P.lineEnd]),
+			P.lineEnd,
+			P.option(newLine),
 		]).map(result => {
 			const lang = (result[3] as string[]).join('').trim();
 			const code = (result[5] as string[]).join('');
@@ -199,7 +200,8 @@ export const language = P.createLanguage({
 			P.seq([P.notMatch(P.seq([P.option(newLine), close])), P.any], 1).atLeast(1),
 			P.option(newLine),
 			close,
-			P.alt([newLine, P.lineEnd]),
+			P.lineEnd,
+			P.option(newLine),
 		]).map(result => {
 			const formula = (result[4] as string[]).join('');
 			return M.MATH_BLOCK(formula);
@@ -217,7 +219,8 @@ export const language = P.createLanguage({
 			P.seq([P.notMatch(P.seq([P.option(newLine), close])), nest(r.inline)], 1).atLeast(1),
 			P.option(newLine),
 			close,
-			P.alt([newLine, P.lineEnd]),
+			P.lineEnd,
+			P.option(newLine),
 		]).map(result => {
 			return M.CENTER(mergeText(result[4]));
 		});
@@ -591,13 +594,14 @@ export const language = P.createLanguage({
 			P.seq([
 				P.notMatch(P.alt([
 					newLine,
-					P.seq([space, button, P.alt([newLine, P.lineEnd])]),
+					P.seq([space, button, P.lineEnd]),
 				])),
 				P.any,
 			], 1).atLeast(1),
 			space,
 			button,
-			P.alt([newLine, P.lineEnd]),
+			P.lineEnd,
+			P.option(newLine),
 		]).map(result => {
 			const query = result[2].join('');
 			return M.SEARCH(query, `${query}${result[3]}${result[4]}`);
