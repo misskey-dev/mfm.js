@@ -156,7 +156,7 @@ export const language = P.createLanguage({
 			const contents = result.value;
 			const quoteIndex = result.index;
 			// disallow empty content if single line
-			if (contents.length == 1 && contents[0].length === 0) {
+			if (contents.length === 1 && contents[0].length === 0) {
 				return P.failure();
 			}
 			// parse inner content
