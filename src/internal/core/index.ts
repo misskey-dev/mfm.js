@@ -224,17 +224,19 @@ export const lineEnd = new Parser((input, index, state) => {
 	return failure();
 });
 
-type Syntax<T> = (rules: Record<string, Parser<any>>) => Parser<T>;
-type SyntaxReturn<T> = T extends (rules: Record<string, Parser<any>>) => infer R ? R : never;
+//type Syntax<T> = (rules: Record<string, Parser<T>>) => Parser<T>;
+//type SyntaxReturn<T> = T extends (rules: Record<string, Parser<any>>) => infer R ? R : never;
+//export function createLanguage2<T extends Record<string, Syntax<any>>>(syntaxes: T): { [K in keyof T]: SyntaxReturn<T[K]> } {
 
-export function createLanguage<T extends Record<string, Syntax<any>>>(syntaxes: T): { [K in keyof T]: SyntaxReturn<T[K]> } {
+// TODO: 関数の型宣言をいい感じにしたい
+export function createLanguage<T>(syntaxes: { [K in keyof T]: (r: Record<string, Parser<any>>) => T[K] }): T {
 	const rules: Record<string, Parser<any>> = {};
 	for (const key of Object.keys(syntaxes)) {
 		rules[key] = lazy(() => {
-			const parser = syntaxes[key](rules);
+			const parser = (syntaxes as any)[key](rules);
 			parser.name = key;
 			return parser;
 		});
 	}
-	return rules as { [K in keyof T]: SyntaxReturn<T[K]> };
+	return rules as any;
 }
