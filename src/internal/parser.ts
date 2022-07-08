@@ -554,12 +554,20 @@ export const language = P.createLanguage({
 			innerItem.atLeast(1),
 		]).text();
 		return new P.Parser((input, index, state) => {
-			// TODO: check ".,"
-			const result = parser.handler(input, index, state);
+			let result;
+			result = parser.handler(input, index, state);
 			if (!result.success) {
 				return P.failure();
 			}
-			return P.success(result.index, M.N_URL(result.value, false));
+			// remove the ".," at the right end
+			let resultIndex = result.index;
+			let resultValue = result.value;
+			result = /[.,]+$/.exec(resultValue);
+			if (result != null) {
+				resultIndex -= result[0].length;
+				resultValue = resultValue.slice(0, (-1 * result[0].length));
+			}
+			return P.success(resultIndex, M.N_URL(resultValue, false));
 		});
 	},
 
