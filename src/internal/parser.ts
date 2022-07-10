@@ -1,7 +1,9 @@
-import twemojiRegex from 'twemoji-parser/dist/lib/regex';
 import * as M from '..';
 import * as P from './core';
 import { mergeText } from './util';
+
+// @ts-ignore
+import twemojiRegex from 'twemoji-parser/dist/lib/regex';
 
 type ArgPair = { k: string, v: string | true };
 type Args = Record<string, string | true>;
