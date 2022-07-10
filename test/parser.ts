@@ -1419,13 +1419,19 @@ hoge`;
 		});
 
 		it('url', () => {
-			const input = '<b><b>https://example.com/abc(xyz)</b></b>';
-			const output = [
+			let input, output;
+			input = '<b>https://example.com/abc(xyz)</b>';
+			output = [
 				BOLD([
-					BOLD([
-						N_URL('https://example.com/abc'),
-						TEXT('(xyz)'),
-					]),
+					N_URL('https://example.com/abc(xyz)'),
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+			input = '<b>https://example.com/abc(x(y)z)</b>';
+			output = [
+				BOLD([
+					N_URL('https://example.com/abc'),
+					TEXT('(x(y)z)'),
 				]),
 			];
 			assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
