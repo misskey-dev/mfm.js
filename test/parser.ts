@@ -702,6 +702,48 @@ hoge`;
 			const output = [TEXT('あいう'), MENTION('abc', null, '@abc')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		it('allow "-" in username', () => {
+			const input = '@abc-d';
+			const output = [MENTION('abc-d', null, '@abc-d')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow "-" in head of username', () => {
+			const input = '@-abc';
+			const output = [TEXT('@-abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow "-" in tail of username', () => {
+			const input = '@abc-';
+			const output = [MENTION('abc', null, '@abc'), TEXT('-')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow "." in head of hostname', () => {
+			const input = '@abc@.aaa';
+			const output = [TEXT('@abc@.aaa')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow "." in tail of hostname', () => {
+			const input = '@abc@aaa.';
+			const output = [MENTION('abc', 'aaa', '@abc@aaa'), TEXT('.')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow "-" in head of hostname', () => {
+			const input = '@abc@-aaa';
+			const output = [TEXT('@abc@-aaa')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow "-" in tail of hostname', () => {
+			const input = '@abc@aaa-';
+			const output = [MENTION('abc', 'aaa', '@abc@aaa'), TEXT('-')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('hashtag', () => {
