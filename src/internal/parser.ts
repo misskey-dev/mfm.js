@@ -501,17 +501,22 @@ export const language = P.createLanguage({
 			], 1).atLeast(1).text(),
 		], 2);
 		return new P.Parser((input, index, state) => {
-			// TODO: check deatail
 			const result = parser.handler(input, index, state);
 			if (!result.success) {
 				return P.failure();
 			}
-			const value = result.value;
-			// disallow number only
-			if (/^[0-9]+$/.test(value)) {
+			// check before
+			const beforeStr = input.slice(0, index);
+			if (/[a-z0-9]$/i.test(beforeStr)) {
 				return P.failure();
 			}
-			return P.success(result.index, M.HASHTAG(value));
+			let resultIndex = result.index;
+			let resultValue = result.value;
+			// disallow number only
+			if (/^[0-9]+$/.test(resultValue)) {
+				return P.failure();
+			}
+			return P.success(resultIndex, M.HASHTAG(resultValue));
 		});
 	},
 
