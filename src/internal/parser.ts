@@ -470,22 +470,56 @@ export const language = P.createLanguage({
 				P.regexp(/[a-z0-9_.-]+/i),
 			], 1)),
 		]);
-		return new P.Parser((input, index, state) => {
-			const result = parser.handler(input, index, state);
+		return new P.Parser<M.MfmMention | string>((input, index, state) => {
+			let result;
+			result = parser.handler(input, index, state);
 			if (!result.success) {
 				return P.failure();
 			}
-			// check before
+			// check before (not mention)
 			const beforeStr = input.slice(0, index);
 			if (/[a-z0-9]$/i.test(beforeStr)) {
 				return P.failure();
 			}
-			const name = result.value[2];
-			// TODO: (name) 1文字目と最後の文字は`-`にできない。
-			const host = result.value[3];
-			// TODO: (host) 1文字目と最後の文字は`-` `.`にできない。
-			const acct = host != null ? `@${name}@${host}` : `@${name}`;
-			return P.success(result.index, M.MENTION(name, host, acct));
+			let invalidMention = false;
+			let resultIndex = result.index;
+			let username: string = result.value[2];
+			let hostname: string | null = result.value[3];
+			// remove [.-] of tail of hostname
+			let modifiedHost = hostname;
+			if (hostname != null) {
+				result = /[.-]+$/.exec(hostname);
+				if (result != null) {
+					modifiedHost = hostname.slice(0, (-1 * result[0].length));
+					if (modifiedHost.length == 0) {
+						modifiedHost = null;
+					}
+				}
+			}
+			// remove "-" of tail of username
+			let modifiedName = username;
+			result = /-+$/.exec(username);
+			if (result != null) {
+				if (modifiedHost == null) {
+					modifiedName = username.slice(0, (-1 * result[0].length));
+				} else {
+					invalidMention = true;
+				}
+			}
+			// disallow "-" of head of username
+			if (modifiedName.length != 0 && modifiedName[0] == '-') {
+				invalidMention = true;
+			}
+			// disallow [.-] of head of hostname
+			if (modifiedHost != null && /^[.-]/.test(modifiedHost)) {
+				invalidMention = true;
+			}
+			// generate a text if mention is invalid
+			if (invalidMention) {
+				return P.success(resultIndex, input.slice(index, resultIndex));
+			}
+			const acct = modifiedHost != null ? `@${modifiedName}@${modifiedHost}` : `@${modifiedName}`;
+			return P.success(index + acct.length, M.MENTION(modifiedName, modifiedHost, acct));
 		});
 	},
 
@@ -578,9 +612,9 @@ export const language = P.createLanguage({
 			if (!result.success) {
 				return P.failure();
 			}
-			// remove the ".," at the right end
 			let resultIndex = result.index;
 			let resultValue = result.value;
+			// remove the ".," at the right end
 			result = /[.,]+$/.exec(resultValue);
 			if (result != null) {
 				resultIndex -= result[0].length;
