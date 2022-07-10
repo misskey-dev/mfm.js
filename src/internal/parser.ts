@@ -2,6 +2,10 @@ import * as M from '..';
 import * as P from './core';
 import { mergeText } from './util';
 
+// NOTE:
+// tsdのテストでファイルを追加しているにも関わらず「twemoji-parser/dist/lib/regex」の型定義ファイルがないとエラーが出るため、
+// このエラーを無視する。
+/* eslint @typescript-eslint/ban-ts-comment: 1 */
 // @ts-ignore
 import twemojiRegex from 'twemoji-parser/dist/lib/regex';
 
@@ -531,16 +535,16 @@ export const language = P.createLanguage({
 				return P.failure();
 			}
 			let invalidMention = false;
-			let resultIndex = result.index;
-			let username: string = result.value[2];
-			let hostname: string | null = result.value[3];
+			const resultIndex = result.index;
+			const username: string = result.value[2];
+			const hostname: string | null = result.value[3];
 			// remove [.-] of tail of hostname
 			let modifiedHost = hostname;
 			if (hostname != null) {
 				result = /[.-]+$/.exec(hostname);
 				if (result != null) {
 					modifiedHost = hostname.slice(0, (-1 * result[0].length));
-					if (modifiedHost.length == 0) {
+					if (modifiedHost.length === 0) {
 						// disallow invalid char only hostname
 						invalidMention = true;
 						modifiedHost = null;
@@ -559,7 +563,7 @@ export const language = P.createLanguage({
 				}
 			}
 			// disallow "-" of head of username
-			if (modifiedName.length == 0 || modifiedName[0] == '-') {
+			if (modifiedName.length === 0 || modifiedName[0] === '-') {
 				invalidMention = true;
 			}
 			// disallow [.-] of head of hostname
@@ -611,8 +615,8 @@ export const language = P.createLanguage({
 			if (/[a-z0-9]$/i.test(beforeStr)) {
 				return P.failure();
 			}
-			let resultIndex = result.index;
-			let resultValue = result.value;
+			const resultIndex = result.index;
+			const resultValue = result.value;
 			// disallow number only
 			if (/^[0-9]+$/.test(resultValue)) {
 				return P.failure();
@@ -688,7 +692,7 @@ export const language = P.createLanguage({
 			if (result != null) {
 				modifiedIndex -= result[0].length;
 				content = content.slice(0, (-1 * result[0].length));
-				if (content.length == 0) {
+				if (content.length === 0) {
 					return P.success(resultIndex, input.slice(index, resultIndex));
 				}
 			}
