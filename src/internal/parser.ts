@@ -69,32 +69,58 @@ export const language = P.createLanguage({
 
 	full: r => {
 		return P.alt([
-			r.unicodeEmoji, // Regexp
-			r.centerTag,    // "<center>" block
-			r.smallTag,     // "<small>"
-			r.plainTag,     // "<plain>"
-			r.boldTag,      // "<b>"
-			r.italicTag,    // "<i>"
-			r.strikeTag,    // "<s>"
-			r.urlAlt,       // "<http"
-			r.big,          // "***"
-			r.boldAsta,     // "**"
-			r.italicAsta,   // "*"
-			r.boldUnder,    // "__"
-			r.italicUnder,  // "_"
-			r.codeBlock,    // "```" block
-			r.inlineCode,   // "`"
-			r.quote,        // ">" block
-			r.mathBlock,    // "\\[" block
-			r.mathInline,   // "\\("
-			r.strikeWave,   // "~~"
-			r.fn,           // "$[""
-			r.mention,      // "@"
-			r.hashtag,      // "#"
-			r.emojiCode,    // ":"
-			r.link,         // "?[" or "["
-			r.url,          // http
-			r.search,       // block
+			// Regexp
+			r.unicodeEmoji,
+			// "<center>" block
+			r.centerTag,
+			// "<small>"
+			r.smallTag,
+			// "<plain>"
+			r.plainTag,
+			// "<b>"
+			r.boldTag,
+			// "<i>"
+			r.italicTag,
+			// "<s>"
+			r.strikeTag,
+			// "<http"
+			r.urlAlt,
+			// "***"
+			r.big,
+			// "**"
+			r.boldAsta,
+			// "*"
+			r.italicAsta,
+			// "__"
+			r.boldUnder,
+			// "_"
+			r.italicUnder,
+			// "```" block
+			r.codeBlock,
+			// "`"
+			r.inlineCode,
+			// ">" block
+			r.quote,
+			// "\\[" block
+			r.mathBlock,
+			// "\\("
+			r.mathInline,
+			// "~~"
+			r.strikeWave,
+			// "$[""
+			r.fn,
+			// "@"
+			r.mention,
+			// "#"
+			r.hashtag,
+			// ":"
+			r.emojiCode,
+			// "?[" or "["
+			r.link,
+			// http
+			r.url,
+			// block
+			r.search,
 			r.text,
 		]);
 	},
@@ -102,34 +128,55 @@ export const language = P.createLanguage({
 	simple: r => {
 		return P.alt([
 			r.unicodeEmoji, // Regexp
-			r.emojiCode,    // ":"
+			r.emojiCode, // ":"
 			r.text,
 		]);
 	},
 
 	inline: r => {
 		return P.alt([
-			r.unicodeEmoji, // Regexp
-			r.smallTag,     // "<small>"
-			r.plainTag,     // "<plain>"
-			r.boldTag,      // "<b>"
-			r.italicTag,    // "<i>"
-			r.strikeTag,    // "<s>"
-			r.urlAlt,       // <http
-			r.big,          // "***"
-			r.boldAsta,     // "**"
-			r.italicAsta,   // "*"
-			r.boldUnder,    // "__"
-			r.italicUnder,  // "_"
-			r.inlineCode,   // "`"
-			r.mathInline,   // "\\("
-			r.strikeWave,   // "~~"
-			r.fn,           // "$[""
-			r.mention,      // "@"
-			r.hashtag,      // "#"
-			r.emojiCode,    // ":"
-			r.link,         // "?[" or "["
-			r.url,          // http
+			// Regexp
+			r.unicodeEmoji,
+			// "<small>"
+			r.smallTag,
+			// "<plain>"
+			r.plainTag,
+			// "<b>"
+			r.boldTag,
+			// "<i>"
+			r.italicTag,
+			// "<s>"
+			r.strikeTag,
+			// <http
+			r.urlAlt,
+			// "***"
+			r.big,
+			// "**"
+			r.boldAsta,
+			// "*"
+			r.italicAsta,
+			// "__"
+			r.boldUnder,
+			// "_"
+			r.italicUnder,
+			// "`"
+			r.inlineCode,
+			// "\\("
+			r.mathInline,
+			// "~~"
+			r.strikeWave,
+			// "$[""
+			r.fn,
+			// "@"
+			r.mention,
+			// "#"
+			r.hashtag,
+			// ":"
+			r.emojiCode,
+			// "?[" or "["
+			r.link,
+			// http
+			r.url,
 			r.text,
 		]);
 	},
