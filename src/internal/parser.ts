@@ -492,7 +492,7 @@ export const language = P.createLanguage({
 				if (result != null) {
 					modifiedHost = hostname.slice(0, (-1 * result[0].length));
 					if (modifiedHost.length == 0) {
-						// invalid char only hostname
+						// disallow invalid char only hostname
 						invalidMention = true;
 						modifiedHost = null;
 					}
