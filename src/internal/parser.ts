@@ -607,23 +607,28 @@ export const language = P.createLanguage({
 		const parser = P.seq([
 			notLinkLabel,
 			P.regexp(/https?:\/\//),
-			innerItem.atLeast(1),
-		]).text();
-		return new P.Parser((input, index, state) => {
+			innerItem.atLeast(1).text(),
+		]);
+		return new P.Parser<M.MfmUrl | string>((input, index, state) => {
 			let result;
 			result = parser.handler(input, index, state);
 			if (!result.success) {
 				return P.failure();
 			}
-			let resultIndex = result.index;
-			let resultValue = result.value;
+			const resultIndex = result.index;
+			let modifiedIndex = resultIndex;
+			const schema: string = result.value[1];
+			let content: string = result.value[2];
 			// remove the ".," at the right end
-			result = /[.,]+$/.exec(resultValue);
+			result = /[.,]+$/.exec(content);
 			if (result != null) {
-				resultIndex -= result[0].length;
-				resultValue = resultValue.slice(0, (-1 * result[0].length));
+				modifiedIndex -= result[0].length;
+				content = content.slice(0, (-1 * result[0].length));
+				if (content.length == 0) {
+					return P.success(resultIndex, input.slice(index, resultIndex));
+				}
 			}
-			return P.success(resultIndex, M.N_URL(resultValue, false));
+			return P.success(modifiedIndex, M.N_URL(schema + content, false));
 		});
 	},
 

@@ -919,6 +919,14 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
+		it('disallow period only', () => {
+			const input = 'https://.';
+			const output = [
+				TEXT('https://.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
 		it('ignore trailing periods', () => {
 			const input = 'https://misskey.io/@ai...';
 			const output = [
