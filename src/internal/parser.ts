@@ -527,15 +527,30 @@ export const language = P.createLanguage({
 	},
 
 	hashtag: r => {
-		// TODO: bracket pair
 		const mark = P.str('#');
+		const hashTagChar = P.seq([
+			P.notMatch(P.alt([P.regexp(/[ \u3000\t.,!?'"#:/[\]【】()「」（）<>]/), space, newLine])),
+			P.any,
+		], 1);
+		const innerItem: P.Parser<any> = P.lazy(() => P.alt([
+			P.seq([
+				P.str('('), nest(innerItem, hashTagChar).atLeast(0), P.str(')'),
+			]),
+			P.seq([
+				P.str('['), nest(innerItem, hashTagChar).atLeast(0), P.str(']'),
+			]),
+			P.seq([
+				P.str('「'), nest(innerItem, hashTagChar).atLeast(0), P.str('」'),
+			]),
+			P.seq([
+				P.str('（'), nest(innerItem, hashTagChar).atLeast(0), P.str('）'),
+			]),
+			hashTagChar,
+		]));
 		const parser = P.seq([
 			notLinkLabel,
 			mark,
-			P.seq([
-				P.notMatch(P.alt([P.regexp(/[ \u3000\t.,!?'"#:/[\]【】()「」（）<>]/), space, newLine])),
-				P.any,
-			], 1).atLeast(1).text(),
+			innerItem.atLeast(1).text(),
 		], 2);
 		return new P.Parser((input, index, state) => {
 			const result = parser.handler(input, index, state);

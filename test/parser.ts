@@ -1365,13 +1365,19 @@ hoge`;
 
 		describe('hashtag', () => {
 			it('basic', () => {
-				const input = '<b><b>#abc(xyz)</b></b>';
-				const output = [
+				let input, output;
+				input = '<b>#abc(xyz)</b>';
+				output = [
 					BOLD([
-						BOLD([
-							HASHTAG('abc'),
-							TEXT('(xyz)'),
-						]),
+						HASHTAG('abc(xyz)'),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+				input = '<b>#abc(x(y)z)</b>';
+				output = [
+					BOLD([
+						HASHTAG('abc'),
+						TEXT('(x(y)z)'),
 					]),
 				];
 				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
