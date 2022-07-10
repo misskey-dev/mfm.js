@@ -1205,11 +1205,7 @@ hoge`;
 				const output = [
 					QUOTE([
 						QUOTE([
-							TEXT('*'),
-							ITALIC([
-								TEXT('abc'),
-							]),
-							TEXT('*'),
+							TEXT('**abc**'),
 						]),
 					]),
 				];
@@ -1222,11 +1218,7 @@ hoge`;
 			const output = [
 				BOLD([
 					BOLD([
-						TEXT('**'),
-						ITALIC([
-							TEXT('abc'),
-						]),
-						TEXT('**'),
+						TEXT('***abc***'),
 					]),
 				]),
 			];
@@ -1239,11 +1231,7 @@ hoge`;
 				const output = [
 					ITALIC([
 						ITALIC([
-							TEXT('*'),
-							ITALIC([
-								TEXT('abc'),
-							]),
-							TEXT('*'),
+							TEXT('**abc**'),
 						]),
 					]),
 				];
