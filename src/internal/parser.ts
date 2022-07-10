@@ -299,7 +299,6 @@ export const language = P.createLanguage({
 	},
 
 	italicAsta: r => {
-		// TODO: check before and after
 		const mark = P.str('*');
 		const parser = P.seq([
 			mark,
@@ -311,12 +310,21 @@ export const language = P.createLanguage({
 			if (!result.success) {
 				return P.failure();
 			}
+			// check before
+			const beforeStr = input.slice(0, index);
+			const allowedBeforeStr = (
+				index == 0 ||
+				/(\r\n|\r|\n)$/.test(beforeStr) ||
+				!/[a-z0-9]$/i.test(beforeStr)
+			);
+			if (!allowedBeforeStr) {
+				return P.failure();
+			}
 			return P.success(result.index, M.ITALIC(mergeText(result.value[1] as string[])));
 		});
 	},
 
 	italicUnder: r => {
-		// TODO: check before and after
 		const mark = P.str('_');
 		const parser = P.seq([
 			mark,
@@ -326,6 +334,16 @@ export const language = P.createLanguage({
 		return new P.Parser((input, index, state) => {
 			const result = parser.handler(input, index, state);
 			if (!result.success) {
+				return P.failure();
+			}
+			// check before
+			const beforeStr = input.slice(0, index);
+			const allowedBeforeStr = (
+				index == 0 ||
+				/(\r\n|\r|\n)$/.test(beforeStr) ||
+				!/[a-z0-9]$/i.test(beforeStr)
+			);
+			if (!allowedBeforeStr) {
 				return P.failure();
 			}
 			return P.success(result.index, M.ITALIC(mergeText(result.value[1] as string[])));
