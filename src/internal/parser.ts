@@ -312,12 +312,7 @@ export const language = P.createLanguage({
 			}
 			// check before
 			const beforeStr = input.slice(0, index);
-			const allowedBeforeStr = (
-				index == 0 ||
-				/(\r\n|\r|\n)$/.test(beforeStr) ||
-				!/[a-z0-9]$/i.test(beforeStr)
-			);
-			if (!allowedBeforeStr) {
+			if (/[a-z0-9]$/i.test(beforeStr)) {
 				return P.failure();
 			}
 			return P.success(result.index, M.ITALIC(mergeText(result.value[1] as string[])));
@@ -338,12 +333,7 @@ export const language = P.createLanguage({
 			}
 			// check before
 			const beforeStr = input.slice(0, index);
-			const allowedBeforeStr = (
-				index == 0 ||
-				/(\r\n|\r|\n)$/.test(beforeStr) ||
-				!/[a-z0-9]$/i.test(beforeStr)
-			);
-			if (!allowedBeforeStr) {
+			if (/[a-z0-9]$/i.test(beforeStr)) {
 				return P.failure();
 			}
 			return P.success(result.index, M.ITALIC(mergeText(result.value[1] as string[])));
@@ -481,13 +471,19 @@ export const language = P.createLanguage({
 			], 1)),
 		]);
 		return new P.Parser((input, index, state) => {
-			// TODO: check deatail
 			const result = parser.handler(input, index, state);
 			if (!result.success) {
 				return P.failure();
 			}
+			// check before
+			const beforeStr = input.slice(0, index);
+			if (/[a-z0-9]$/i.test(beforeStr)) {
+				return P.failure();
+			}
 			const name = result.value[2];
+			// TODO: (name) 1文字目と最後の文字は`-`にできない。
 			const host = result.value[3];
+			// TODO: (host) 1文字目と最後の文字は`-` `.`にできない。
 			const acct = host != null ? `@${name}@${host}` : `@${name}`;
 			return P.success(result.index, M.MENTION(name, host, acct));
 		});
