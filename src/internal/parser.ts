@@ -492,6 +492,8 @@ export const language = P.createLanguage({
 				if (result != null) {
 					modifiedHost = hostname.slice(0, (-1 * result[0].length));
 					if (modifiedHost.length == 0) {
+						// invalid char only hostname
+						invalidMention = true;
 						modifiedHost = null;
 					}
 				}
@@ -508,7 +510,7 @@ export const language = P.createLanguage({
 				}
 			}
 			// disallow "-" of head of username
-			if (modifiedName.length != 0 && modifiedName[0] == '-') {
+			if (modifiedName.length == 0 || modifiedName[0] == '-') {
 				invalidMention = true;
 			}
 			// disallow [.-] of head of hostname

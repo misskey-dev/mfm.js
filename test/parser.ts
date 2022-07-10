@@ -703,6 +703,18 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
+		it('invalid char only username', () => {
+			const input = '@-';
+			const output = [TEXT('@-')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('invalid char only hostname', () => {
+			const input = '@abc@.';
+			const output = [TEXT('@abc@.')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
 		it('allow "-" in username', () => {
 			const input = '@abc-d';
 			const output = [MENTION('abc-d', null, '@abc-d')];
