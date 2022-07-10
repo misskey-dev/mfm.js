@@ -503,6 +503,7 @@ export const language = P.createLanguage({
 				if (modifiedHost == null) {
 					modifiedName = username.slice(0, (-1 * result[0].length));
 				} else {
+					// cannnot to remove tail of username if exist hostname
 					invalidMention = true;
 				}
 			}
