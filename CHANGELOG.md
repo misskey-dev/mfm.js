@@ -13,7 +13,14 @@
 
 ## 0.23.0 (unreleased)
 
-- The parser is now implemented in TypeScript! 🎉
+### Features
+- Add Plain syntax (#101)
+
+### Changes
+- The parser is now implemented in TypeScript! 🎉 (#92)
+- Rename existing plain series (#113):
+  - parsePlain -> parseSimple
+  - MfmPlainNode -> MfmSimpleNode
 
 ## 0.22.1
 
