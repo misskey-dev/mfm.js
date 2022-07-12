@@ -1,10 +1,7 @@
-import { isMfmBlock, MfmInline, MfmNode, MfmSimpleNode, TEXT } from '../node';
+import { isMfmBlock, MfmInline, MfmNode, MfmText, TEXT } from '../node';
 
-export function mergeText(nodes: (MfmSimpleNode | string)[]): MfmSimpleNode[]
-export function mergeText(nodes: (MfmInline | string)[]): MfmInline[]
-export function mergeText(nodes: (MfmNode | string)[]): MfmNode[]
-export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
-	const dest: MfmNode[] = [];
+export function mergeText<T extends MfmNode>(nodes: ((T extends MfmInline ? MfmInline : MfmNode) | string)[]): (T | MfmText)[] {
+	const dest: (T | MfmText)[] = [];
 	const storedChars: string[] = [];
 
 	/**
@@ -17,14 +14,14 @@ export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
 		}
 	}
 
-	const flatten = nodes.flat(1);
+	const flatten = nodes.flat(1) as (string | T)[];
 	for (const node of flatten) {
 		if (typeof node === 'string') {
 			// Store the char.
 			storedChars.push(node);
 		}
 		else if (!Array.isArray(node) && node.type === 'text') {
-			storedChars.push(node.props.text);
+			storedChars.push((node as MfmText).props.text);
 		}
 		else {
 			generateText();
