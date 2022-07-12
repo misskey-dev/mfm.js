@@ -16,6 +16,9 @@
 ### Features
 - Add Plain syntax (#101)
 
+### Improvements
+- Disable all syntax when nesting limited (#90)
+
 ### Changes
 - The parser is now implemented in TypeScript! 🎉 (#92)
 - Rename existing plain series (#113):
