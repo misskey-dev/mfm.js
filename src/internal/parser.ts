@@ -15,6 +15,7 @@ type Args = Record<string, string | true>;
 const space = P.regexp(/[\u0020\u3000\t]/);
 const alphaAndNum = P.regexp(/[a-z0-9]/i);
 const newLine = P.alt([P.crlf, P.cr, P.lf]);
+const emoji = P.regexp(RegExp(twemojiRegex.source));
 
 function seqOrText(parsers: P.Parser<any>[]): P.Parser<any[] | string> {
 	return new P.Parser<any[] | string>((input, index, state) => {
@@ -419,8 +420,7 @@ export const language = P.createLanguage({
 	},
 
 	unicodeEmoji: r => {
-		const emoji = RegExp(twemojiRegex.source);
-		return P.regexp(emoji).map(content => M.UNI_EMOJI(content));
+		return emoji.map(content => M.UNI_EMOJI(content));
 	},
 
 	plainTag: r => {
