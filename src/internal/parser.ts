@@ -49,10 +49,10 @@ const nestable = new P.Parser((_input, index, state) => {
 });
 
 function nest<T>(parser: P.Parser<T>, fallback?: P.Parser<string>): P.Parser<T | string> {
-	// nesting limited? -> No: specified parser, Yes: fallback parser (default = P.any)
+	// nesting limited? -> No: specified parser, Yes: fallback parser (default = P.char)
 	const inner = P.alt([
 		P.seq([nestable, parser], 1),
-		(fallback != null) ? fallback : P.any,
+		(fallback != null) ? fallback : P.char,
 	]);
 	return new P.Parser<T | string>((input, index, state) => {
 		state.depth++;
@@ -64,11 +64,11 @@ function nest<T>(parser: P.Parser<T>, fallback?: P.Parser<string>): P.Parser<T |
 
 export const language = P.createLanguage({
 	fullParser: r => {
-		return r.full.atLeast(0);
+		return r.full.many(0);
 	},
 
 	simpleParser: r => {
-		return r.simple.atLeast(0);
+		return r.simple.many(0);
 	},
 
 	full: r => {
@@ -188,16 +188,16 @@ export const language = P.createLanguage({
 	quote: r => {
 		const lines: P.Parser<string[]> = P.seq([
 			P.str('>'),
-			P.option(space),
-			P.seq([P.notMatch(newLine), P.any], 1).atLeast(0).text(),
-		], 2).sep1(newLine);
+			space.option(),
+			P.seq([P.notMatch(newLine), P.char], 1).many(0).text(),
+		], 2).sep(newLine, 1);
 		const parser = P.seq([
-			P.option(newLine),
-			P.option(newLine),
+			newLine.option(),
+			newLine.option(),
 			P.lineBegin,
 			lines,
-			P.option(newLine),
-			P.option(newLine),
+			newLine.option(),
+			newLine.option(),
 		], 3);
 		return new P.Parser((input, index, state) => {
 			let result;
@@ -213,7 +213,7 @@ export const language = P.createLanguage({
 				return P.failure();
 			}
 			// parse inner content
-			const contentParser = nest(r.fullParser).atLeast(0);
+			const contentParser = nest(r.fullParser).many(0);
 			result = contentParser.handler(contents.join('\n'), 0, state);
 			if (!result.success) {
 				return result;
@@ -225,16 +225,16 @@ export const language = P.createLanguage({
 	codeBlock: r => {
 		const mark = P.str('```');
 		return P.seq([
-			P.option(newLine),
+			newLine.option(),
 			P.lineBegin,
 			mark,
-			P.seq([P.notMatch(newLine), P.any], 1).atLeast(0),
+			P.seq([P.notMatch(newLine), P.char], 1).many(0),
 			newLine,
-			P.seq([P.notMatch(P.seq([newLine, mark, P.lineEnd])), P.any], 1).atLeast(1),
+			P.seq([P.notMatch(P.seq([newLine, mark, P.lineEnd])), P.char], 1).many(1),
 			newLine,
 			mark,
 			P.lineEnd,
-			P.option(newLine),
+			newLine.option(),
 		]).map(result => {
 			const lang = (result[3] as string[]).join('').trim();
 			const code = (result[5] as string[]).join('');
@@ -246,15 +246,15 @@ export const language = P.createLanguage({
 		const open = P.str('\\[');
 		const close = P.str('\\]');
 		return P.seq([
-			P.option(newLine),
+			newLine.option(),
 			P.lineBegin,
 			open,
-			P.option(newLine),
-			P.seq([P.notMatch(P.seq([P.option(newLine), close])), P.any], 1).atLeast(1),
-			P.option(newLine),
+			newLine.option(),
+			P.seq([P.notMatch(P.seq([newLine.option(), close])), P.char], 1).many(1),
+			newLine.option(),
 			close,
 			P.lineEnd,
-			P.option(newLine),
+			newLine.option(),
 		]).map(result => {
 			const formula = (result[4] as string[]).join('');
 			return M.MATH_BLOCK(formula);
@@ -265,15 +265,15 @@ export const language = P.createLanguage({
 		const open = P.str('<center>');
 		const close = P.str('</center>');
 		return P.seq([
-			P.option(newLine),
+			newLine.option(),
 			P.lineBegin,
 			open,
-			P.option(newLine),
-			P.seq([P.notMatch(P.seq([P.option(newLine), close])), nest(r.inline)], 1).atLeast(1),
-			P.option(newLine),
+			newLine.option(),
+			P.seq([P.notMatch(P.seq([newLine.option(), close])), nest(r.inline)], 1).many(1),
+			newLine.option(),
 			close,
 			P.lineEnd,
-			P.option(newLine),
+			newLine.option(),
 		]).map(result => {
 			return M.CENTER(mergeText(result[4]));
 		});
@@ -283,7 +283,7 @@ export const language = P.createLanguage({
 		const mark = P.str('***');
 		return seqOrText([
 			mark,
-			P.seq([P.notMatch(mark), nest(r.inline)], 1).atLeast(1),
+			P.seq([P.notMatch(mark), nest(r.inline)], 1).many(1),
 			mark,
 		]).map(result => {
 			if (typeof result === 'string') return result;
@@ -295,7 +295,7 @@ export const language = P.createLanguage({
 		const mark = P.str('**');
 		return seqOrText([
 			mark,
-			P.seq([P.notMatch(mark), nest(r.inline)], 1).atLeast(1),
+			P.seq([P.notMatch(mark), nest(r.inline)], 1).many(1),
 			mark,
 		]).map(result => {
 			if (typeof result === 'string') return result;
@@ -308,7 +308,7 @@ export const language = P.createLanguage({
 		const close = P.str('</b>');
 		return seqOrText([
 			open,
-			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
+			P.seq([P.notMatch(close), nest(r.inline)], 1).many(1),
 			close,
 		]).map(result => {
 			if (typeof result === 'string') return result;
@@ -320,7 +320,7 @@ export const language = P.createLanguage({
 		const mark = P.str('__');
 		return P.seq([
 			mark,
-			P.alt([alphaAndNum, space]).atLeast(1),
+			P.alt([alphaAndNum, space]).many(1),
 			mark,
 		]).map(result => M.BOLD(mergeText(result[1] as string[])));
 	},
@@ -330,7 +330,7 @@ export const language = P.createLanguage({
 		const close = P.str('</small>');
 		return seqOrText([
 			open,
-			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
+			P.seq([P.notMatch(close), nest(r.inline)], 1).many(1),
 			close,
 		]).map(result => {
 			if (typeof result === 'string') return result;
@@ -343,7 +343,7 @@ export const language = P.createLanguage({
 		const close = P.str('</i>');
 		return seqOrText([
 			open,
-			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
+			P.seq([P.notMatch(close), nest(r.inline)], 1).many(1),
 			close,
 		]).map(result => {
 			if (typeof result === 'string') return result;
@@ -355,7 +355,7 @@ export const language = P.createLanguage({
 		const mark = P.str('*');
 		const parser = P.seq([
 			mark,
-			P.alt([alphaAndNum, space]).atLeast(1),
+			P.alt([alphaAndNum, space]).many(1),
 			mark,
 		]);
 		return new P.Parser((input, index, state) => {
@@ -376,7 +376,7 @@ export const language = P.createLanguage({
 		const mark = P.str('_');
 		const parser = P.seq([
 			mark,
-			P.alt([alphaAndNum, space]).atLeast(1),
+			P.alt([alphaAndNum, space]).many(1),
 			mark,
 		]);
 		return new P.Parser((input, index, state) => {
@@ -398,7 +398,7 @@ export const language = P.createLanguage({
 		const close = P.str('</s>');
 		return seqOrText([
 			open,
-			P.seq([P.notMatch(close), nest(r.inline)], 1).atLeast(1),
+			P.seq([P.notMatch(close), nest(r.inline)], 1).many(1),
 			close,
 		]).map(result => {
 			if (typeof result === 'string') return result;
@@ -410,7 +410,7 @@ export const language = P.createLanguage({
 		const mark = P.str('~~');
 		return seqOrText([
 			mark,
-			P.seq([P.notMatch(P.alt([mark, newLine])), nest(r.inline)], 1).atLeast(1),
+			P.seq([P.notMatch(P.alt([mark, newLine])), nest(r.inline)], 1).many(1),
 			mark,
 		]).map(result => {
 			if (typeof result === 'string') return result;
@@ -428,12 +428,12 @@ export const language = P.createLanguage({
 		const close = P.str('</plain>');
 		return P.seq([
 			open,
-			P.option(newLine),
+			newLine.option(),
 			P.seq([
-				P.notMatch(P.seq([P.option(newLine), close])),
-				P.any,
-			], 1).atLeast(1).text(),
-			P.option(newLine),
+				P.notMatch(P.seq([newLine.option(), close])),
+				P.char,
+			], 1).many(1).text(),
+			newLine.option(),
 			close,
 		], 2).map(result => M.PLAIN(result));
 	},
@@ -451,10 +451,10 @@ export const language = P.createLanguage({
 		});
 		const arg: P.Parser<ArgPair> = P.seq([
 			P.regexp(/[a-z0-9_]+/i),
-			P.option(P.seq([
+			P.seq([
 				P.str('='),
 				P.regexp(/[a-z0-9_.]+/i),
-			], 1)),
+			], 1).option(),
 		]).map(result => {
 			return {
 				k: result[0],
@@ -463,7 +463,7 @@ export const language = P.createLanguage({
 		});
 		const args = P.seq([
 			P.str('.'),
-			arg.sep1(P.str(',')),
+			arg.sep(P.str(','), 1),
 		], 1).map(pairs => {
 			const result: Args = { };
 			for (const pair of pairs) {
@@ -475,9 +475,9 @@ export const language = P.createLanguage({
 		return seqOrText([
 			P.str('$['),
 			fnName,
-			P.option(args),
+			args.option(),
 			P.str(' '),
-			P.seq([P.notMatch(fnClose), nest(r.inline)], 1).atLeast(1),
+			P.seq([P.notMatch(fnClose), nest(r.inline)], 1).many(1),
 			fnClose,
 		]).map(result => {
 			if (typeof result === 'string') return result;
@@ -494,8 +494,8 @@ export const language = P.createLanguage({
 			mark,
 			P.seq([
 				P.notMatch(P.alt([mark, P.str('´'), newLine])),
-				P.any,
-			], 1).atLeast(1),
+				P.char,
+			], 1).many(1),
 			mark,
 		]).map(result => M.INLINE_CODE(result[1].join('')));
 	},
@@ -507,8 +507,8 @@ export const language = P.createLanguage({
 			open,
 			P.seq([
 				P.notMatch(P.alt([close, newLine])),
-				P.any,
-			], 1).atLeast(1),
+				P.char,
+			], 1).many(1),
 			close,
 		]).map(result => M.MATH_INLINE(result[1].join('')));
 	},
@@ -518,10 +518,10 @@ export const language = P.createLanguage({
 			notLinkLabel,
 			P.str('@'),
 			P.regexp(/[a-z0-9_-]+/i),
-			P.option(P.seq([
+			P.seq([
 				P.str('@'),
 				P.regexp(/[a-z0-9_.-]+/i),
-			], 1)),
+			], 1).option(),
 		]);
 		return new P.Parser<M.MfmMention | string>((input, index, state) => {
 			let result;
@@ -583,27 +583,27 @@ export const language = P.createLanguage({
 		const mark = P.str('#');
 		const hashTagChar = P.seq([
 			P.notMatch(P.alt([P.regexp(/[ \u3000\t.,!?'"#:/[\]【】()「」（）<>]/), space, newLine])),
-			P.any,
+			P.char,
 		], 1);
 		const innerItem: P.Parser<any> = P.lazy(() => P.alt([
 			P.seq([
-				P.str('('), nest(innerItem, hashTagChar).atLeast(0), P.str(')'),
+				P.str('('), nest(innerItem, hashTagChar).many(0), P.str(')'),
 			]),
 			P.seq([
-				P.str('['), nest(innerItem, hashTagChar).atLeast(0), P.str(']'),
+				P.str('['), nest(innerItem, hashTagChar).many(0), P.str(']'),
 			]),
 			P.seq([
-				P.str('「'), nest(innerItem, hashTagChar).atLeast(0), P.str('」'),
+				P.str('「'), nest(innerItem, hashTagChar).many(0), P.str('」'),
 			]),
 			P.seq([
-				P.str('（'), nest(innerItem, hashTagChar).atLeast(0), P.str('）'),
+				P.str('（'), nest(innerItem, hashTagChar).many(0), P.str('）'),
 			]),
 			hashTagChar,
 		]));
 		const parser = P.seq([
 			notLinkLabel,
 			mark,
-			innerItem.atLeast(1).text(),
+			innerItem.many(1).text(),
 		], 2);
 		return new P.Parser((input, index, state) => {
 			const result = parser.handler(input, index, state);
@@ -648,7 +648,7 @@ export const language = P.createLanguage({
 			P.seq([
 				P.notMatch(P.alt([closeLabel, newLine])),
 				nest(labelInline),
-			], 1).atLeast(1),
+			], 1).many(1),
 			closeLabel,
 			P.str('('),
 			P.alt([r.urlAlt, r.url]),
@@ -665,17 +665,17 @@ export const language = P.createLanguage({
 		const urlChar = P.regexp(/[.,a-z0-9_/:%#@$&?!~=+-]/i);
 		const innerItem: P.Parser<any> = P.lazy(() => P.alt([
 			P.seq([
-				P.str('('), nest(innerItem, urlChar).atLeast(0), P.str(')'),
+				P.str('('), nest(innerItem, urlChar).many(0), P.str(')'),
 			]),
 			P.seq([
-				P.str('['), nest(innerItem, urlChar).atLeast(0), P.str(']'),
+				P.str('['), nest(innerItem, urlChar).many(0), P.str(']'),
 			]),
 			urlChar,
 		]));
 		const parser = P.seq([
 			notLinkLabel,
 			P.regexp(/https?:\/\//),
-			innerItem.atLeast(1).text(),
+			innerItem.many(1).text(),
 		]);
 		return new P.Parser<M.MfmUrl | string>((input, index, state) => {
 			let result;
@@ -707,7 +707,7 @@ export const language = P.createLanguage({
 			notLinkLabel,
 			open,
 			P.regexp(/https?:\/\//),
-			P.seq([P.notMatch(P.alt([close, space])), P.any], 1).atLeast(1),
+			P.seq([P.notMatch(P.alt([close, space])), P.char], 1).many(1),
 			close,
 		]).text();
 		return new P.Parser((input, index, state) => {
@@ -726,24 +726,24 @@ export const language = P.createLanguage({
 			P.regexp(/(検索|search)/i),
 		]);
 		return P.seq([
-			P.option(newLine),
+			newLine.option(),
 			P.lineBegin,
 			P.seq([
 				P.notMatch(P.alt([
 					newLine,
 					P.seq([space, button, P.lineEnd]),
 				])),
-				P.any,
-			], 1).atLeast(1),
+				P.char,
+			], 1).many(1),
 			space,
 			button,
 			P.lineEnd,
-			P.option(newLine),
+			newLine.option(),
 		]).map(result => {
 			const query = result[2].join('');
 			return M.SEARCH(query, `${query}${result[3]}${result[4]}`);
 		});
 	},
 
-	text: r => P.any,
+	text: r => P.char,
 });

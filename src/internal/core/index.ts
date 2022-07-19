@@ -71,7 +71,7 @@ export class Parser<T> {
 		});
 	}
 
-	atLeast(n: number): Parser<T[]> {
+	many(min: number): Parser<T[]> {
 		return new Parser((input, index, state) => {
 			let result;
 			let latestIndex = index;
@@ -84,28 +84,32 @@ export class Parser<T> {
 				latestIndex = result.index;
 				accum.push(result.value);
 			}
-			if (accum.length < n) {
+			if (accum.length < min) {
 				return failure();
 			}
 			return success(latestIndex, accum);
 		});
 	}
 
-	sep1(separator: Parser<any>): Parser<T[]> {
+	sep(separator: Parser<any>, min: number): Parser<T[]> {
+		if (min < 1) {
+			throw new Error('"min" must be a value greater than or equal to 1.');
+		}
 		return seq([
 			this,
 			seq([
 				separator,
 				this,
-			], 1).atLeast(0),
+			], 1).many(min - 1),
 		]).map(result => [result[0], ...result[1]]);
 	}
-}
 
-export function succeeded<T>(value: T): Parser<T> {
-	return new Parser((_input, index, _state) => {
-		return success(index, value);
-	});
+	option<T>(): Parser<T | null> {
+		return alt([
+			this,
+			succeeded(null),
+		]);
+	}
 }
 
 export function str<T extends string>(value: T): Parser<T> {
@@ -162,11 +166,10 @@ export function alt(parsers: Parser<any>[]): Parser<any> {
 	});
 }
 
-export function option<T>(parser: Parser<T>): Parser<T | null> {
-	return alt([
-		parser,
-		succeeded(null),
-	]);
+function succeeded<T>(value: T): Parser<T> {
+	return new Parser((_input, index, _state) => {
+		return success(index, value);
+	});
 }
 
 export function notMatch(parser: Parser<any>): Parser<null> {
@@ -178,19 +181,12 @@ export function notMatch(parser: Parser<any>): Parser<null> {
 	});
 }
 
-export function lazy<T>(fn: () => Parser<T>): Parser<T> {
-	const parser: Parser<T> = new Parser((input, index, state) => {
-		parser.handler = fn().handler;
-		return parser.handler(input, index, state);
-	});
-	return parser;
-}
-
 export const cr = str('\r');
 export const lf = str('\n');
 export const crlf = str('\r\n');
+export const newline = alt([crlf, cr, lf]);
 
-export const any = new Parser((input, index, _state) => {
+export const char = new Parser((input, index, _state) => {
 	if ((input.length - index) < 1) {
 		return failure();
 	}
@@ -224,6 +220,14 @@ export const lineEnd = new Parser((input, index, state) => {
 	return failure();
 });
 
+export function lazy<T>(fn: () => Parser<T>): Parser<T> {
+	const parser: Parser<T> = new Parser((input, index, state) => {
+		parser.handler = fn().handler;
+		return parser.handler(input, index, state);
+	});
+	return parser;
+}
+
 //type Syntax<T> = (rules: Record<string, Parser<T>>) => Parser<T>;
 //type SyntaxReturn<T> = T extends (rules: Record<string, Parser<any>>) => infer R ? R : never;
 //export function createLanguage2<T extends Record<string, Syntax<any>>>(syntaxes: T): { [K in keyof T]: SyntaxReturn<T[K]> } {
@@ -234,6 +238,9 @@ export function createLanguage<T>(syntaxes: { [K in keyof T]: (r: Record<string,
 	for (const key of Object.keys(syntaxes)) {
 		rules[key] = lazy(() => {
 			const parser = (syntaxes as any)[key](rules);
+			if (parser == null) {
+				throw new Error('syntax must return a parser.');
+			}
 			parser.name = key;
 			return parser;
 		});
