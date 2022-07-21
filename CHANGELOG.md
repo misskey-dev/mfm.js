@@ -11,6 +11,20 @@
 
 -->
 
+## 0.23.0 (unreleased)
+
+### Features
+- Add Plain syntax (#101)
+
+### Improvements
+- The parser is now implemented in TypeScript! 🎉 (#92)
+- Disable all syntax when nesting limited (#90)
+
+### Changes
+- Rename existing plain series (#113):
+  - parsePlain -> parseSimple
+  - MfmPlainNode -> MfmSimpleNode
+
 ## 0.22.1
 
 npm: https://www.npmjs.com/package/mfm-js/v/0.22.1
