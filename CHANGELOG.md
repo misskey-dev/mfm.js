@@ -11,7 +11,7 @@
 
 -->
 
-## 0.23.0 (unreleased)
+## 0.23.0
 
 ### Features
 - Add Plain syntax (#101)
