@@ -35,8 +35,6 @@
 
 ## 0.22.0
 
-npm: https://www.npmjs.com/package/mfm-js/v/0.22.0
-
 ### Features
 - Unicode emoji supports Unicode 14.0 emoji (#109)
 
