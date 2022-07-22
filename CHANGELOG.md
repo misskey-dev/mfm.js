@@ -25,6 +25,9 @@
   - parsePlain -> parseSimple
   - MfmPlainNode -> MfmSimpleNode
 
+### Bugfixes
+- Fix a bug that allows line breaks in link label (#115)
+
 ## 0.22.1
 
 ### Improvements
