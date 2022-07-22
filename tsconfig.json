@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "ES6",
     "module": "commonjs",
     "declaration": true,
     "outDir": "./built/",
@@ -12,6 +12,10 @@
     "noImplicitReturns": true,
     "esModuleInterop": true,
   },
+  "typeRoots": [
+    "node_modules/@types",
+    "src/@types",
+  ],
   "include": [
     "src/**/*",
   ],

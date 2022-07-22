@@ -11,9 +11,21 @@
 
 -->
 
-## 0.22.1
+## 0.23.0
 
-npm: https://www.npmjs.com/package/mfm-js/v/0.22.1
+### Features
+- Add Plain syntax (#101)
+
+### Improvements
+- The parser is now implemented in TypeScript! 🎉 (#92)
+- Disable all syntax when nesting limited (#90)
+
+### Changes
+- Rename existing plain series (#113):
+  - parsePlain -> parseSimple
+  - MfmPlainNode -> MfmSimpleNode
+
+## 0.22.1
 
 ### Improvements
 - Removes a unnecessary built file
@@ -35,8 +47,6 @@ npm: https://www.npmjs.com/package/mfm-js/v/0.22.0
 
 ## 0.21.0
 
-npm: https://www.npmjs.com/package/mfm-js/v/0.21.0
-
 ### Features
 - Supports nestLimit option. (#87, #91)
 
@@ -48,8 +58,6 @@ npm: https://www.npmjs.com/package/mfm-js/v/0.21.0
 - Fix parsing of the link label.
 
 ## 0.20.0
-
-npm: https://www.npmjs.com/package/mfm-js/v/0.20.0
 
 ### Features
 - Add tag syntaxes of bold `<b></b>` and strikethrough `<s></s>`. (#76)
@@ -66,21 +74,15 @@ npm: https://www.npmjs.com/package/mfm-js/v/0.20.0
 
 ## 0.19.0
 
-npm: https://www.npmjs.com/package/mfm-js/v/0.19.0
-
 ### Improvements
 - Ignores a blank line after quote lines. (#61)
 
 ## 0.18.0
 
-npm: https://www.npmjs.com/package/mfm-js/v/0.18.0
-
 ### Improvements
 - Twemoji v13.1 is supported.
 
 ## 0.17.0
-
-npm: https://www.npmjs.com/package/mfm-js/v/0.17.0
 
 ### Improvements
 - Improves syntax of inline code.

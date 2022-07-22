@@ -1,7 +1,7 @@
-import { isMfmBlock, MfmNode, TEXT } from '../node';
+import { isMfmBlock, MfmInline, MfmNode, MfmText, TEXT } from '../node';
 
-export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
-	const dest: MfmNode[] = [];
+export function mergeText<T extends MfmNode>(nodes: ((T extends MfmInline ? MfmInline : MfmNode) | string)[]): (T | MfmText)[] {
+	const dest: (T | MfmText)[] = [];
 	const storedChars: string[] = [];
 
 	/**
@@ -14,10 +14,14 @@ export function mergeText(nodes: (MfmNode | string)[]): MfmNode[] {
 		}
 	}
 
-	for (const node of nodes) {
+	const flatten = nodes.flat(1) as (string | T)[];
+	for (const node of flatten) {
 		if (typeof node === 'string') {
 			// Store the char.
 			storedChars.push(node);
+		}
+		else if (!Array.isArray(node) && node.type === 'text') {
+			storedChars.push((node as MfmText).props.text);
 		}
 		else {
 			generateText();
@@ -103,6 +107,9 @@ export function stringifyNode(node: MfmNode): string {
 			const args = (argFields.length > 0) ? '.' + argFields.join(',') : '';
 			return `$[${ node.props.name }${ args } ${ stringifyTree(node.children) }]`;
 		}
+		case 'plain': {
+			return `<plain>\n${ stringifyTree(node.children) }\n</plain>`;
+		}
 		case 'text': {
 			return node.props.text;
 		}
@@ -159,40 +166,4 @@ export function inspectOne(node: MfmNode, action: (node: MfmNode) => void) {
 			inspectOne(child, action);
 		}
 	}
-}
-
-//
-// dynamic consuming
-//
-
-/*
-	1. If you want to consume 3 chars, call the setConsumeCount.
-	```
-	setConsumeCount(3);
-	```
-
-	2. And the rule to consume the input is as below:
-	```
-	rule = (&{ return consumeDynamically(); } .)+
-	```
-*/
-
-let consumeCount = 0;
-
-/**
- * set the length of dynamic consuming.
-*/
-export function setConsumeCount(count: number) {
-	consumeCount = count;
-}
-
-/**
- * consume the input and returns matching result.
-*/
-export function consumeDynamically() {
-	const matched = (consumeCount > 0);
-	if (matched) {
-		consumeCount--;
-	}
-	return matched;
 }

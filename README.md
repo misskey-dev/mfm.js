@@ -1,5 +1,5 @@
 # mfm.js
-An MFM parser implementation with PEG.js.
+An MFM parser implementation with TypeScript.
 [Try it out!](https://runkit.com/npm/mfm-js)
 
 [![Test](https://github.com/misskey-dev/mfm.js/actions/workflows/test.yml/badge.svg)](https://github.com/misskey-dev/mfm.js/actions/workflows/test.yml)
@@ -28,11 +28,11 @@ I'm @ai, A bot of misskey!
 https://github.com/syuilo/ai
 </center>`;
 
-// Generate a MFM tree from the MFM text.
+// Generate a MFM tree from the full MFM text.
 const mfmTree = mfm.parse(inputText);
 
-// Generate a MFM tree from the MFM plain text.
-const plainMfmTree = mfm.parsePlain('I like the hot soup :soup:​');
+// Generate a MFM tree from the simple MFM text.
+const simpleMfmTree = mfm.parseSimple('I like the hot soup :soup:​');
 
 // Reverse to a MFM text from the MFM tree.
 const text = mfm.toString(mfmTree);
@@ -62,9 +62,9 @@ full parser:
 npm run parse
 ```
 
-plain parser:
+simple parser:
 ```
-npm run parse-plain
+npm run parse-simple
 ```
 
 ## License

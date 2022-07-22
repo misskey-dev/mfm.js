@@ -1,27 +1,27 @@
 import assert from 'assert';
 import * as mfm from '../src/index';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE, MATH_INLINE
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE, MATH_INLINE, PLAIN
 } from '../src/index';
 
-describe('PlainParser', () => {
+describe('SimpleParser', () => {
 	describe('text', () => {
 		it('basic', () => {
 			const input = 'abc';
 			const output = [TEXT('abc')];
-			assert.deepStrictEqual(mfm.parsePlain(input), output);
+			assert.deepStrictEqual(mfm.parseSimple(input), output);
 		});
 
 		it('ignore hashtag', () => {
 			const input = 'abc#abc';
 			const output = [TEXT('abc#abc')];
-			assert.deepStrictEqual(mfm.parsePlain(input), output);
+			assert.deepStrictEqual(mfm.parseSimple(input), output);
 		});
 
 		it('keycap number sign', () => {
 			const input = 'abc#️⃣abc';
 			const output = [TEXT('abc'), UNI_EMOJI('#️⃣'), TEXT('abc')];
-			assert.deepStrictEqual(mfm.parsePlain(input), output);
+			assert.deepStrictEqual(mfm.parseSimple(input), output);
 		});
 	});
 
@@ -29,20 +29,20 @@ describe('PlainParser', () => {
 		it('basic', () => {
 			const input = ':foo:';
 			const output = [EMOJI_CODE('foo')];
-			assert.deepStrictEqual(mfm.parsePlain(input), output);
+			assert.deepStrictEqual(mfm.parseSimple(input), output);
 		});
 
 		it('between texts', () => {
 			const input = 'foo:bar:baz';
 			const output = [TEXT('foo'), EMOJI_CODE('bar'), TEXT('baz')];
-			assert.deepStrictEqual(mfm.parsePlain(input), output);
+			assert.deepStrictEqual(mfm.parseSimple(input), output);
 		});
 	});
 
 	it('disallow other syntaxes', () => {
 		const input = 'foo **bar** baz';
 		const output = [TEXT('foo **bar** baz')];
-		assert.deepStrictEqual(mfm.parsePlain(input), output);
+		assert.deepStrictEqual(mfm.parseSimple(input), output);
 	});
 });
 
@@ -140,6 +140,24 @@ hoge`;
 					TEXT('foo\nbar')
 				]),
 				TEXT('hoge')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+		it('2つの引用行の間に空行がある場合は2つの引用ブロックが生成される', () => {
+			const input = `
+> foo
+
+> bar
+
+hoge`;
+			const output = [
+				QUOTE([
+					TEXT('foo')
+				]),
+				QUOTE([
+					TEXT('bar')
+				]),
+				TEXT('hoge'),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
@@ -684,6 +702,60 @@ hoge`;
 			const output = [TEXT('あいう'), MENTION('abc', null, '@abc')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		it('invalid char only username', () => {
+			const input = '@-';
+			const output = [TEXT('@-')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('invalid char only hostname', () => {
+			const input = '@abc@.';
+			const output = [TEXT('@abc@.')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('allow "-" in username', () => {
+			const input = '@abc-d';
+			const output = [MENTION('abc-d', null, '@abc-d')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow "-" in head of username', () => {
+			const input = '@-abc';
+			const output = [TEXT('@-abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow "-" in tail of username', () => {
+			const input = '@abc-';
+			const output = [MENTION('abc', null, '@abc'), TEXT('-')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow "." in head of hostname', () => {
+			const input = '@abc@.aaa';
+			const output = [TEXT('@abc@.aaa')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow "." in tail of hostname', () => {
+			const input = '@abc@aaa.';
+			const output = [MENTION('abc', 'aaa', '@abc@aaa'), TEXT('.')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow "-" in head of hostname', () => {
+			const input = '@abc@-aaa';
+			const output = [TEXT('@abc@-aaa')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow "-" in tail of hostname', () => {
+			const input = '@abc@aaa-';
+			const output = [MENTION('abc', 'aaa', '@abc@aaa'), TEXT('-')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('hashtag', () => {
@@ -843,6 +915,14 @@ hoge`;
 			const output = [
 				N_URL('https://misskey.io/@ai'),
 				TEXT('.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('disallow period only', () => {
+			const input = 'https://.';
+			const output = [
+				TEXT('https://.')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
@@ -1107,6 +1187,14 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
+		it('invalid fn name', () => {
+			const input = '$[関数 text]';
+			const output = [
+				TEXT('$[関数 text]')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
 		it('nest', () => {
 			const input = '$[spin.speed=1.1s $[shake a]]';
 			const output = [
@@ -1138,6 +1226,28 @@ hoge`;
 		});
 	});
 
+	describe('plain', () => {
+		it('multiple line', () => {
+			const input = 'a\n<plain>\n**Hello**\nworld\n</plain>\nb';
+			const output = [
+				TEXT('a\n'),
+				PLAIN('**Hello**\nworld'),
+				TEXT('\nb')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('single line', () => {
+			const input = 'a\n<plain>**Hello** world</plain>\nb';
+			const output = [
+				TEXT('a\n'),
+				PLAIN('**Hello** world'),
+				TEXT('\nb')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
+
 	describe('nesting limit', () => {
 		describe('quote', () => {
 			it('basic', () => {
@@ -1157,11 +1267,7 @@ hoge`;
 				const output = [
 					QUOTE([
 						QUOTE([
-							TEXT('*'),
-							ITALIC([
-								TEXT('abc'),
-							]),
-							TEXT('*'),
+							TEXT('**abc**'),
 						]),
 					]),
 				];
@@ -1174,11 +1280,7 @@ hoge`;
 			const output = [
 				BOLD([
 					BOLD([
-						TEXT('**'),
-						ITALIC([
-							TEXT('abc'),
-						]),
-						TEXT('**'),
+						TEXT('***abc***'),
 					]),
 				]),
 			];
@@ -1191,11 +1293,7 @@ hoge`;
 				const output = [
 					ITALIC([
 						ITALIC([
-							TEXT('*'),
-							ITALIC([
-								TEXT('abc'),
-							]),
-							TEXT('*'),
+							TEXT('**abc**'),
 						]),
 					]),
 				];
@@ -1267,13 +1365,19 @@ hoge`;
 
 		describe('hashtag', () => {
 			it('basic', () => {
-				const input = '<b><b>#abc(xyz)</b></b>';
-				const output = [
+				let input, output;
+				input = '<b>#abc(xyz)</b>';
+				output = [
 					BOLD([
-						BOLD([
-							HASHTAG('abc'),
-							TEXT('(xyz)'),
-						]),
+						HASHTAG('abc(xyz)'),
+					]),
+				];
+				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+				input = '<b>#abc(x(y)z)</b>';
+				output = [
+					BOLD([
+						HASHTAG('abc'),
+						TEXT('(x(y)z)'),
 					]),
 				];
 				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
@@ -1321,13 +1425,19 @@ hoge`;
 		});
 
 		it('url', () => {
-			const input = '<b><b>https://example.com/abc(xyz)</b></b>';
-			const output = [
+			let input, output;
+			input = '<b>https://example.com/abc(xyz)</b>';
+			output = [
 				BOLD([
-					BOLD([
-						N_URL('https://example.com/abc'),
-						TEXT('(xyz)'),
-					]),
+					N_URL('https://example.com/abc(xyz)'),
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
+			input = '<b>https://example.com/abc(x(y)z)</b>';
+			output = [
+				BOLD([
+					N_URL('https://example.com/abc'),
+					TEXT('(x(y)z)'),
 				]),
 			];
 			assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);

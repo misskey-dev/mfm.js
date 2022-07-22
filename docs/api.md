@@ -36,13 +36,13 @@ console.log(JSON.stringify(nodes));
 // => [{"type":"bold","children":[{"type":"text","props":{"text":"<s>cannot nest</s>"}}]}]
 ```
 
-## parsePlain API
+## parseSimple API
 入力文字列からノードツリーを生成します。  
 絵文字コードとUnicode絵文字を利用可能です。  
 
 例:  
 ```ts
-const nodes = mfm.parsePlain('Hello :surprised_ai:');
+const nodes = mfm.parseSimple('Hello :surprised_ai:');
 console.log(JSON.stringify(nodes));
 // => [{"type":"text","props":{"text":"Hello "}},{"type":"emojiCode","props":{"name":"surprised_ai"}}]
 ```
