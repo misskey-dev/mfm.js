@@ -626,12 +626,15 @@ export const language = P.createLanguage({
 	},
 
 	emojiCode: r => {
+		const side = P.notMatch(P.regexp(/[a-z0-9]/i));
 		const mark = P.str(':');
 		return P.seq([
+			P.alt([P.lineBegin, side]),
 			mark,
 			P.regexp(/[a-z0-9_+-]+/i),
 			mark,
-		], 1).map(name => M.EMOJI_CODE(name as string));
+			P.alt([P.lineEnd, side]),
+		], 2).map(name => M.EMOJI_CODE(name as string));
 	},
 
 	link: r => {
