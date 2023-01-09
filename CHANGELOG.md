@@ -11,6 +11,10 @@
 
 -->
 
+## 0.23.1
+### Improvements
+- improve emoji code parsing
+
 ## 0.23.0
 
 ### Features

@@ -1,6 +1,6 @@
 {
   "name": "mfm-js",
-  "version": "0.23.0",
+  "version": "0.23.1",
   "description": "An MFM parser implementation with TypeScript",
   "main": "./built/index.js",
   "types": "./built/index.d.ts",
