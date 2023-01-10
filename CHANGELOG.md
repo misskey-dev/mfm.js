@@ -11,6 +11,10 @@
 
 -->
 
+## 0.23.2
+### Features
+- Supports whitelisting of emoji code names. (#130)
+
 ## 0.23.1
 ### Improvements
 - improve emoji code parsing
