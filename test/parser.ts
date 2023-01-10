@@ -34,7 +34,19 @@ describe('SimpleParser', () => {
 
 		it('between texts', () => {
 			const input = 'foo:bar:baz';
-			const output = [TEXT('foo'), EMOJI_CODE('bar'), TEXT('baz')];
+			const output = [TEXT('foo:bar:baz')];
+			assert.deepStrictEqual(mfm.parseSimple(input), output);
+		});
+
+		it('between texts 2', () => {
+			const input = '12:34:56';
+			const output = [TEXT('12:34:56')];
+			assert.deepStrictEqual(mfm.parseSimple(input), output);
+		});
+
+		it('between texts 3', () => {
+			const input = 'あ:bar:い';
+			const output = [TEXT('あ'), EMOJI_CODE('bar'), TEXT('い')];
 			assert.deepStrictEqual(mfm.parseSimple(input), output);
 		});
 	});

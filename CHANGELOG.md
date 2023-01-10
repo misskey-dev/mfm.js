@@ -11,6 +11,10 @@
 
 -->
 
+## 0.23.1
+### Improvements
+- improve emoji code parsing
+
 ## 0.23.0
 
 ### Features
@@ -34,8 +38,6 @@
 - Removes a unnecessary built file
 
 ## 0.22.0
-
-npm: https://www.npmjs.com/package/mfm-js/v/0.22.0
 
 ### Features
 - Unicode emoji supports Unicode 14.0 emoji (#109)
