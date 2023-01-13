@@ -444,9 +444,6 @@ export const language = P.createLanguage({
 			if (!result.success) {
 				return result;
 			}
-			if (state.fnNameList != null && !state.fnNameList.includes(result.value)) {
-				return P.failure();
-			}
 			return P.success(result.index, result.value);
 		});
 		const arg: P.Parser<ArgPair> = P.seq([

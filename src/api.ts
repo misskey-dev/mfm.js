@@ -5,9 +5,8 @@ import { MfmNode, MfmSimpleNode } from './node';
 /**
  * Generates a MfmNode tree from the MFM string.
 */
-export function parse(input: string, opts: Partial<{ fnNameList: string[]; nestLimit: number; }> = {}): MfmNode[] {
+export function parse(input: string, opts: Partial<{ nestLimit: number; }> = {}): MfmNode[] {
 	const nodes = fullParser(input, {
-		fnNameList: opts.fnNameList,
 		nestLimit: opts.nestLimit,
 	});
 	return nodes;

@@ -1218,24 +1218,6 @@ hoge`;
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
-
-		it('exists name in the fnNameList', () => {
-			const input = '$[spin.speed=1.1s text]';
-			const output = [
-				FN('spin', { speed: '1.1s' }, [
-					TEXT('text')
-				])
-			];
-			assert.deepStrictEqual(mfm.parse(input, { fnNameList: ['tada', 'spin'] }), output);
-		});
-
-		it('not exists name in the fnNameList', () => {
-			const input = '$[pope.speed=1.1s text]';
-			const output = [
-				TEXT('$[pope.speed=1.1s text]')
-			];
-			assert.deepStrictEqual(mfm.parse(input, { fnNameList: ['tada', 'spin'] }), output);
-		});
 	});
 
 	describe('plain', () => {

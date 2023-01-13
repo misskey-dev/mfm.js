@@ -9,32 +9,6 @@ console.log(JSON.stringify(nodes));
 // => [{"type":"text","props":{"text":"hello "}},{"type":"fn","props":{"name":"tada","args":{}},"children":[{"type":"text","props":{"text":"world"}}]}]
 ```
 
-### 利用可能なMFM関数やカスタム絵文字のリストを設定する
-MFM関数の名前をホワイトリストに登録して、登録されたMFM関数以外を通常のテキストノードとして解釈するように設定できます。  
-デフォルトではすべてのMFM関数名を受け入れるように設定されています。  
-
-例:  
-```ts
-const nodes = mfm.parse('hello $[tada world]', { fnNameList: ['tada', 'spin'] });
-console.log(JSON.stringify(nodes));
-// => [{"type":"text","props":{"text":"hello "}},{"type":"fn","props":{"name":"tada","args":{}},"children":[{"type":"text","props":{"text":"world"}}]}]
-```
-
-```ts
-const nodes = mfm.parse('hello $[pope world]', { fnNameList: ['tada', 'spin'] });
-console.log(JSON.stringify(nodes));
-// => [{"type":"text","props":{"text":"hello $[pope world]"}}]
-```
-
-同様に、カスタム絵文字の名前もホワイトリスト制にできます。
-
-例:  
-```ts
-const nodes = mfm.parse(':bap:', { emojiCodeList: ['polarbear', 'bap'] });
-console.log(JSON.stringify(nodes));
-// => [{"type":"emojiCode","props":{"name":"bap"}}]
-```
-
 ### 最大のネストの深さを変更する
 デフォルトで20に設定されています。  
 
