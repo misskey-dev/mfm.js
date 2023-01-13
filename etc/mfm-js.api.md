@@ -243,7 +243,6 @@ export type NodeType<T extends MfmNode['type']> = T extends 'quote' ? MfmQuote :
 // @public (undocumented)
 export function parse(input: string, opts?: Partial<{
     fnNameList: string[];
-    emojiCodeList: string[];
     nestLimit: number;
 }>): MfmNode[];
 
