@@ -11,6 +11,11 @@
 
 -->
 
+## 0.23.3
+- tweak fn parsing
+- fnNameList option removed
+- emojiCodeList option removed
+
 ## 0.23.2
 ### Features
 - Supports whitelisting of emoji code names. (#130)
