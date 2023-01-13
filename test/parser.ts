@@ -1199,6 +1199,16 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
+		it('with a string argument 2', () => {
+			const input = '$[position.x=-3 a]';
+			const output = [
+				FN('position', { x: '-3' }, [
+					TEXT('a')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
 		it('invalid fn name', () => {
 			const input = '$[関数 text]';
 			const output = [

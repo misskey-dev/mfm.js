@@ -450,7 +450,7 @@ export const language = P.createLanguage({
 			P.regexp(/[a-z0-9_]+/i),
 			P.seq([
 				P.str('='),
-				P.regexp(/[a-z0-9_.]+/i),
+				P.regexp(/[a-z0-9_.-]+/i),
 			], 1).option(),
 		]).map(result => {
 			return {
