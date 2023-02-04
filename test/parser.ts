@@ -1028,6 +1028,14 @@ hoge`;
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		it('prevent xss', () => {
+			const input = 'javascript:foo';
+			const output = [
+				TEXT('javascript:foo')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('link', () => {
@@ -1060,6 +1068,14 @@ hoge`;
 					TEXT('official instance')
 				]),
 				TEXT('.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		it('prevent xss', () => {
+			const input = '[click here](javascript:foo)';
+			const output = [
+				TEXT('[click here](javascript:foo)')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
