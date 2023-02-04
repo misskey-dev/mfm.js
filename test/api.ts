@@ -6,7 +6,7 @@ import {
 
 describe('API', () => {
 	describe('toString', () => {
-		it('basic', () => {
+		test('basic', () => {
 			const input =
 `before
 <center>
@@ -20,12 +20,12 @@ after`;
 			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		});
 
-		it('single node', () => {
+		test('single node', () => {
 			const input = '$[tada Hello]';
 			assert.strictEqual(mfm.toString(mfm.parse(input)[0]), '$[tada Hello]');
 		});
 
-		it('quote', () => {
+		test('quote', () => {
 			const input = `
 > abc
 > 
@@ -36,128 +36,128 @@ after`;
 		});
 
 
-		it('search', () => {
+		test('search', () => {
 			const input = 'MFM 書き方 123 Search';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		});
 
-		it('block code', () => {
+		test('block code', () => {
 			const input = '```\nabc\n```';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		});
 
-		it('math block', () => {
+		test('math block', () => {
 			const input = '\\[\ny = 2x + 1\n\\]';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		});
 
-		it('center', () => {
+		test('center', () => {
 			const input = '<center>\nabc\n</center>';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		});
 
-		// it('center (single line)', () => {
+		// test('center (single line)', () => {
 		// 	const input = '<center>abc</center>';
 		// 	assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		// });
 
-		it('emoji code', () => {
+		test('emoji code', () => {
 			const input = ':abc:';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		});
 
-		it('unicode emoji', () => {
+		test('unicode emoji', () => {
 			const input = '今起きた😇';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		});
 
-		it('big', () => {
+		test('big', () => {
 			const input = '***abc***';
 			const output = '$[tada abc]';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), output);
 		});
 
-		it('bold', () => {
+		test('bold', () => {
 			const input = '**abc**';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		});
 
-		// it('bold tag', () => {
+		// test('bold tag', () => {
 		// 	const input = '<b>abc</b>';
 		// 	assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		// });
 
-		it('small', () => {
+		test('small', () => {
 			const input = '<small>abc</small>';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		});
 
-		// it('italic', () => {
+		// test('italic', () => {
 		// 	const input = '*abc*';
 		// 	assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		// });
 
-		it('italic tag', () => {
+		test('italic tag', () => {
 			const input = '<i>abc</i>';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		});
 
-		it('strike', () => {
+		test('strike', () => {
 			const input = '~~foo~~';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		});
 
-		// it('strike tag', () => {
+		// test('strike tag', () => {
 		// 	const input = '<s>foo</s>';
 		// 	assert.strictEqual(mfm.toString(mfm.parse(input)), input);
 		// });
 
-		it('inline code', () => {
+		test('inline code', () => {
 			const input = 'AiScript: `#abc = 2`';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), 'AiScript: `#abc = 2`');
 		});
 
-		it('math inline', () => {
+		test('math inline', () => {
 			const input = '\\(y = 2x + 3\\)';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), '\\(y = 2x + 3\\)');
 		});
 
-		it('hashtag', () => {
+		test('hashtag', () => {
 			const input = 'a #misskey b';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), 'a #misskey b');
 		});
 
-		it('link', () => {
+		test('link', () => {
 			const input = '[Ai](https://github.com/syuilo/ai)';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), '[Ai](https://github.com/syuilo/ai)');
 		});
 
-		it('silent link', () => {
+		test('silent link', () => {
 			const input = '?[Ai](https://github.com/syuilo/ai)';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), '?[Ai](https://github.com/syuilo/ai)');
 		});
 
-		it('fn', () => {
+		test('fn', () => {
 			const input = '$[tada Hello]';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), '$[tada Hello]');
 		});
 
-		it('fn with arguments', () => {
+		test('fn with arguments', () => {
 			const input = '$[spin.speed=1s,alternate Hello]';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), '$[spin.speed=1s,alternate Hello]');
 		});
 
-		it('plain', () => {
+		test('plain', () => {
 			const input = 'a\n<plain>\nHello\nworld\n</plain>\nb';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), 'a\n<plain>\nHello\nworld\n</plain>\nb');
 		});
 
-		it('1 line plain', () => {
+		test('1 line plain', () => {
 			const input = 'a\n<plain>Hello</plain>\nb';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), 'a\n<plain>\nHello\n</plain>\nb');
 		});
 
-		it('preserve url brackets', () => {
+		test('preserve url brackets', () => {
 			const input1 = 'https://github.com/syuilo/ai';
 			assert.strictEqual(mfm.toString(mfm.parse(input1)), input1);
 
@@ -167,7 +167,7 @@ after`;
 	});
 
 	describe('inspect', () => {
-		it('replace text', () => {
+		test('replace text', () => {
 			const input = 'good morning $[tada everynyan!]';
 			const result = mfm.parse(input);
 			mfm.inspect(result, node => {
@@ -178,7 +178,7 @@ after`;
 			assert.strictEqual(mfm.toString(result), 'hello $[tada everynyan!]');
 		});
 
-		it('replace text (one item)', () => {
+		test('replace text (one item)', () => {
 			const input = 'good morning $[tada everyone!]';
 			const result = mfm.parse(input);
 			mfm.inspect(result[1], node => {
@@ -191,7 +191,7 @@ after`;
 	});
 
 	describe('extract', () => {
-		it('basic', () => {
+		test('basic', () => {
 			const nodes = mfm.parse('@hoge @piyo @bebeyo');
 			const expect = [
 				MENTION('hoge', null, '@hoge'),
@@ -201,7 +201,7 @@ after`;
 			assert.deepStrictEqual(mfm.extract(nodes, node => node.type == 'mention'), expect);
 		});
 
-		it('nested', () => {
+		test('nested', () => {
 			const nodes = mfm.parse('abc:hoge:$[tada 123 @hoge :foo:]:piyo:');
 			const expect = [
 				EMOJI_CODE('hoge'),
