@@ -10,6 +10,10 @@
 ### Bugfixes
 
 -->
+## 0.23.4 (unreleased)
+
+### Improvements
+- Improve generation of brackets for links (#126)
 
 ## 0.23.3
 - tweak fn parsing

@@ -1042,9 +1042,11 @@ hoge`;
 		test('basic', () => {
 			const input = '[official instance](https://misskey.io/@ai).';
 			const output = [
-				LINK(false, 'https://misskey.io/@ai', [
-					TEXT('official instance')
-				]),
+				LINK(
+					false,
+					N_URL('https://misskey.io/@ai'),
+					[TEXT('official instance')]
+				),
 				TEXT('.')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
@@ -1053,20 +1055,24 @@ hoge`;
 		test('silent flag', () => {
 			const input = '?[official instance](https://misskey.io/@ai).';
 			const output = [
-				LINK(true, 'https://misskey.io/@ai', [
-					TEXT('official instance')
-				]),
+				LINK(
+					true,
+					N_URL('https://misskey.io/@ai'),
+					[TEXT('official instance')]
+				),
 				TEXT('.')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
 		test('with angle brackets url', () => {
-			const input = '[official instance](<https://misskey.io/@ai>).';
+			const input = '[#藍ちゃファンクラブ](<https://misskey.io/explore/tags/藍ちゃファンクラブ>).';
 			const output = [
-				LINK(false, 'https://misskey.io/@ai', [
-					TEXT('official instance')
-				]),
+				LINK(
+					false,
+					N_URL('https://misskey.io/explore/tags/藍ちゃファンクラブ', true),
+					[TEXT('#藍ちゃファンクラブ')]
+				),
 				TEXT('.')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
@@ -1085,9 +1091,11 @@ hoge`;
 				const input = 'official instance: [https://misskey.io/@ai](https://misskey.io/@ai).';
 				const output = [
 					TEXT('official instance: '),
-					LINK(false, 'https://misskey.io/@ai', [
-						TEXT('https://misskey.io/@ai'),
-					]),
+					LINK(
+						false,
+						N_URL('https://misskey.io/@ai'),
+						[TEXT('https://misskey.io/@ai')]
+					),
 					TEXT('.'),
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
@@ -1096,12 +1104,16 @@ hoge`;
 				const input = 'official instance: [https://misskey.io/@ai**https://misskey.io/@ai**](https://misskey.io/@ai).';
 				const output = [
 					TEXT('official instance: '),
-					LINK(false, 'https://misskey.io/@ai', [
-						TEXT('https://misskey.io/@ai'),
-						BOLD([
+					LINK(
+						false,
+						N_URL('https://misskey.io/@ai'),
+						[
 							TEXT('https://misskey.io/@ai'),
-						]),
-					]),
+							BOLD([
+								TEXT('https://misskey.io/@ai'),
+							]),
+						]
+					),
 					TEXT('.'),
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
@@ -1113,9 +1125,11 @@ hoge`;
 				const input = 'official instance: [[https://misskey.io/@ai](https://misskey.io/@ai)](https://misskey.io/@ai).';
 				const output = [
 					TEXT('official instance: '),
-					LINK(false, 'https://misskey.io/@ai', [
-						TEXT('[https://misskey.io/@ai'),
-					]),
+					LINK(
+						false,
+						N_URL('https://misskey.io/@ai'),
+						[TEXT('[https://misskey.io/@ai')]
+					),
 					TEXT(']('),
 					N_URL('https://misskey.io/@ai'),
 					TEXT(').'),
@@ -1126,11 +1140,15 @@ hoge`;
 				const input = 'official instance: [**[https://misskey.io/@ai](https://misskey.io/@ai)**](https://misskey.io/@ai).';
 				const output = [
 					TEXT('official instance: '),
-					LINK(false, 'https://misskey.io/@ai', [
-						BOLD([
-							TEXT('[https://misskey.io/@ai](https://misskey.io/@ai)'),
-						]),
-					]),
+					LINK(
+						false,
+						N_URL('https://misskey.io/@ai'),
+						[
+							BOLD([
+								TEXT('[https://misskey.io/@ai](https://misskey.io/@ai)'),
+							]),
+						]
+					),
 					TEXT('.'),
 				];
 			});
@@ -1140,21 +1158,27 @@ hoge`;
 			test('basic', () => {
 				const input = '[@example](https://example.com)';
 				const output = [
-					LINK(false, 'https://example.com', [
-						TEXT('@example'),
-					]),
+					LINK(
+						false,
+						N_URL('https://example.com'),
+						[TEXT('@example')]
+					),
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
 			});
 			test('nested', () => {
 				const input = '[@example**@example**](https://example.com)';
 				const output = [
-					LINK(false, 'https://example.com', [
-						TEXT('@example'),
-						BOLD([
+					LINK(
+						false,
+						N_URL('https://example.com'),
+						[
 							TEXT('@example'),
-						]),
-					]),
+							BOLD([
+								TEXT('@example'),
+							]),
+						]
+					),
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
 			});
@@ -1163,9 +1187,11 @@ hoge`;
 		test('with brackets', () => {
 			const input = '[foo](https://example.com/foo(bar))';
 			const output = [
-				LINK(false, 'https://example.com/foo(bar)', [
-					TEXT('foo')
-				]),
+				LINK(
+					false,
+					N_URL('https://example.com/foo(bar)'),
+					[TEXT('foo')]
+				),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
@@ -1174,9 +1200,11 @@ hoge`;
 			const input = '([foo](https://example.com/foo(bar)))';
 			const output = [
 				TEXT('('),
-				LINK(false, 'https://example.com/foo(bar)', [
-					TEXT('foo')
-				]),
+				LINK(
+					false,
+					N_URL('https://example.com/foo(bar)'),
+					[TEXT('foo')]
+				),
 				TEXT(')'),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
@@ -1186,9 +1214,11 @@ hoge`;
 			const input = '[test] foo [bar](https://example.com)';
 			const output = [
 				TEXT('[test] foo '),
-				LINK(false, 'https://example.com', [
-					TEXT('bar')
-				]),
+				LINK(
+					false,
+					N_URL('https://example.com'),
+					[TEXT('bar')]
+				),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
@@ -1369,7 +1399,7 @@ hoge`;
 				];
 				assert.deepStrictEqual(mfm.parse(input, { nestLimit: 2 }), output);
 			});
-	
+
 			test('tag', () => {
 				const input = '<b><b><s>abc</s></b></b>';
 				const output = [

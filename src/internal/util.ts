@@ -92,7 +92,7 @@ export function stringifyNode(node: MfmNode): string {
 		}
 		case 'link': {
 			const prefix = node.props.silent ? '?' : '';
-			return `${ prefix }[${ stringifyTree(node.children) }](${ node.props.url })`;
+			return `${ prefix }[${ stringifyTree(node.children) }](${ stringifyNode(node.props.url) })`;
 		}
 		case 'fn': {
 			const argFields = Object.keys(node.props.args).map(key => {

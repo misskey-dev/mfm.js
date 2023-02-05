@@ -157,11 +157,11 @@ export type MfmLink = {
 	type: 'link';
 	props: {
 		silent: boolean;
-		url: string;
+		url: MfmUrl;
 	};
 	children: MfmInline[];
 };
-export const LINK = (silent: boolean, url: string, children: MfmInline[]): NodeType<'link'> => { return { type: 'link', props: { silent, url }, children }; };
+export const LINK = (silent: boolean, url: MfmUrl, children: MfmInline[]): NodeType<'link'> => { return { type: 'link', props: { silent, url }, children }; };
 
 export type MfmFn = {
 	type: 'fn';
