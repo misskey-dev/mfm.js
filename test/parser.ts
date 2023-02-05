@@ -1043,7 +1043,7 @@ hoge`;
 			const input = '[official instance](https://misskey.io/@ai).';
 			const output = [
 				LINK(
-					false,
+					'plain',
 					N_URL('https://misskey.io/@ai'),
 					[TEXT('official instance')]
 				),
@@ -1056,7 +1056,7 @@ hoge`;
 			const input = '?[official instance](https://misskey.io/@ai).';
 			const output = [
 				LINK(
-					true,
+					'silent',
 					N_URL('https://misskey.io/@ai'),
 					[TEXT('official instance')]
 				),
@@ -1069,7 +1069,7 @@ hoge`;
 			const input = '[#藍ちゃファンクラブ](<https://misskey.io/explore/tags/藍ちゃファンクラブ>).';
 			const output = [
 				LINK(
-					false,
+					'plain',
 					N_URL('https://misskey.io/explore/tags/藍ちゃファンクラブ', true),
 					[TEXT('#藍ちゃファンクラブ')]
 				),
@@ -1086,13 +1086,52 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
+		test('embed flag', () => {
+			const input = '![image](https://raw.githubusercontent.com/syuilo/ai/master/ai.svg).';
+			const output = [
+				LINK(
+					'embed',
+					N_URL('https://raw.githubusercontent.com/syuilo/ai/master/ai.svg'),
+					[TEXT('image')]
+				),
+				TEXT('.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with angle brackets silent url', () => {
+			const input = '?[image](<https://raw.githubusercontent.com/syuilo/ai/master/ai.svg>).';
+			const output = [
+				LINK(
+					'silent',
+					N_URL('https://raw.githubusercontent.com/syuilo/ai/master/ai.svg', true),
+					[TEXT('image')]
+				),
+				TEXT('.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with angle brackets embed url', () => {
+			const input = '![image](<https://raw.githubusercontent.com/syuilo/ai/master/ai.svg>).';
+			const output = [
+				LINK(
+					'embed',
+					N_URL('https://raw.githubusercontent.com/syuilo/ai/master/ai.svg', true),
+					[TEXT('image')]
+				),
+				TEXT('.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
 		describe('cannot nest a url in a link label', () => {
 			test('basic', () => {
 				const input = 'official instance: [https://misskey.io/@ai](https://misskey.io/@ai).';
 				const output = [
 					TEXT('official instance: '),
 					LINK(
-						false,
+						'plain',
 						N_URL('https://misskey.io/@ai'),
 						[TEXT('https://misskey.io/@ai')]
 					),
@@ -1100,12 +1139,13 @@ hoge`;
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
 			});
+
 			test('nested', () => {
 				const input = 'official instance: [https://misskey.io/@ai**https://misskey.io/@ai**](https://misskey.io/@ai).';
 				const output = [
 					TEXT('official instance: '),
 					LINK(
-						false,
+						'plain',
 						N_URL('https://misskey.io/@ai'),
 						[
 							TEXT('https://misskey.io/@ai'),
@@ -1126,7 +1166,7 @@ hoge`;
 				const output = [
 					TEXT('official instance: '),
 					LINK(
-						false,
+						'plain',
 						N_URL('https://misskey.io/@ai'),
 						[TEXT('[https://misskey.io/@ai')]
 					),
@@ -1136,12 +1176,13 @@ hoge`;
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
 			});
+
 			test('nested', () => {
 				const input = 'official instance: [**[https://misskey.io/@ai](https://misskey.io/@ai)**](https://misskey.io/@ai).';
 				const output = [
 					TEXT('official instance: '),
 					LINK(
-						false,
+						'plain',
 						N_URL('https://misskey.io/@ai'),
 						[
 							BOLD([
@@ -1159,18 +1200,19 @@ hoge`;
 				const input = '[@example](https://example.com)';
 				const output = [
 					LINK(
-						false,
+						'plain',
 						N_URL('https://example.com'),
 						[TEXT('@example')]
 					),
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
 			});
+
 			test('nested', () => {
 				const input = '[@example**@example**](https://example.com)';
 				const output = [
 					LINK(
-						false,
+						'plain',
 						N_URL('https://example.com'),
 						[
 							TEXT('@example'),
@@ -1188,7 +1230,7 @@ hoge`;
 			const input = '[foo](https://example.com/foo(bar))';
 			const output = [
 				LINK(
-					false,
+					'plain',
 					N_URL('https://example.com/foo(bar)'),
 					[TEXT('foo')]
 				),
@@ -1201,7 +1243,7 @@ hoge`;
 			const output = [
 				TEXT('('),
 				LINK(
-					false,
+					'plain',
 					N_URL('https://example.com/foo(bar)'),
 					[TEXT('foo')]
 				),
@@ -1215,7 +1257,7 @@ hoge`;
 			const output = [
 				TEXT('[test] foo '),
 				LINK(
-					false,
+					'plain',
 					N_URL('https://example.com'),
 					[TEXT('bar')]
 				),

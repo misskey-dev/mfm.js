@@ -535,19 +535,24 @@ http://hoge.jp/abc
 <h1 id="link">Inline: リンク</h2>
 
 ## 形式
-silent=false
+type='plain'
 ```
 [Misskey.io](https://misskey.io/)
 ```
 
-silent=true
+type='plain' with special characters
+```
+[#藍ちゃファンクラブ](<https://misskey.io/explore/tags/藍ちゃファンクラブ>)
+```
+
+type='silent'
 ```
 ?[Misskey.io](https://misskey.io/)
 ```
 
-Special characters
+type='embed'
 ```
-[#藍ちゃファンクラブ](<https://misskey.io/explore/tags/藍ちゃファンクラブ>)
+![A cute picture of Ai-chan](https://藍.moe/aiart/1.png)
 ```
 
 ## 詳細
@@ -559,7 +564,7 @@ Special characters
   {
     type: 'link',
     props: {
-      silent: false,
+      type: 'plain'
       url: {
         type: 'url',
         props: {

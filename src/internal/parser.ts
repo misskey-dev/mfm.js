@@ -462,7 +462,7 @@ export const language = P.createLanguage({
 			P.str('.'),
 			arg.sep(P.str(','), 1),
 		], 1).map(pairs => {
-			const result: Args = { };
+			const result: Args = {};
 			for (const pair of pairs) {
 				result[pair.k] = pair.v;
 			}
@@ -644,7 +644,7 @@ export const language = P.createLanguage({
 		const closeLabel = P.str(']');
 		return P.seq([
 			notLinkLabel,
-			P.alt([P.str('?['), P.str('[')]),
+			P.alt([P.str('?['), P.str('!['), P.str('[')]),
 			P.seq([
 				P.notMatch(P.alt([closeLabel, newLine])),
 				nest(labelInline),
@@ -654,10 +654,15 @@ export const language = P.createLanguage({
 			P.alt([r.urlAlt, r.url]),
 			P.str(')'),
 		]).map(result => {
-			const silent = (result[1] === '?[');
+			const mapping: {[key: string]: M.MfmLink['props']['type']} = {
+				'?[': 'silent',
+				'![': 'embed',
+				'[': 'plain',
+			};
+			const type: M.MfmLink['props']['type'] = mapping[result[1]];
 			const label = result[2];
 			const url: M.MfmUrl = result[5];
-			return M.LINK(silent, url, mergeText(label));
+			return M.LINK(type, url, mergeText(label));
 		});
 	},
 

@@ -142,6 +142,21 @@ after`;
 			assert.strictEqual(mfm.toString(mfm.parse(input)), '?[Ai](https://github.com/syuilo/ai)');
 		});
 
+		test('silent bracket link', () => {
+			const input = '?[#藍ちゃファンクラブ](<https://misskey.io/explore/tags/藍ちゃファンクラブ>)';
+			assert.strictEqual(mfm.toString(mfm.parse(input)), '?[#藍ちゃファンクラブ](<https://misskey.io/explore/tags/藍ちゃファンクラブ>)');
+		});
+
+		test('image link', () => {
+			const input = '![Ai logo](https://raw.githubusercontent.com/syuilo/ai/master/ai.svg)';
+			assert.strictEqual(mfm.toString(mfm.parse(input)), '![Ai logo](https://raw.githubusercontent.com/syuilo/ai/master/ai.svg)');
+		});
+
+		test('image bracket link', () => {
+			const input = '![#藍ちゃファンクラブ](<https://misskey.io/explore/tags/藍ちゃファンクラブ>)';
+			assert.strictEqual(mfm.toString(mfm.parse(input)), '![#藍ちゃファンクラブ](<https://misskey.io/explore/tags/藍ちゃファンクラブ>)');
+		});
+
 		test('fn', () => {
 			const input = '$[tada Hello]';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), '$[tada Hello]');
