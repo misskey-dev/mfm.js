@@ -38,7 +38,7 @@ export function inspect(nodes: MfmNode[], action: (node: MfmNode) => void): void
 export const ITALIC: (children: MfmInline[]) => NodeType<'italic'>;
 
 // @public (undocumented)
-export const LINK: (silent: boolean, url: string, children: MfmInline[]) => NodeType<'link'>;
+export const LINK: (silent: boolean, url: MfmUrl, children: MfmInline[]) => NodeType<'link'>;
 
 // @public (undocumented)
 export const MATH_BLOCK: (formula: string) => NodeType<'mathBlock'>;
@@ -128,7 +128,7 @@ export type MfmLink = {
     type: 'link';
     props: {
         silent: boolean;
-        url: string;
+        url: MfmUrl;
     };
     children: MfmInline[];
 };

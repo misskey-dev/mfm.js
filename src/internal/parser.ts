@@ -657,7 +657,7 @@ export const language = P.createLanguage({
 			const silent = (result[1] === '?[');
 			const label = result[2];
 			const url: M.MfmUrl = result[5];
-			return M.LINK(silent, url.props.url, mergeText(label));
+			return M.LINK(silent, url, mergeText(label));
 		});
 	},
 

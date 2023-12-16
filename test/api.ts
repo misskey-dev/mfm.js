@@ -28,7 +28,7 @@ after`;
 		test('quote', () => {
 			const input = `
 > abc
-> 
+>
 > 123
 `;
 
@@ -130,6 +130,11 @@ after`;
 		test('link', () => {
 			const input = '[Ai](https://github.com/syuilo/ai)';
 			assert.strictEqual(mfm.toString(mfm.parse(input)), '[Ai](https://github.com/syuilo/ai)');
+		});
+
+		test('bracket link', () => {
+			const input = '[#藍ちゃファンクラブ](<https://misskey.io/explore/tags/藍ちゃファンクラブ>)';
+			assert.strictEqual(mfm.toString(mfm.parse(input)), '[#藍ちゃファンクラブ](<https://misskey.io/explore/tags/藍ちゃファンクラブ>)');
 		});
 
 		test('silent link', () => {
