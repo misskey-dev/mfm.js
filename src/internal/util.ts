@@ -1,4 +1,4 @@
-import { isMfmBlock, MfmInline, MfmNode, MfmText, TEXT } from '../node';
+import { isMfmBlock, MfmInline, MfmNode, MfmText, MfmLink, TEXT } from '../node';
 
 export function mergeText<T extends MfmNode>(nodes: ((T extends MfmInline ? MfmInline : MfmNode) | string)[]): (T | MfmText)[] {
 	const dest: (T | MfmText)[] = [];
@@ -91,8 +91,12 @@ export function stringifyNode(node: MfmNode): string {
 			}
 		}
 		case 'link': {
-			const prefix = node.props.silent ? '?' : '';
-			return `${ prefix }[${ stringifyTree(node.children) }](${ node.props.url })`;
+			const prefixMapping: {[key in MfmLink['props']['type']]: string} = {
+				'silent': '?',
+				'embed': '!',
+				'plain': '',
+			};
+			return `${ prefixMapping[node.props.type] }[${ stringifyTree(node.children) }](${ stringifyNode(node.props.url) })`;
 		}
 		case 'fn': {
 			const argFields = Object.keys(node.props.args).map(key => {

@@ -10,6 +10,13 @@
 ### Bugfixes
 
 -->
+## 0.23.4 (unreleased)
+
+### Features
+- Add remote media syntax for links (#127)
+
+### Improvements
+- Improve generation of brackets for links (#126)
 
 ## 0.x.x (unreleased)
 ### Features

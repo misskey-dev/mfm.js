@@ -225,10 +225,10 @@ __bold__
 - 内容には再度InlineParserを適用する。
 - 内容を空にすることはできない。
 
-構文1,3のみ:  
+構文1,3のみ:
 - 内容にはすべての文字、改行が使用できる。
 
-構文2のみ:  
+構文2のみ:
 - 内容には`[a-z0-9 \t]i`にマッチする文字が使用できる。
 
 ## ノード
@@ -289,11 +289,11 @@ _italic_
 - 内容には再度InlineParserを適用する。
 - 内容を空にすることはできない。
 
-構文1のみ:  
+構文1のみ:
 - 内容にはすべての文字、改行が使用できる。
 
-構文2,3のみ:  
-※1つ目の`*`と`_`を開始記号と呼ぶ。  
+構文2,3のみ:
+※1つ目の`*`と`_`を開始記号と呼ぶ。
 - 内容には`[a-z0-9 \t]i`にマッチする文字が使用できる。
 - 開始記号の前の文字が`[a-z0-9]i`に一致しない時にイタリック文字として判定される。
 
@@ -326,10 +326,10 @@ _italic_
 - 内容には再度InlineParserを適用する。
 - 内容を空にすることはできない。
 
-構文1のみ:  
+構文1のみ:
 - 内容には`~`、改行以外の文字を使用できる。
 
-構文2のみ:  
+構文2のみ:
 - 内容にはすべての文字、改行が使用できる。
 
 ## ノード
@@ -488,12 +488,12 @@ http://hoge.jp/abc
 ```
 
 ## 詳細
-構文1のみ:  
+構文1のみ:
 - 内容には`[.,a-z0-9_/:%#@$&?!~=+-]i`にマッチする文字を使用できる。
 - 内容には対になっている括弧を使用できる。対象: `( )` `[ ]`
 - `.`や`,`は最後の文字にできない。
 
-構文2のみ:  
+構文2のみ:
 - 内容には改行、スペース以外の文字を使用できる。
 
 ## ノード
@@ -535,14 +535,24 @@ http://hoge.jp/abc
 <h1 id="link">Inline: リンク</h2>
 
 ## 形式
-silent=false
+type='plain'
 ```
 [Misskey.io](https://misskey.io/)
 ```
 
-silent=true
+type='plain' with special characters
+```
+[#藍ちゃファンクラブ](<https://misskey.io/explore/tags/藍ちゃファンクラブ>)
+```
+
+type='silent'
 ```
 ?[Misskey.io](https://misskey.io/)
+```
+
+type='embed'
+```
+![A cute picture of Ai-chan](https://藍.moe/aiart/1.png)
 ```
 
 ## 詳細
@@ -554,8 +564,14 @@ silent=true
   {
     type: 'link',
     props: {
-      silent: false,
-      url: 'https://misskey.io/'
+      type: 'plain'
+      url: {
+        type: 'url',
+        props: {
+          url: 'https://misskey.io/@ai',
+          brackets: false
+        }
+      },
     },
     children: [
       {
@@ -665,7 +681,7 @@ abc
 ```js
 {
   type: 'text',
-  props: 
+  props:
     text: 'abc'
   }
 }

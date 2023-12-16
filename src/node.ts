@@ -156,12 +156,12 @@ export const N_URL = (value: string, brackets?: boolean): NodeType<'url'> => {
 export type MfmLink = {
 	type: 'link';
 	props: {
-		silent: boolean;
-		url: string;
+		type: 'plain' | 'silent' | 'embed';
+		url: MfmUrl;
 	};
 	children: MfmInline[];
 };
-export const LINK = (silent: boolean, url: string, children: MfmInline[]): NodeType<'link'> => { return { type: 'link', props: { silent, url }, children }; };
+export const LINK = (type: 'plain' | 'silent' | 'embed', url: MfmUrl, children: MfmInline[]): NodeType<'link'> => { return { type: 'link', props: { type, url }, children }; };
 
 export type MfmFn = {
 	type: 'fn';
