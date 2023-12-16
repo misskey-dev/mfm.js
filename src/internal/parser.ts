@@ -3,11 +3,11 @@ import * as P from './core';
 import { mergeText } from './util';
 
 // NOTE:
-// tsdのテストでファイルを追加しているにも関わらず「twemoji-parser/dist/lib/regex」の型定義ファイルがないとエラーが出るため、
+// tsdのテストでファイルを追加しているにも関わらず「@twemoji/parser/dist/lib/regex」の型定義ファイルがないとエラーが出るため、
 // このエラーを無視する。
 /* eslint @typescript-eslint/ban-ts-comment: 1 */
 // @ts-ignore
-import twemojiRegex from 'twemoji-parser/dist/lib/regex';
+import twemojiRegex from '@twemoji/parser/dist/lib/regex';
 
 type ArgPair = { k: string, v: string | true };
 type Args = Record<string, string | true>;

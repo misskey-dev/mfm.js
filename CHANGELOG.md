@@ -11,6 +11,10 @@
 
 -->
 
+## 0.x.x (unreleased)
+### Features
+- Supports Unicode 15.0 emoji
+
 ## 0.23.3
 - tweak fn parsing
 - fnNameList option removed
