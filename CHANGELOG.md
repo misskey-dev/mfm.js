@@ -6,11 +6,21 @@
 ### Improvements
 
 ### Changes
-- allow `.` in mentions (like `@bsky.brid.gy@bsky.brid.gy`)
 
 ### Bugfixes
 
 -->
+
+## 0.x.x (unreleased)
+
+### Features
+
+### Improvements
+
+### Changes
+- allow `.` in mentions (like `@bsky.brid.gy@bsky.brid.gy`)
+
+### Bugfixes
 
 ## 0.24.0
 ### Features
