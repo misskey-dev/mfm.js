@@ -12,15 +12,11 @@
 -->
 
 ## 0.x.x (unreleased)
-
 ### Features
-
-### Improvements
+- Supports Unicode 15.1 and 16.0 emoji
 
 ### Changes
 - allow `.` in mentions (like `@bsky.brid.gy@bsky.brid.gy`)
-
-### Bugfixes
 
 ## 0.24.0
 ### Features
