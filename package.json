@@ -12,7 +12,7 @@
     "parse-simple": "node ./built/cli/parseSimple",
     "api": "npx api-extractor run --local --verbose",
     "api-prod": "npx api-extractor run --verbose",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint",
     "vitest": "vitest run --coverage",
     "test": "npm run vitest && npm run tsd"
   },

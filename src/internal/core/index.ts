@@ -19,7 +19,7 @@ interface State {
 	depth: number,
 }
 
-export type ParserHandler<T> = (input: string, index: number, state: State) => Result<T>
+export type ParserHandler<T> = (input: string, index: number, state: State) => Result<T>;
 
 export function success<T>(index: number, value: T): Success<T> {
 	return {
@@ -151,10 +151,10 @@ type ParsedType<T extends Parser<unknown>> = T extends Parser<infer U> ? U : nev
 
 export type SeqParseResult<T extends unknown[]> =
 	T extends [] ? [] 
-		: T extends [infer F, ...infer R]
+	: T extends [infer F, ...infer R]
 		? (
 			F extends Parser<unknown> ? [ParsedType<F>, ...SeqParseResult<R>] : [unknown, ...SeqParseResult<R>]
-			)
+		)
 		: unknown[];
 
 export function seq<Parsers extends Parser<unknown>[]>(...parsers: Parsers): Parser<SeqParseResult<Parsers>> {

@@ -1,6 +1,6 @@
 import { performance } from 'perf_hooks';
-import inputLine, { InputCanceledError } from './misc/inputLine';
 import { parseSimple } from '..';
+import inputLine, { InputCanceledError } from './misc/inputLine';
 
 async function entryPoint(): Promise<void> {
 	console.log('intaractive simple parser');
@@ -9,8 +9,7 @@ async function entryPoint(): Promise<void> {
 		let input: string;
 		try {
 			input = await inputLine('> ');
-		}
-		catch (err) {
+		} catch (err) {
 			if (err instanceof InputCanceledError) {
 				console.log('bye.');
 				return;
@@ -31,8 +30,7 @@ async function entryPoint(): Promise<void> {
 			console.log(JSON.stringify(result));
 			const parseTime = (parseTimeEnd - parseTimeStart).toFixed(3);
 			console.log(`parsing time: ${parseTime}ms`);
-		}
-		catch (err) {
+		} catch (err) {
 			console.log('parsing error:');
 			console.log(err);
 		}

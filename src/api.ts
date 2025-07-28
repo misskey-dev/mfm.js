@@ -23,13 +23,12 @@ export function parseSimple(input: string): MfmSimpleNode[] {
 /**
  * Generates a MFM string from the MfmNode tree.
 */
-export function toString(tree: MfmNode[]): string
-export function toString(node: MfmNode): string
+export function toString(tree: MfmNode[]): string;
+export function toString(node: MfmNode): string;
 export function toString(node: MfmNode | MfmNode[]): string {
 	if (Array.isArray(node)) {
 		return stringifyTree(node);
-	}
-	else {
+	} else {
 		return stringifyNode(node);
 	}
 }
@@ -37,15 +36,14 @@ export function toString(node: MfmNode | MfmNode[]): string {
 /**
  * Inspects the MfmNode tree.
 */
-export function inspect(node: MfmNode, action: (node: MfmNode) => void): void
-export function inspect(nodes: MfmNode[], action: (node: MfmNode) => void): void
+export function inspect(node: MfmNode, action: (node: MfmNode) => void): void;
+export function inspect(nodes: MfmNode[], action: (node: MfmNode) => void): void;
 export function inspect(node: (MfmNode | MfmNode[]), action: (node: MfmNode) => void): void {
 	if (Array.isArray(node)) {
 		for (const n of node) {
 			inspectOne(n, action);
 		}
-	}
-	else {
+	} else {
 		inspectOne(node, action);
 	}
 }

@@ -1,14 +1,14 @@
-import * as M from '..';
-import * as P from './core';
-import { mergeText } from './util';
-import { SeqParseResult } from './core';
-
 // NOTE:
 // tsdのテストでファイルを追加しているにも関わらず「@twemoji/parser/dist/lib/regex」の型定義ファイルがないとエラーが出るため、
 // このエラーを無視する。
 /* eslint @typescript-eslint/ban-ts-comment: 1 */
 // @ts-ignore
 import twemojiRegex from '@twemoji/parser/dist/lib/regex';
+
+import * as M from '..';
+import * as P from './core';
+import { mergeText } from './util';
+import { SeqParseResult } from './core';
 
 type ArgPair = { k: string, v: string | true };
 type Args = Record<string, string | true>;
@@ -22,7 +22,7 @@ function seqOrText<Parsers extends P.Parser<unknown>[]>(...parsers: Parsers): P.
 		// TODO: typesafe implementation
 		const accum: unknown[] = [];
 		let latestIndex = index;
-		for (let i = 0 ; i < parsers.length; i++) {
+		for (let i = 0; i < parsers.length; i++) {
 			const result = parsers[i].handler(input, latestIndex, state);
 			if (!result.success) {
 				if (latestIndex === index) {
