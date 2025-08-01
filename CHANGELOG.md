@@ -10,8 +10,9 @@
 ### Bugfixes
 
 -->
-
 ## 0.x.x (unreleased)
+
+## 0.25.0
 ### Features
 - Supports Unicode 15.1 and 16.0 emoji
 
