@@ -34,9 +34,6 @@
     "typescript": "5.8.3",
     "vitest": "^3.2.4"
   },
-  "dependencies": {
-    "@twemoji/parser": "16.0.0"
-  },
   "files": [
     "built",
     "CHANGELOG.md"

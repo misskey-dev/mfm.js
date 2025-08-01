@@ -1,10 +1,3 @@
-// NOTE:
-// tsdのテストでファイルを追加しているにも関わらず「@twemoji/parser/dist/lib/regex」の型定義ファイルがないとエラーが出るため、
-// このエラーを無視する。
-/* eslint @typescript-eslint/ban-ts-comment: 1 */
-// @ts-ignore
-import twemojiRegex from '@twemoji/parser/dist/lib/regex';
-
 import * as M from '..';
 import * as P from './core';
 import { mergeText } from './util';
@@ -16,6 +9,11 @@ type Args = Record<string, string | true>;
 const space = P.regexp(/[\u0020\u3000\t]/);
 const alphaAndNum = P.regexp(/[a-z0-9]/i);
 const newLine = P.alt([P.crlf, P.cr, P.lf]);
+
+// taken from https://github.com/slevithan/emoji-regex-xs
+const r = String.raw;
+const base = r`\p{Emoji}(?:\p{EMod}|[\u{E0020}-\u{E007E}]+\u{E007F}|\uFE0F?\u20E3?)`;
+const emojiRegex = new RegExp(r`\p{RI}{2}|(?![#*\d](?!\uFE0F?\u20E3))${base}(?:\u200D${base})*`, 'gu');
 
 function seqOrText<Parsers extends P.Parser<unknown>[]>(...parsers: Parsers): P.Parser<SeqParseResult<Parsers> | string> {
 	return new P.Parser<SeqParseResult<Parsers> | string>((input, index, state) => {
@@ -457,8 +455,7 @@ export const language = P.createLanguage<TypeTable>({
 	},
 
 	unicodeEmoji: () => {
-		const emoji = RegExp(twemojiRegex.source);
-		return P.regexp(emoji).map(content => {
+		return P.regexp(emojiRegex).map(content => {
 			// 異体字セレクタ(U+FE0F)の場合は文字として返す
 			return content === '\uFE0F' ? content : M.UNI_EMOJI(content);
 		});
