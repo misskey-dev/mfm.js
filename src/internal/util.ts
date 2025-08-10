@@ -51,6 +51,12 @@ export function stringifyNode(node: MfmNode): string {
 		case 'center': {
 			return `<center>\n${ stringifyTree(node.children) }\n</center>`;
 		}
+		case 'list': {
+			return stringifyTree(node.children);
+		}
+		case 'listItem': {
+			return `- ${ stringifyTree(node.children) }`;
+		}
 		// inline
 		case 'emojiCode': {
 			return `:${ node.props.name }:`;
