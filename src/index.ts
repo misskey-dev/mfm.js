@@ -21,6 +21,7 @@ export {
 	MfmCodeBlock,
 	MfmMathBlock,
 	MfmCenter,
+	MfmList,
 
 	// inline
 	MfmUnicodeEmoji,
