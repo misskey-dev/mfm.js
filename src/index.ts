@@ -47,6 +47,7 @@ export {
 	CODE_BLOCK,
 	MATH_BLOCK,
 	CENTER,
+	LIST,
 
 	// inline
 	UNI_EMOJI,
