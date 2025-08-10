@@ -265,7 +265,7 @@ export const language = P.createLanguage<TypeTable>({
 	},
 
 	list: r => {
-		const listItem: M.MfmListItem = P.seq(
+		const listItem: P.Parser<M.MfmListItem> = P.seq(
 			P.str('-'),
 			space.option(),
 			P.seq(P.notMatch(newLine), nest(r.inline)).select(1).many(1),
