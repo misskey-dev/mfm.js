@@ -270,7 +270,7 @@ export const language = P.createLanguage<TypeTable>({
 			space.option(),
 			P.seq(P.notMatch(newLine), nest(r.inline)).select(1).many(1),
 		).select(2).map(result => {
-			return M.LIST_ITEM(result);
+			return M.LIST_ITEM(mergeText(result));
 		});
 		return P.seq(
 			newLine.option(),
