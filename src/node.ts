@@ -206,7 +206,7 @@ export const TEXT = (value: string): NodeType<'text'> => { return { type: 'text'
 export type NodeType<T extends MfmNode['type']> =
 	T extends 'quote' ? MfmQuote :
 	T extends 'list' ? MfmList :
-	T extends 'listItem' ? MfmList :
+	T extends 'listItem' ? MfmListItem :
 	T extends 'search' ? MfmSearch :
 	T extends 'blockCode' ? MfmCodeBlock :
 	T extends 'mathBlock' ? MfmMathBlock :
