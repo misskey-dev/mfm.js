@@ -2,9 +2,9 @@ export type MfmNode = MfmBlock | MfmInline;
 
 export type MfmSimpleNode = MfmUnicodeEmoji | MfmEmojiCode | MfmText | MfmPlain;
 
-export type MfmBlock = MfmQuote | MfmSearch | MfmCodeBlock | MfmMathBlock | MfmCenter;
+export type MfmBlock = MfmQuote | MfmSearch | MfmCodeBlock | MfmMathBlock | MfmCenter | MfmList;
 
-const blockTypes: MfmNode['type'][] = ['quote', 'search', 'blockCode', 'mathBlock', 'center'];
+const blockTypes: MfmNode['type'][] = ['quote', 'search', 'blockCode', 'mathBlock', 'center', 'list'];
 export function isMfmBlock(node: MfmNode): node is MfmBlock {
 	return blockTypes.includes(node.type);
 }
@@ -198,6 +198,7 @@ export const TEXT = (value: string): NodeType<'text'> => { return { type: 'text'
 
 export type NodeType<T extends MfmNode['type']> =
 	T extends 'quote' ? MfmQuote :
+	T extends 'list' ? MfmList :
 	T extends 'search' ? MfmSearch :
 	T extends 'blockCode' ? MfmCodeBlock :
 	T extends 'mathBlock' ? MfmMathBlock :
