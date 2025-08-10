@@ -144,7 +144,7 @@ export const language = P.createLanguage<TypeTable>({
 			r.inlineCode,
 			// ">" block
 			r.quote,
-			// "-"
+			// "-" block
 			r.list,
 			// "\\[" block
 			r.mathBlock,
