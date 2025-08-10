@@ -19,9 +19,9 @@ export const QUOTE = (children: MfmNode[]): NodeType<'quote'> => { return { type
 export type MfmList = {
 	type: 'list';
 	props?: Record<string, unknown>;
-	children: MfmList[];
+	children: MfmListItem[];
 };
-export const LIST = (children: MfmList[]): NodeType<'list'> => { return { type: 'list', children }; };
+export const LIST = (children: MfmListItem[]): NodeType<'list'> => { return { type: 'list', children }; };
 
 export type MfmListItem = {
 	type: 'listItem';
