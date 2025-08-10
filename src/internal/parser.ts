@@ -265,21 +265,24 @@ export const language = P.createLanguage<TypeTable>({
 	},
 
 	list: r => {
+		return P.seq(
+			newLine.option(),
+			P.lineBegin,
+			r.listItem.sep(newLine, 1),
+			P.lineEnd,
+			newLine.option(),
+		).select(2).map(result => {
+			return M.LIST(result);
+		});
+	},
+
+	listItem: r => {
 		const listItem: P.Parser<M.MfmListItem> = P.seq(
 			P.str('-'),
 			space.option(),
 			P.seq(P.notMatch(newLine), nest(r.inline)).select(1).many(1),
 		).select(2).map(result => {
 			return M.LIST_ITEM(mergeText(result));
-		});
-		return P.seq(
-			newLine.option(),
-			P.lineBegin,
-			listItem.sep(newLine, 1),
-			P.lineEnd,
-			newLine.option(),
-		).select(2).map(result => {
-			return M.LIST(result);
 		});
 	},
 
