@@ -267,11 +267,13 @@ export const language = P.createLanguage<TypeTable>({
 	list: r => {
 		return P.seq(
 			newLine.option(),
+			newLine.option(),
 			P.lineBegin,
 			r.listItem.sep(newLine, 1),
 			P.lineEnd,
 			newLine.option(),
-		).select(2).map(result => {
+			newLine.option(),
+		).select(3).map(result => {
 			return M.LIST(result);
 		});
 	},
