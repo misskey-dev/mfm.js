@@ -16,6 +16,13 @@ export type MfmQuote = {
 };
 export const QUOTE = (children: MfmNode[]): NodeType<'quote'> => { return { type: 'quote', children }; };
 
+export type MfmList = {
+	type: 'list';
+	props?: Record<string, unknown>;
+	children: MfmInline[];
+};
+export const LIST = (children: MfmInline[]): NodeType<'list'> => { return { type: 'list', children }; };
+
 export type MfmSearch = {
 	type: 'search';
 	props: {
