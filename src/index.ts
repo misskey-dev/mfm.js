@@ -22,6 +22,7 @@ export {
 	MfmMathBlock,
 	MfmCenter,
 	MfmList,
+	MfmListItem,
 
 	// inline
 	MfmUnicodeEmoji,
@@ -49,6 +50,7 @@ export {
 	MATH_BLOCK,
 	CENTER,
 	LIST,
+	LIST_ITEM,
 
 	// inline
 	UNI_EMOJI,
