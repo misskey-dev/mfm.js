@@ -72,6 +72,7 @@ interface TypeTable {
 	inline: M.MfmInline | string,
 	quote: M.NodeType<'quote'>,
 	list: M.NodeType<'list'>,
+	listItem: M.NodeType<'listItem'>,
 	codeBlock: M.NodeType<'blockCode'>,
 	mathBlock: M.NodeType<'mathBlock'>,
 	centerTag: M.NodeType<'center'>,
@@ -264,17 +265,20 @@ export const language = P.createLanguage<TypeTable>({
 	},
 
 	list: r => {
-		const lines: P.Parser<string[]> = P.seq(
-			P.lineBegin,
+		const listItem: M.MfmListItem = P.seq(
 			P.str('-'),
 			space.option(),
-			P.seq(P.notMatch(newLine), P.char).select(1).many(0).text(),
-		).select(3).sep(newLine, 1);
+			P.seq(P.notMatch(newLine), nest(r.inline)).select(1).many(1),
+		).select(2).map(result => {
+			return M.LIST_ITEM(result);
+		});
 		return P.seq(
 			newLine.option(),
-			lines,
+			P.lineBegin,
+			listItem.sep(newLine, 1),
+			P.lineEnd,
 			newLine.option(),
-		).select(1).map(result => {
+		).select(2).map(result => {
 			return M.LIST(result);
 		});
 	},
