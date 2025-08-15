@@ -770,10 +770,14 @@ export const language = P.createLanguage<TypeTable>({
 	},
 
 	search: () => {
-		const button = P.alt([
-			P.regexp(/\[(検索|search)\]/i),
-			P.regexp(/(検索|search)/i),
-		]);
+		const button = P.seq(
+			P.str('['),
+			P.alt([
+				P.str('検索'),
+				P.str('search'),
+			]),
+			P.str(']'),
+		).text();
 		return P.seq(
 			newLine.option(),
 			P.lineBegin,
