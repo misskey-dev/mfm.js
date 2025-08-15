@@ -185,7 +185,7 @@ hoge`;
 	describe('search', () => {
 		describe('検索構文を使用できる', () => {
 			test('Search', () => {
-				const input = 'MFM 書き方 123 Search';
+				const input = 'MFM 書き方 123 [Search]';
 				const output = [
 					SEARCH('MFM 書き方 123', input)
 				];
@@ -198,22 +198,8 @@ hoge`;
 				];
 				assert.deepStrictEqual(mfm.parse(input), output);
 			});
-			test('search', () => {
-				const input = 'MFM 書き方 123 search';
-				const output = [
-					SEARCH('MFM 書き方 123', input)
-				];
-				assert.deepStrictEqual(mfm.parse(input), output);
-			});
 			test('[search]', () => {
 				const input = 'MFM 書き方 123 [search]';
-				const output = [
-					SEARCH('MFM 書き方 123', input)
-				];
-				assert.deepStrictEqual(mfm.parse(input), output);
-			});
-			test('検索', () => {
-				const input = 'MFM 書き方 123 検索';
 				const output = [
 					SEARCH('MFM 書き方 123', input)
 				];
@@ -228,10 +214,10 @@ hoge`;
 			});
 		});
 		test('ブロックの前後にあるテキストが正しく解釈される', () => {
-			const input = 'abc\nhoge piyo bebeyo 検索\n123';
+			const input = 'abc\nhoge piyo bebeyo [検索]\n123';
 			const output = [
 				TEXT('abc'),
-				SEARCH('hoge piyo bebeyo', 'hoge piyo bebeyo 検索'),
+				SEARCH('hoge piyo bebeyo', 'hoge piyo bebeyo [検索]'),
 				TEXT('123')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
