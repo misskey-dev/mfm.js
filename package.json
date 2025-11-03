@@ -35,7 +35,7 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@twemoji/parser": "16.0.0"
+    "@twemoji/parser": "17.0.0"
   },
   "files": [
     "built",

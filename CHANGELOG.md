@@ -11,6 +11,8 @@
 
 -->
 ## 0.x.x (unreleased)
+### Features
+- Supports Unicode 17.0 emoji
 
 ## 0.25.0
 ### Features
