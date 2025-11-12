@@ -71,6 +71,8 @@ interface TypeTable {
 	simple: M.MfmSimpleNode | string,
 	inline: M.MfmInline | string,
 	quote: M.NodeType<'quote'>,
+	list: M.NodeType<'list'>,
+	listItem: M.NodeType<'listItem'>,
 	codeBlock: M.NodeType<'blockCode'>,
 	mathBlock: M.NodeType<'mathBlock'>,
 	centerTag: M.NodeType<'center'>,
@@ -142,6 +144,8 @@ export const language = P.createLanguage<TypeTable>({
 			r.inlineCode,
 			// ">" block
 			r.quote,
+			// "-" block
+			r.list,
 			// "\\[" block
 			r.mathBlock,
 			// "\\("
@@ -257,6 +261,30 @@ export const language = P.createLanguage<TypeTable>({
 				return result;
 			}
 			return P.success(quoteIndex, M.QUOTE(mergeText(result.value)));
+		});
+	},
+
+	list: r => {
+		return P.seq(
+			newLine.option(),
+			newLine.option(),
+			P.lineBegin,
+			r.listItem.sep(newLine, 1),
+			P.lineEnd,
+			newLine.option(),
+			newLine.option(),
+		).select(3).map(result => {
+			return M.LIST(result);
+		});
+	},
+
+	listItem: r => {
+		return P.seq(
+			P.str('-'),
+			space.option(),
+			P.seq(P.notMatch(newLine), nest(r.inline)).select(1).many(1),
+		).select(2).map(result => {
+			return M.LIST_ITEM(mergeText(result));
 		});
 	},
 

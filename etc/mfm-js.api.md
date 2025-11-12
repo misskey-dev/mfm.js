@@ -41,6 +41,12 @@ export const ITALIC: (children: MfmInline[]) => NodeType<"italic">;
 export const LINK: (silent: boolean, url: string, children: MfmInline[]) => NodeType<"link">;
 
 // @public (undocumented)
+export const LIST: (children: MfmListItem[]) => NodeType<"list">;
+
+// @public (undocumented)
+export const LIST_ITEM: (children: MfmInline[]) => NodeType<"listItem">;
+
+// @public (undocumented)
 export const MATH_BLOCK: (formula: string) => NodeType<"mathBlock">;
 
 // @public (undocumented)
@@ -50,7 +56,7 @@ export const MATH_INLINE: (formula: string) => NodeType<"mathInline">;
 export const MENTION: (username: string, host: string | null, acct: string) => NodeType<"mention">;
 
 // @public (undocumented)
-export type MfmBlock = MfmQuote | MfmSearch | MfmCodeBlock | MfmMathBlock | MfmCenter;
+export type MfmBlock = MfmQuote | MfmSearch | MfmCodeBlock | MfmMathBlock | MfmCenter | MfmList | MfmListItem;
 
 // @public (undocumented)
 export type MfmBold = {
@@ -130,6 +136,20 @@ export type MfmLink = {
         silent: boolean;
         url: string;
     };
+    children: MfmInline[];
+};
+
+// @public (undocumented)
+export type MfmList = {
+    type: 'list';
+    props?: Record<string, unknown>;
+    children: MfmListItem[];
+};
+
+// @public (undocumented)
+export type MfmListItem = {
+    type: 'listItem';
+    props?: Record<string, unknown>;
     children: MfmInline[];
 };
 
@@ -238,7 +258,7 @@ export type MfmUrl = {
 export const N_URL: (value: string, brackets?: boolean) => NodeType<"url">;
 
 // @public (undocumented)
-export type NodeType<T extends MfmNode['type']> = T extends 'quote' ? MfmQuote : T extends 'search' ? MfmSearch : T extends 'blockCode' ? MfmCodeBlock : T extends 'mathBlock' ? MfmMathBlock : T extends 'center' ? MfmCenter : T extends 'unicodeEmoji' ? MfmUnicodeEmoji : T extends 'emojiCode' ? MfmEmojiCode : T extends 'bold' ? MfmBold : T extends 'small' ? MfmSmall : T extends 'italic' ? MfmItalic : T extends 'strike' ? MfmStrike : T extends 'inlineCode' ? MfmInlineCode : T extends 'mathInline' ? MfmMathInline : T extends 'mention' ? MfmMention : T extends 'hashtag' ? MfmHashtag : T extends 'url' ? MfmUrl : T extends 'link' ? MfmLink : T extends 'fn' ? MfmFn : T extends 'plain' ? MfmPlain : T extends 'text' ? MfmText : never;
+export type NodeType<T extends MfmNode['type']> = T extends 'quote' ? MfmQuote : T extends 'list' ? MfmList : T extends 'listItem' ? MfmListItem : T extends 'search' ? MfmSearch : T extends 'blockCode' ? MfmCodeBlock : T extends 'mathBlock' ? MfmMathBlock : T extends 'center' ? MfmCenter : T extends 'unicodeEmoji' ? MfmUnicodeEmoji : T extends 'emojiCode' ? MfmEmojiCode : T extends 'bold' ? MfmBold : T extends 'small' ? MfmSmall : T extends 'italic' ? MfmItalic : T extends 'strike' ? MfmStrike : T extends 'inlineCode' ? MfmInlineCode : T extends 'mathInline' ? MfmMathInline : T extends 'mention' ? MfmMention : T extends 'hashtag' ? MfmHashtag : T extends 'url' ? MfmUrl : T extends 'link' ? MfmLink : T extends 'fn' ? MfmFn : T extends 'plain' ? MfmPlain : T extends 'text' ? MfmText : never;
 
 // @public (undocumented)
 export function parse(input: string, opts?: Partial<{

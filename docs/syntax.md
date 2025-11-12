@@ -2,6 +2,7 @@
 
 ブロック構文:
 - [引用ブロック](#quote)
+- [リスト](#list)
 - [検索ブロック](#search)
 - [コードブロック](#code-block)
 - [数式ブロック](#math-block)
@@ -48,6 +49,37 @@
   type: 'quote',
   children: [
     { type: 'text', props: { text: 'abc' } }
+  ]
+}
+```
+
+
+
+<h1 id="list">Block: リスト</h1>
+
+## 形式
+```
+- abc
+-123
+```
+
+## ノード
+```js
+{
+  type: 'list',
+  children: [
+		{
+			type: 'listItem',
+			children: [
+    		{ type: 'text', props: { text: 'abc' } }
+			]
+		},
+		{
+			type: 'listItem',
+			children: [
+    		{ type: 'text', props: { text: '123' } }
+			]
+		}
   ]
 }
 ```

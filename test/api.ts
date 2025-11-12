@@ -36,6 +36,13 @@ after`;
 			assert.strictEqual(mfm.toString(mfm.parse(input)), '> abc\n> \n> 123');
 		});
 
+		test('list', () => {
+			const input = `
+- item1
+- item2
+`;
+			assert.strictEqual(mfm.toString(mfm.parse(input)), '- item1\n- item2');
+		});
 
 		test('search', () => {
 			const input = 'MFM 書き方 123 Search';

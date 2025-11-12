@@ -2,7 +2,7 @@ import { describe, test } from 'vitest';
 import assert from 'assert';
 import * as mfm from '../src/index';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE, MATH_INLINE, PLAIN
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE, MATH_INLINE, PLAIN, LIST, LIST_ITEM
 } from '../src/index';
 
 describe('SimpleParser', () => {
@@ -177,6 +177,138 @@ hoge`;
 					TEXT('bar')
 				]),
 				TEXT('hoge'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
+
+	describe('list', () => {
+		test('1行のリストを使用できる', () => {
+			const input = '- abc';
+			const output = [
+				LIST([
+					LIST_ITEM([
+						TEXT('abc'),
+					]),
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('2行のリストを使用できる', () => {
+			const input = '- abc\n- 123';
+			const output = [
+				LIST([
+					LIST_ITEM([
+						TEXT('abc'),
+					]),
+					LIST_ITEM([
+						TEXT('123'),
+					]),
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('リストはブロックをネストできない', () => {
+			const input = `
+- <center>
+- a
+- </center>
+`;
+			const output = [
+				LIST([
+					LIST_ITEM([
+						TEXT('<center>'),
+					]),
+					LIST_ITEM([
+						TEXT('a'),
+					]),
+					LIST_ITEM([
+						TEXT('</center>'),
+					])
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('リストはインライン構文を含んだテキストをネストできる', () => {
+			const input = `
+- I'm @ai, An bot of misskey!
+`;
+			const output = [
+				LIST([
+					LIST_ITEM([
+						TEXT('I\'m '),
+						MENTION('ai', null, '@ai'),
+						TEXT(', An bot of misskey!'),
+					])
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('リスト項目を空にはできない', () => {
+			const input = '- ';
+			const output = [
+				TEXT('- ')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('リストの前の空行は無視される', () => {
+			const input = `hoge
+
+- foo
+- bar
+`;
+			const output = [
+				TEXT('hoge'),
+				LIST([
+					LIST_ITEM([
+						TEXT('foo'),
+					]),
+					LIST_ITEM([
+						TEXT('bar'),
+					]),
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('リストの後ろの空行は無視される', () => {
+			const input = `
+- foo
+- bar
+
+hoge`;
+			const output = [
+				LIST([
+					LIST_ITEM([
+						TEXT('foo'),
+					]),
+					LIST_ITEM([
+						TEXT('bar'),
+					]),
+				]),
+				TEXT('hoge'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('2つのリスト項目の間に空行があれば2つのリストが生成される', () => {
+			const input = '- abc\n\n- 123';
+			const output = [
+				LIST([
+					LIST_ITEM([
+						TEXT('abc'),
+					]),
+				]),
+				LIST([
+					LIST_ITEM([
+						TEXT('123'),
+					]),
+				]),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});

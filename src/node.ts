@@ -2,9 +2,9 @@ export type MfmNode = MfmBlock | MfmInline;
 
 export type MfmSimpleNode = MfmUnicodeEmoji | MfmEmojiCode | MfmText | MfmPlain;
 
-export type MfmBlock = MfmQuote | MfmSearch | MfmCodeBlock | MfmMathBlock | MfmCenter;
+export type MfmBlock = MfmQuote | MfmSearch | MfmCodeBlock | MfmMathBlock | MfmCenter | MfmList | MfmListItem;
 
-const blockTypes: MfmNode['type'][] = ['quote', 'search', 'blockCode', 'mathBlock', 'center'];
+const blockTypes: MfmNode['type'][] = ['quote', 'search', 'blockCode', 'mathBlock', 'center', 'list', 'listItem'];
 export function isMfmBlock(node: MfmNode): node is MfmBlock {
 	return blockTypes.includes(node.type);
 }
@@ -15,6 +15,20 @@ export type MfmQuote = {
 	children: MfmNode[];
 };
 export const QUOTE = (children: MfmNode[]): NodeType<'quote'> => { return { type: 'quote', children }; };
+
+export type MfmList = {
+	type: 'list';
+	props?: Record<string, unknown>;
+	children: MfmListItem[];
+};
+export const LIST = (children: MfmListItem[]): NodeType<'list'> => { return { type: 'list', children }; };
+
+export type MfmListItem = {
+	type: 'listItem';
+	props?: Record<string, unknown>;
+	children: MfmInline[];
+};
+export const LIST_ITEM = (children: MfmInline[]): NodeType<'listItem'> => { return { type: 'listItem', children }; };
 
 export type MfmSearch = {
 	type: 'search';
@@ -191,6 +205,8 @@ export const TEXT = (value: string): NodeType<'text'> => { return { type: 'text'
 
 export type NodeType<T extends MfmNode['type']> =
 	T extends 'quote' ? MfmQuote :
+	T extends 'list' ? MfmList :
+	T extends 'listItem' ? MfmListItem :
 	T extends 'search' ? MfmSearch :
 	T extends 'blockCode' ? MfmCodeBlock :
 	T extends 'mathBlock' ? MfmMathBlock :
