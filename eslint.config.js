@@ -11,6 +11,7 @@ export default [ // eslint-disable-line import/no-default-export
 			'src/@types/package.json.d.ts',
 			'built',
 			'vitest.config.ts',
+			'tsdown.config.ts',
 			'test',
 			'test-d',
 		],
