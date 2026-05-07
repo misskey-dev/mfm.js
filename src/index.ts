@@ -64,4 +64,7 @@ export {
 	FN,
 	PLAIN,
 	TEXT,
+
+	// util
+	isMfmBlock,
 } from './node';
