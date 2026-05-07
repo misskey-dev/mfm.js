@@ -35,6 +35,9 @@ export function inspect(node: MfmNode, action: (node: MfmNode) => void): void;
 export function inspect(nodes: MfmNode[], action: (node: MfmNode) => void): void;
 
 // @public (undocumented)
+export function isMfmBlock(node: MfmNode): node is MfmBlock;
+
+// @public (undocumented)
 export const ITALIC: (children: MfmInline[]) => NodeType<"italic">;
 
 // @public (undocumented)
