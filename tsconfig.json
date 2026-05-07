@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "module": "commonjs",
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "bundler",
     "declaration": true,
-    "outDir": "./built/",
+    "rootDir": "./src",
+    "outDir": "./built",
     "removeComments": true,
     "strict": true,
     "strictFunctionTypes": true,

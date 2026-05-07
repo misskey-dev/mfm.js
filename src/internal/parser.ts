@@ -1,9 +1,4 @@
-// NOTE:
-// tsdのテストでファイルを追加しているにも関わらず「@twemoji/parser/dist/lib/regex」の型定義ファイルがないとエラーが出るため、
-// このエラーを無視する。
-/* eslint @typescript-eslint/ban-ts-comment: 1 */
-// @ts-ignore
-import twemojiRegex from '@twemoji/parser/dist/lib/regex';
+import { emojiRegex } from '@misskey-dev/emoji-data';
 
 import * as M from '..';
 import * as P from './core';
@@ -457,7 +452,7 @@ export const language = P.createLanguage<TypeTable>({
 	},
 
 	unicodeEmoji: () => {
-		const emoji = RegExp(twemojiRegex.source);
+		const emoji = RegExp(emojiRegex.source);
 		return P.regexp(emoji).map(content => {
 			// 異体字セレクタ(U+FE0F)の場合は文字として返す
 			return content === '\uFE0F' ? content : M.UNI_EMOJI(content);

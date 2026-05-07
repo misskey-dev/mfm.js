@@ -2,11 +2,19 @@
   "name": "mfm-js",
   "version": "0.25.0",
   "description": "An MFM parser implementation with TypeScript",
-  "main": "./built/index.js",
+  "type": "module",
+  "main": "./built/index.mjs",
   "types": "./built/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./built/index.mjs",
+      "require": "./built/index.cjs",
+      "types": "./built/index.d.ts"
+    }
+  },
   "scripts": {
-    "build": "npm run tsc",
-    "tsc": "tsc",
+    "build": "tsdown",
+    "tsc": "tsc --noEmit",
     "tsd": "tsd",
     "parse": "node ./built/cli/parse",
     "parse-simple": "node ./built/cli/parseSimple",
@@ -23,19 +31,20 @@
   "author": "Marihachi",
   "license": "MIT",
   "devDependencies": {
-    "@microsoft/api-extractor": "7.52.9",
+    "@microsoft/api-extractor": "7.58.7",
     "@misskey-dev/eslint-plugin": "^2.1.0",
-    "@types/node": "22.13.14",
-    "@typescript-eslint/eslint-plugin": "8.38.0",
-    "@typescript-eslint/parser": "8.38.0",
-    "@vitest/coverage-v8": "^3.2.4",
-    "eslint": "9.32.0",
-    "tsd": "0.32.0",
-    "typescript": "5.8.3",
-    "vitest": "^3.2.4"
+    "@types/node": "22.19.17",
+    "@typescript-eslint/eslint-plugin": "8.59.1",
+    "@typescript-eslint/parser": "8.59.1",
+    "@vitest/coverage-v8": "4.1.5",
+    "eslint": "9.39.4",
+    "tsd": "0.33.0",
+    "tsdown": "^0.21.10",
+    "typescript": "5.9.3",
+    "vitest": "4.1.5"
   },
   "dependencies": {
-    "@twemoji/parser": "17.0.0"
+    "@misskey-dev/emoji-data": "17.0.0"
   },
   "files": [
     "built",
