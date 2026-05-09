@@ -5,7 +5,7 @@
   ],
   timezone: 'Asia/Tokyo',
   schedule: [
-    '0 0 * * *',
+    '* 0-3 * * *',
   ],
   prHourlyLimit: 5,
   labels: [
@@ -20,7 +20,7 @@
     {
       groupName: 'Non-breaking updates',
       matchUpdateTypes: [
-				'minor',
+        'minor',
         'patch',
         'digest',
       ],
