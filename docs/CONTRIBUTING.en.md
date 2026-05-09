@@ -23,8 +23,8 @@ Thank you for your PR! Before creating a PR, please check the following:
 - Check if there are any documents that need to be created or updated due to this change.
 - If you have added a feature or fixed a bug, please add a test case if possible.
 - Please make sure that tests and Lint are passed in advance.
-  - You can run it with `npm run test` and `npm run lint`.
-- Run `npm run api` to update the API report and commit it if there are any diffs.
+  - You can run it with `pnpm run test` and `pnpm run lint`.
+- Run `pnpm run api` to update the API report and commit it if there are any diffs.
 
 Thanks for your cooperation 🤗
 

@@ -3,6 +3,7 @@
   "version": "0.26.0",
   "description": "An MFM parser implementation with TypeScript",
   "type": "module",
+  "packageManager": "pnpm@10.33.4",
   "main": "./built/index.mjs",
   "types": "./built/index.d.ts",
   "exports": {
@@ -18,11 +19,11 @@
     "tsd": "tsd",
     "parse": "node ./built/cli/parse",
     "parse-simple": "node ./built/cli/parseSimple",
-    "api": "npx api-extractor run --local --verbose",
-    "api-prod": "npx api-extractor run --verbose",
+    "api": "pnpm exec api-extractor run --local --verbose",
+    "api-prod": "pnpm exec api-extractor run --verbose",
     "lint": "eslint",
     "vitest": "vitest run --coverage",
-    "test": "npm run vitest && npm run tsd"
+    "test": "pnpm run vitest && pnpm run tsd"
   },
   "repository": {
     "type": "git",
