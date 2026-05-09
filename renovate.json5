@@ -5,7 +5,7 @@
   ],
   timezone: 'Asia/Tokyo',
   schedule: [
-    '* 0 * * *',
+    '0 0 * * *',
   ],
   prHourlyLimit: 5,
   labels: [
