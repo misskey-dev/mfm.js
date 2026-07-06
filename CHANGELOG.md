@@ -10,7 +10,11 @@
 ### Bugfixes
 
 -->
-## 0.x.x (unreleased)
+## 0.27.0
+### Bugfixes
+- Bring back CLI commands that are accidentally removed in 0.26.0
+- Update dependencies
+  - Fix `👁️‍🗨️` (eye in speech bubble) not recognized correctly
 
 ## 0.26.0
 ### Features
