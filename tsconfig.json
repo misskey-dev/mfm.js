@@ -13,6 +13,7 @@
     "experimentalDecorators": true,
     "noImplicitReturns": true,
     "esModuleInterop": true,
+    "types": ["node"],
   },
   "typeRoots": [
     "node_modules/@types",
