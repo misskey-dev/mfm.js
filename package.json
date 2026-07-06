@@ -3,7 +3,7 @@
   "version": "0.26.0",
   "description": "An MFM parser implementation with TypeScript",
   "type": "module",
-  "packageManager": "pnpm@10.33.4",
+  "packageManager": "pnpm@11.5.3",
   "main": "./built/index.mjs",
   "types": "./built/index.d.ts",
   "exports": {
