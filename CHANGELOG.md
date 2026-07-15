@@ -10,16 +10,28 @@
 ### Bugfixes
 
 -->
-## 0.24.1
-
+## 0.x.x (unreleased)
 ### Features
 - URL node with silence with `?<url>`
 
+## 0.26.0
+### Features
+- Supports Unicode 17.0 emoji
+
 ### Improvements
+- Expose `isMfmBlock` utility.
 
 ### Changes
+- Package now ships both ESM and CJS builds.
+- Package now exposes main entry point only. Other independent files are no longer importable.
 
-### Bugfixes
+## 0.25.0
+### Features
+- Supports Unicode 15.1 and 16.0 emoji
+
+### Changes
+- allow `.` in mentions (like `@bsky.brid.gy@bsky.brid.gy`)
+- Heterograph selectors (`U+FE0F`) adjacent to unicode emojis is now treated as character strings
 
 ## 0.24.0
 ### Features

@@ -3,6 +3,7 @@
  * with https://github.com/SamVerschueren/tsd
  */
 
+import { describe, test } from 'vitest';
 import { expectType } from 'tsd';
 import { NodeType, MfmUrl } from '../src';
 import * as P from '../src/internal/core';

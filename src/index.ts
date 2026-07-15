@@ -6,7 +6,7 @@ export {
 	extract,
 } from './api';
 
-export {
+export type {
 	NodeType,
 	MfmNode,
 	MfmSimpleNode,
@@ -14,7 +14,7 @@ export {
 	MfmInline,
 } from './node';
 
-export {
+export type {
 	// block
 	MfmQuote,
 	MfmSearch,
@@ -64,4 +64,7 @@ export {
 	FN,
 	PLAIN,
 	TEXT,
+
+	// util
+	isMfmBlock,
 } from './node';

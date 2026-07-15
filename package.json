@@ -1,20 +1,29 @@
 {
   "name": "mfm-js",
-  "version": "0.24.0",
+  "version": "0.26.0",
   "description": "An MFM parser implementation with TypeScript",
-  "main": "./built/index.js",
+  "type": "module",
+  "packageManager": "pnpm@11.8.0",
+  "main": "./built/index.mjs",
   "types": "./built/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./built/index.mjs",
+      "require": "./built/index.cjs",
+      "types": "./built/index.d.ts"
+    }
+  },
   "scripts": {
-    "build": "npm run tsc",
-    "tsc": "tsc",
+    "build": "tsdown",
+    "tsc": "tsc --noEmit",
     "tsd": "tsd",
-    "parse": "node ./built/cli/parse",
-    "parse-simple": "node ./built/cli/parseSimple",
-    "api": "npx api-extractor run --local --verbose",
-    "api-prod": "npx api-extractor run --verbose",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "jest": "jest --coverage",
-    "test": "npm run jest && npm run tsd"
+    "parse": "node ./built/cli/parse.cjs",
+    "parse-simple": "node ./built/cli/parseSimple.cjs",
+    "api": "pnpm exec api-extractor run --local --verbose",
+    "api-prod": "pnpm exec api-extractor run --verbose",
+    "lint": "eslint",
+    "vitest": "vitest run --coverage",
+    "test": "pnpm run vitest && pnpm run tsd"
   },
   "repository": {
     "type": "git",
@@ -23,20 +32,20 @@
   "author": "Marihachi",
   "license": "MIT",
   "devDependencies": {
-    "@microsoft/api-extractor": "7.38.5",
-    "@types/jest": "29.5.11",
-    "@types/node": "20.10.5",
-    "@typescript-eslint/eslint-plugin": "6.14.0",
-    "@typescript-eslint/parser": "6.14.0",
-    "eslint": "8.56.0",
-    "jest": "29.7.0",
-    "ts-jest": "29.1.1",
-    "ts-node": "10.9.2",
-    "tsd": "0.30.0",
-    "typescript": "5.3.3"
+    "@microsoft/api-extractor": "7.58.9",
+    "@misskey-dev/eslint-plugin": "^2.1.0",
+    "@types/node": "22.20.0",
+    "@typescript-eslint/eslint-plugin": "8.62.0",
+    "@typescript-eslint/parser": "8.62.0",
+    "@vitest/coverage-v8": "4.1.9",
+    "eslint": "9.39.4",
+    "tsd": "0.33.0",
+    "tsdown": "^0.21.10",
+    "typescript": "5.9.3",
+    "vitest": "4.1.9"
   },
   "dependencies": {
-    "@twemoji/parser": "15.0.0"
+    "@misskey-dev/emoji-data": "17.0.5"
   },
   "files": [
     "built",

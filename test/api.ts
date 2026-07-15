@@ -1,3 +1,4 @@
+import { describe, test } from 'vitest';
 import assert from 'assert';
 import * as mfm from '../src/index';
 import {
