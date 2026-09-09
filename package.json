@@ -42,7 +42,7 @@
     "tsd": "0.33.0",
     "tsdown": "^0.21.10",
     "typescript": "5.9.3",
-    "vitest": "4.1.9"
+    "vitest": "4.1.11"
   },
   "dependencies": {
     "@misskey-dev/emoji-data": "17.0.5"
