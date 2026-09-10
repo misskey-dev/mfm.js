@@ -11,6 +11,7 @@ type Args = Record<string, string | true>;
 const space = P.regexp(/[\u0020\u3000\t]/);
 const alphaAndNum = P.regexp(/[a-z0-9]/i);
 const newLine = P.alt([P.crlf, P.cr, P.lf]);
+const asciiPunctuation = P.regexp(/[!#$%&'()*+,-./:;<=>?@\[\\\]^_`{|}~]/);
 
 function seqOrText<Parsers extends P.Parser<unknown>[]>(...parsers: Parsers): P.Parser<SeqParseResult<Parsers> | string> {
 	return new P.Parser<SeqParseResult<Parsers> | string>((input, index, state) => {
@@ -789,5 +790,10 @@ export const language = P.createLanguage<TypeTable>({
 		});
 	},
 
-	text: () => P.char,
+	text: () => {
+		return P.alt([
+			P.seq(P.str('\\'), asciiPunctuation).select(1),
+			P.char,
+		]);
+	},
 });

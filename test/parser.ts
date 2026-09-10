@@ -303,14 +303,14 @@ hoge`;
 		test('行末以外に閉じタグがある場合はマッチしない', () => {
 			const input = '\\[aaa\\]after';
 			const output = [
-				TEXT('\\[aaa\\]after')
+				TEXT('[aaa]after')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 		test('行頭以外に開始タグがある場合はマッチしない', () => {
 			const input = 'before\\[aaa\\]';
 			const output = [
-				TEXT('before\\[aaa\\]')
+				TEXT('before[aaa]')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
@@ -1084,6 +1084,28 @@ hoge`;
 				TEXT('.')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with escaped text', () => {
+			const input = 'Ai said: ["Misskey.io \\[is\\] the official instance"](https://xn--931a.moe/).';
+			const output = [
+				TEXT('Ai said: '),
+				LINK(false, 'https://xn--931a.moe/', [
+					TEXT('"Misskey.io [is] the official instance"')
+				]),
+				TEXT('.')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with double escaped text', () => {
+			const input = 'Ai said: ["Misskey.io \\\\[is\\\\] the official instance"](https://xn--931a.moe/).';
+			const output = [
+				TEXT('Ai said: '),
+				LINK(false, 'https://xn--931a.moe/', [
+					TEXT('"Misskey.io \\[is\\] the official instance"')
+				]),
+			];
 		});
 
 		test('with angle brackets url', () => {
