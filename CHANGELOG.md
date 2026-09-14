@@ -11,6 +11,8 @@
 
 -->
 ## 0.x.x (unreleased)
+### Features
+- URL node with silence with `?<url>`
 
 ## 0.26.0
 ### Features
