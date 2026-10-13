@@ -21,7 +21,7 @@
     "parse-simple": "node ./built/cli/parseSimple.cjs",
     "api": "pnpm exec api-extractor run --local --verbose",
     "api-prod": "pnpm exec api-extractor run --verbose",
-    "lint": "eslint",
+    "lint": "oxlint",
     "vitest": "vitest run --coverage",
     "test": "pnpm run vitest && pnpm run tsd"
   },
@@ -32,20 +32,20 @@
   "author": "Marihachi",
   "license": "MIT",
   "devDependencies": {
-    "@microsoft/api-extractor": "7.58.9",
-    "@misskey-dev/eslint-plugin": "^2.1.0",
-    "@types/node": "22.20.0",
-    "@typescript-eslint/eslint-plugin": "8.62.0",
-    "@typescript-eslint/parser": "8.62.0",
-    "@vitest/coverage-v8": "4.1.9",
-    "eslint": "9.39.4",
+    "@microsoft/api-extractor": "7.59.4",
+    "@misskey-dev/oxlint-fmt-config": "0.1.1",
+    "@stylistic/eslint-plugin": "5.10.0",
+    "@types/node": "26.6.5",
+    "@vitest/coverage-v8": "5.0.3",
+    "oxlint": "1.87.0",
+    "oxlint-tsgolint": "7.0.2004",
     "tsd": "0.33.0",
-    "tsdown": "^0.21.10",
-    "typescript": "5.9.3",
-    "vitest": "4.1.11"
+    "tsdown": "0.23.1",
+    "typescript": "7.0.2",
+    "vitest": "5.0.3"
   },
   "dependencies": {
-    "@misskey-dev/emoji-data": "17.0.5"
+    "@misskey-dev/emoji-data": "17.0.3"
   },
   "files": [
     "built",
