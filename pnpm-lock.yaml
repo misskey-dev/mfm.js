@@ -16,10 +16,10 @@ importers:
         specifier: 7.59.4
         version: 7.59.4(@types/node@26.6.5)
       '@misskey-dev/oxlint-fmt-config':
-        specifier: ^0.1.1
+        specifier: 0.1.1
         version: 0.1.1(@stylistic/eslint-plugin@5.10.0(eslint@9.39.4))(oxlint-tsgolint@7.0.2004)(oxlint@1.87.0(oxlint-tsgolint@7.0.2004))
       '@stylistic/eslint-plugin':
-        specifier: ^5.10.0
+        specifier: 5.10.0
         version: 5.10.0(eslint@9.39.4)
       '@types/node':
         specifier: 26.6.5
@@ -28,16 +28,16 @@ importers:
         specifier: 5.0.3
         version: 5.0.3(vitest@5.0.3)
       oxlint:
-        specifier: ^1.87.0
+        specifier: 1.87.0
         version: 1.87.0(oxlint-tsgolint@7.0.2004)
       oxlint-tsgolint:
-        specifier: ^7.0.2004
+        specifier: 7.0.2004
         version: 7.0.2004
       tsd:
         specifier: 0.33.0
         version: 0.33.0
       tsdown:
-        specifier: ^0.23.1
+        specifier: 0.23.1
         version: 0.23.1(typescript@7.0.2)(unrun@0.2.37)
       typescript:
         specifier: 7.0.2
