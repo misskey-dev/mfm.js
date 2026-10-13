@@ -2,7 +2,7 @@ name: Publish Node.js Package
 
 on:
   release:
-    types: [created]
+    types: [published]
 
   workflow_dispatch:
 
@@ -20,6 +20,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Install pnpm
         uses: pnpm/action-setup@v6
         with:
@@ -28,7 +30,7 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+          package-manager-cache: false
           registry-url: 'https://registry.npmjs.org'
 
       # Ensure npm 11.5.1 or later is installed
@@ -37,6 +39,6 @@ jobs:
 
       - name: Publish package
         run: |
-          pnpm i --frozen-lockfile
+          pnpm i --frozen-lockfile --ignore-scripts
           pnpm build
           pnpm publish --access public --no-git-checks --provenance
