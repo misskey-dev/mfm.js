@@ -49,7 +49,7 @@ function nest<T>(parser: P.Parser<T>, fallback?: P.Parser<string>): P.Parser<T |
 	// nesting limited? -> No: specified parser, Yes: fallback parser (default = P.char)
 	const inner = P.alt([
 		P.seq(nestable, parser).select(1),
-		(fallback != null) ? fallback : P.char,
+		fallback ?? P.char,
 	]);
 	return new P.Parser<T | string>((input, index, state) => {
 		state.depth++;
@@ -491,7 +491,7 @@ export const language = P.createLanguage<TypeTable>({
 		).map(result => {
 			return {
 				k: result[0],
-				v: (result[1] != null) ? result[1] : true,
+				v: result[1] ?? true,
 			};
 		});
 		const args = P.seq(
