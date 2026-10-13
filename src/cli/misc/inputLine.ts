@@ -6,7 +6,7 @@ export class InputCanceledError extends Error {
 	}
 }
 
-export default function(message: string): Promise<string> {
+export default function (message: string): Promise<string> {
 	return new Promise<string>((resolve, reject) => {
 		const rl = readLine.createInterface(process.stdin, process.stdout);
 		rl.question(message, (ans) => {

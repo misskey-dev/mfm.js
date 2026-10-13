@@ -8,7 +8,7 @@ export type FullParserOpts = {
 
 export function fullParser(input: string, opts: FullParserOpts): M.MfmNode[] {
 	const result = language.fullParser.handler(input, 0, {
-		nestLimit: (opts.nestLimit != null) ? opts.nestLimit : 20,
+		nestLimit: opts.nestLimit ?? 20,
 		depth: 0,
 		linkLabel: false,
 		trace: false,
