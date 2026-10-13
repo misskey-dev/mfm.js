@@ -39,6 +39,6 @@ jobs:
 
       - name: Publish package
         run: |
-          pnpm i --frozen-lockfile --ignore-scripts
+          pnpm i --frozen-lockfile
           pnpm build
           pnpm publish --access public --no-git-checks --provenance
