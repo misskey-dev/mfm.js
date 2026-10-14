@@ -15,6 +15,7 @@ export type Result<T> = Success<T> | Failure;
 interface State {
 	trace?: boolean,
 	linkLabel?: boolean,
+	linkLabelFailures?: Map<string, Map<number, Set<number>>>,
 	nestLimit: number,
 	depth: number,
 }

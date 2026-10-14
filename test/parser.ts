@@ -1225,6 +1225,57 @@ hoge`;
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		})
+
+		test('with unclosed brackets before', () => {
+			const input = '[[[foo] [bar](https://example.com)';
+			const output = [
+				TEXT('[[[foo] '),
+				LINK(false, 'https://example.com', [
+					TEXT('bar')
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with unclosed brackets in label', () => {
+			const input = '[[[foo](https://example.com)';
+			const output = [
+				LINK(false, 'https://example.com', [
+					TEXT('[[foo')
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with unclosed brackets in previous line', () => {
+			const input = '[[foo\n?[[bar](https://example.com)';
+			const output = [
+				TEXT('[[foo\n'),
+				LINK(true, 'https://example.com', [
+					TEXT('[bar')
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with unclosed brackets in bold', () => {
+			const input = '**[[foo** [[bar** **[baz](https://example.com)**';
+			const output = [
+				BOLD([
+					TEXT('[[foo'),
+				]),
+				TEXT(' '),
+				LINK(false, 'https://example.com', [
+					TEXT('[bar'),
+					BOLD([
+						TEXT(' '),
+					]),
+					TEXT('[baz'),
+				]),
+				TEXT('**'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('fn', () => {

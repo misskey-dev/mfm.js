@@ -59,6 +59,22 @@ function nest<T>(parser: P.Parser<T>, fallback?: P.Parser<string>): P.Parser<T |
 	});
 }
 
+function getLinkLabelFailures(input: string, state: Parameters<P.ParserHandler<unknown>>[2]): Set<number> {
+	// boundaries are tracked per input (quote contents are parsed as a separate input) and per depth
+	state.linkLabelFailures ??= new Map();
+	let byDepth = state.linkLabelFailures.get(input);
+	if (byDepth == null) {
+		byDepth = new Map();
+		state.linkLabelFailures.set(input, byDepth);
+	}
+	let failures = byDepth.get(state.depth);
+	if (failures == null) {
+		failures = new Set();
+		byDepth.set(state.depth, failures);
+	}
+	return failures;
+}
+
 interface TypeTable {
 	fullParser: (M.MfmNode | string)[],
 	simpleParser: (M.MfmSimpleNode | string)[],
@@ -678,30 +694,57 @@ export const language = P.createLanguage<TypeTable>({
 			return result;
 		});
 		const closeLabel = P.str(']');
-		const parser = P.seq(
+		const openLabel = P.seq(
 			notLinkLabel,
 			P.alt([P.str('?['), P.str('[')]),
-			P.seq(
-				P.notMatch(P.alt([closeLabel, newLine])),
-				nest(labelInline),
-			).select(1).many(1),
+		).select(1);
+		const labelItem = P.seq(
+			P.notMatch(P.alt([closeLabel, newLine])),
+			nest(labelInline),
+		).select(1);
+		const afterLabel = P.seq(
 			closeLabel,
 			P.str('('),
 			P.alt([r.urlAlt, r.url]),
 			P.str(')'),
-		);
+		).select(2);
 		return new P.Parser<M.MfmLink>((input, index, state) => {
-			const result = parser.handler(input, index, state);
-			if (!result.success) {
+			const openResult = openLabel.handler(input, index, state);
+			if (!openResult.success) {
 				return P.failure();
 			}
 
-			const [, prefix, label,,, url] = result.value;
+			const failedBoundaries = getLinkLabelFailures(input, state);
+			const boundaries: number[] = [];
+			const label: (M.MfmInline | string)[] = [];
+			let latestIndex = openResult.index;
+			while (!failedBoundaries.has(latestIndex)) {
+				boundaries.push(latestIndex);
+				if (latestIndex >= input.length) {
+					break;
+				}
+				const itemResult = labelItem.handler(input, latestIndex, state);
+				if (!itemResult.success) {
+					break;
+				}
+				label.push(itemResult.value);
+				latestIndex = itemResult.index;
+			}
+			if (label.length === 0) {
+				return P.failure();
+			}
 
-			const silent = (prefix === '?[');
-			if (typeof url === 'string') return P.failure();
-			
-			return P.success(result.index, M.LINK(silent, url.props.url, mergeText(label)));
+			const knownFailure = failedBoundaries.has(latestIndex);
+			const afterResult = knownFailure ? P.failure() : afterLabel.handler(input, latestIndex, state);
+			if (!afterResult.success || typeof afterResult.value === 'string') {
+				for (const boundary of boundaries) {
+					failedBoundaries.add(boundary);
+				}
+				return P.failure();
+			}
+
+			const silent = (openResult.value === '?[');
+			return P.success(afterResult.index, M.LINK(silent, afterResult.value.props.url, mergeText(label)));
 		});
 	},
 
