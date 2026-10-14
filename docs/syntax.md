@@ -58,8 +58,6 @@
 
 ## 形式
 ```
-MFM 書き方 Search
-MFM 書き方 検索
 MFM 書き方 [Search]
 MFM 書き方 [検索]
 ```
