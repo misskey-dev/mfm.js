@@ -12,7 +12,8 @@
 -->
 ## 0.27.0
 ### Bugfixes
-- Bring back CLI commands that are accidentally removed in 0.26.0
+- Restore CLI commands that are accidentally removed in 0.26.0
+- Security fixes
 - Update dependencies
 
 ## 0.26.0
