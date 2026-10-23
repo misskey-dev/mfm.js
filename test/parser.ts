@@ -1351,6 +1351,16 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
+		test('with unclosed brackets after hashtag', () => {
+			const input = '[#a$[x';
+			const output = [
+				TEXT('['),
+				HASHTAG('a$'),
+				TEXT('[x'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
 		test('with unclosed brackets in label', () => {
 			const input = '[[[foo](https://example.com)';
 			const output = [
