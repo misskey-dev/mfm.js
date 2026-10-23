@@ -3,7 +3,7 @@
   "version": "0.27.0",
   "description": "An MFM parser implementation with TypeScript",
   "type": "module",
-  "packageManager": "pnpm@12.11.2",
+  "packageManager": "pnpm@12.14.0",
   "main": "./built/index.mjs",
   "types": "./built/index.d.ts",
   "exports": {
@@ -36,13 +36,13 @@
     "@misskey-dev/oxlint-fmt-config": "0.1.1",
     "@stylistic/eslint-plugin": "5.10.0",
     "@types/node": "26.6.5",
-    "@vitest/coverage-v8": "5.0.3",
-    "oxlint": "1.87.0",
+    "@vitest/coverage-v8": "5.0.5",
+    "oxlint": "1.88.0",
     "oxlint-tsgolint": "7.0.2004",
     "tsd": "0.33.0",
     "tsdown": "0.23.1",
     "typescript": "7.0.2",
-    "vitest": "5.0.3"
+    "vitest": "5.0.5"
   },
   "dependencies": {
     "@misskey-dev/emoji-data": "17.0.3"
