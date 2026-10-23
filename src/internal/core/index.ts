@@ -12,11 +12,15 @@ export type Failure = { success: false };
 
 export type Result<T> = Success<T> | Failure;
 
+type StateKey = number;
+
 interface State {
 	trace?: boolean,
 	linkLabel?: boolean,
-	linkLabelFailures?: Map<string, Map<number, Set<number>>>,
+	untilSpans?: Map<Parser<unknown>, Map<string, { start: number, end: number }>>,
+	manyThenFailures?: Map<Parser<unknown>, Map<string, Map<StateKey, Set<number>>>>,
 	nestLimit: number,
+	nestBudget?: number,
 	depth: number,
 }
 
@@ -37,24 +41,11 @@ export function failure(): Failure {
 export class Parser<T> {
 	public name?: string;
 	public handler: ParserHandler<T>;
+	// the characters the parser can start with (see `first`)
+	public firstChars?: string;
 
 	constructor(handler: ParserHandler<T>, name?: string) {
-		this.handler = (input, index, state) : Failure | Success<T> => {
-			if (state.trace && this.name != null) {
-				const pos = `${index}`;
-				console.log(`${pos.padEnd(6, ' ')}enter ${this.name}`);
-				const result = handler(input, index, state);
-				if (result.success) {
-					const pos = `${index}:${result.index}`;
-					console.log(`${pos.padEnd(6, ' ')}match ${this.name}`);
-				} else {
-					const pos = `${index}`;
-					console.log(`${pos.padEnd(6, ' ')}fail ${this.name}`);
-				}
-				return result;
-			}
-			return handler(input, index, state);
-		};
+		this.handler = handler;
 		this.name = name;
 	}
 
@@ -176,9 +167,22 @@ export function seq<Parsers extends Parser<unknown>[]>(...parsers: Parsers): Par
 }
 
 export function alt<Parsers extends Parser<unknown>[]>(parsers: Parsers): Parser<ParsedType<Parsers[number]>> {
+	// parsers made by `first` are tried only at the characters they can start with
+	const candidatesByChar = parsers.some(parser => parser.firstChars != null) ? new Map<number, Parsers[number][]>() : null;
 	return new Parser<ParsedType<Parsers[number]>>((input, index, state): Result<ParsedType<Parsers[number]>> => {
-		for (let i = 0; i < parsers.length; i++) {
-			const parser: Parsers[number] = parsers[i];
+		let candidates: Parsers[number][] = parsers;
+		if (candidatesByChar != null) {
+			// non-ascii characters share an entry
+			const code = index < input.length ? Math.min(input.charCodeAt(index), 0x80) : -1;
+			let cached = candidatesByChar.get(code);
+			if (cached === undefined) {
+				cached = parsers.filter(parser => parser.firstChars == null || (code >= 0 && parser.firstChars.includes(String.fromCharCode(code))));
+				candidatesByChar.set(code, cached);
+			}
+			candidates = cached;
+		}
+		for (let i = 0; i < candidates.length; i++) {
+			const parser: Parsers[number] = candidates[i];
 			const result = parser.handler(input, index, state);
 			if (result.success) {
 				return result as Result<ParsedType<Parsers[number]>>;
@@ -186,6 +190,21 @@ export function alt<Parsers extends Parser<unknown>[]>(parsers: Parsers): Parser
 		}
 		return failure();
 	});
+}
+
+/**
+ * Declares that `parser` can only match at one of the ascii characters `chars`.
+ * `alt` uses this to skip the parser at other characters.
+*/
+export function first<T>(chars: string, parser: Parser<T>): Parser<T> {
+	const guarded = new Parser<T>((input, index, state) => {
+		if (index >= input.length || !chars.includes(input.charAt(index))) {
+			return failure();
+		}
+		return parser.handler(input, index, state);
+	});
+	guarded.firstChars = chars;
+	return guarded;
 }
 
 function succeeded<T>(value: T): Parser<T> {
@@ -201,6 +220,88 @@ export function notMatch(parser: Parser<unknown>): Parser<null> {
 			? success(index, null)
 			: failure();
 	});
+}
+
+function getOrCreate<K, V>(map: Map<K, V>, key: K, create: () => V): V {
+	let value = map.get(key);
+	if (value === undefined) {
+		value = create();
+		map.set(key, value);
+	}
+	return value;
+}
+
+// must cover every part of the state that a parse result depends on
+function stateKey(state: State): StateKey {
+	return state.depth * 2 + (state.linkLabel ? 1 : 0);
+}
+
+/**
+ * Same as `seq(notMatch(terminator), char).select(1).many(min).text()`, caching the last scanned span per input.
+ * `terminator` must not depend on the state.
+*/
+export function until(terminator: Parser<unknown>, min: number): Parser<string> {
+	const parser: Parser<string> = new Parser((input, index, state) => {
+		state.untilSpans ??= new Map();
+		const spans = getOrCreate(state.untilSpans, parser, () => new Map());
+		const span = spans.get(input);
+		let end: number;
+		if (span != null && span.start <= index && index <= span.end) {
+			end = span.end;
+		} else {
+			end = index;
+			while (end < input.length && !terminator.handler(input, end, state).success) {
+				end++;
+			}
+			spans.set(input, { start: index, end });
+		}
+		if (end - index < min) {
+			return failure();
+		}
+		return success(end, input.slice(index, end));
+	});
+	return parser;
+}
+
+/**
+ * Same as `seq(seq(notMatch(stop), item).select(1).many(min), after)`, caching the item boundaries that lead to a failure.
+ * `item`, `stop` and `after` must depend only on the input, the position and `stateKey`.
+*/
+export function manyThen<T, U>(item: Parser<T>, stop: Parser<unknown>, after: Parser<U>, min: number): Parser<[T[], U]> {
+	const element = seq(notMatch(stop), item).select(1);
+	const parser: Parser<[T[], U]> = new Parser((input, index, state) => {
+		state.manyThenFailures ??= new Map();
+		const byInput = getOrCreate(state.manyThenFailures, parser, () => new Map());
+		const byState = getOrCreate(byInput, input, () => new Map());
+		const failures = getOrCreate(byState, stateKey(state), () => new Set());
+		const boundaries: number[] = [];
+		const items: T[] = [];
+		let latestIndex = index;
+		while (!failures.has(latestIndex)) {
+			boundaries.push(latestIndex);
+			if (latestIndex >= input.length) {
+				break;
+			}
+			const result = element.handler(input, latestIndex, state);
+			if (!result.success) {
+				break;
+			}
+			items.push(result.value);
+			latestIndex = result.index;
+		}
+		if (items.length < min) {
+			return failure();
+		}
+		const afterResult = failures.has(latestIndex) ? failure() : after.handler(input, latestIndex, state);
+		if (!afterResult.success) {
+			for (const boundary of boundaries) {
+				failures.add(boundary);
+			}
+			return failure();
+		}
+		return success(afterResult.index, [items, afterResult.value]);
+	});
+	return parser;
 }
 
 export const cr = str('\r');
@@ -256,6 +357,26 @@ export function lazy<T>(fn: () => Parser<T>): Parser<T> {
 
 type ParserTable<T> = { [K in keyof T]: Parser<T[K]> };
 
+// logs the calls of the parser when `state.trace` is set
+function traced<T>(parser: Parser<T>, name: string): Parser<T> {
+	return new Parser((input, index, state) => {
+		if (!state.trace) {
+			return parser.handler(input, index, state);
+		}
+		const pos = `${index}`;
+		console.log(`${pos.padEnd(6, ' ')}enter ${name}`);
+		const result = parser.handler(input, index, state);
+		if (result.success) {
+			const pos = `${index}:${result.index}`;
+			console.log(`${pos.padEnd(6, ' ')}match ${name}`);
+		} else {
+			const pos = `${index}`;
+			console.log(`${pos.padEnd(6, ' ')}fail ${name}`);
+		}
+		return result;
+	}, name);
+}
+
 // TODO: 関数の型宣言をいい感じにしたい
 export function createLanguage<T>(syntaxes: { [K in keyof T]: (r: ParserTable<T>) => Parser<T[K]> }): ParserTable<T> {
 	// @ts-expect-error initializing object so type error here
@@ -266,8 +387,7 @@ export function createLanguage<T>(syntaxes: { [K in keyof T]: (r: ParserTable<T>
 			if (parser == null) {
 				throw new Error('syntax must return a parser.');
 			}
-			parser.name = key;
-			return parser;
+			return traced(parser, key);
 		});
 	}
 	return rules;

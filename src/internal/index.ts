@@ -9,6 +9,7 @@ export type FullParserOpts = {
 export function fullParser(input: string, opts: FullParserOpts): M.MfmNode[] {
 	const result = language.fullParser.handler(input, 0, {
 		nestLimit: opts.nestLimit ?? 20,
+		nestBudget: input.length * 20 + 1000, // normal input uses at most about 4 per character
 		depth: 0,
 		linkLabel: false,
 		trace: false,

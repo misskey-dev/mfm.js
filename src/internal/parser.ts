@@ -39,7 +39,28 @@ const notLinkLabel = new P.Parser((_input, index, state) => {
 		: P.failure();
 });
 
+// whether the character before the position is alphanumeric
+function alphaAndNumBefore(input: string, index: number): boolean {
+	return /[a-z0-9]/i.test(input.charAt(index - 1));
+}
+
+// instead of a regexp like /[.,]+$/, which takes quadratic time on a long run
+function trailingLength(text: string, chars: string): number {
+	let length = 0;
+	while (length < text.length && chars.includes(text.charAt(text.length - 1 - length))) {
+		length++;
+	}
+	return length;
+}
+
 const nestable = new P.Parser((_input, index, state) => {
+	// every attempt uses the budget, and nesting stops once it runs out, which bounds the time on crafted input
+	if (state.nestBudget != null) {
+		if (state.nestBudget <= 0) {
+			return P.failure();
+		}
+		state.nestBudget--;
+	}
 	return (state.depth < state.nestLimit)
 		? P.success(index, null)
 		: P.failure();
@@ -57,22 +78,6 @@ function nest<T>(parser: P.Parser<T>, fallback?: P.Parser<string>): P.Parser<T |
 		state.depth--;
 		return result;
 	});
-}
-
-function getLinkLabelFailures(input: string, state: Parameters<P.ParserHandler<unknown>>[2]): Set<number> {
-	// boundaries are tracked per input (quote contents are parsed as a separate input) and per depth
-	state.linkLabelFailures ??= new Map();
-	let byDepth = state.linkLabelFailures.get(input);
-	if (byDepth == null) {
-		byDepth = new Map();
-		state.linkLabelFailures.set(input, byDepth);
-	}
-	let failures = byDepth.get(state.depth);
-	if (failures == null) {
-		failures = new Set();
-		byDepth.set(state.depth, failures);
-	}
-	return failures;
 }
 
 interface TypeTable {
@@ -124,53 +129,53 @@ export const language = P.createLanguage<TypeTable>({
 			// Regexp
 			r.unicodeEmoji,
 			// "<center>" block
-			r.centerTag,
+			P.first('\r\n<', r.centerTag),
 			// "<small>"
-			r.smallTag,
+			P.first('<', r.smallTag),
 			// "<plain>"
-			r.plainTag,
+			P.first('<', r.plainTag),
 			// "<b>"
-			r.boldTag,
+			P.first('<', r.boldTag),
 			// "<i>"
-			r.italicTag,
+			P.first('<', r.italicTag),
 			// "<s>"
-			r.strikeTag,
+			P.first('<', r.strikeTag),
 			// "<http"
-			r.urlAlt,
+			P.first('<', r.urlAlt),
 			// "***"
-			r.big,
+			P.first('*', r.big),
 			// "**"
-			r.boldAsta,
+			P.first('*', r.boldAsta),
 			// "*"
-			r.italicAsta,
+			P.first('*', r.italicAsta),
 			// "__"
-			r.boldUnder,
+			P.first('_', r.boldUnder),
 			// "_"
-			r.italicUnder,
+			P.first('_', r.italicUnder),
 			// "```" block
-			r.codeBlock,
+			P.first('\r\n`', r.codeBlock),
 			// "`"
-			r.inlineCode,
+			P.first('`', r.inlineCode),
 			// ">" block
-			r.quote,
+			P.first('\r\n>', r.quote),
 			// "\\[" block
-			r.mathBlock,
+			P.first('\r\n\\', r.mathBlock),
 			// "\\("
-			r.mathInline,
+			P.first('\\', r.mathInline),
 			// "~~"
-			r.strikeWave,
+			P.first('~', r.strikeWave),
 			// "$[""
-			r.fn,
+			P.first('$', r.fn),
 			// "@"
-			r.mention,
+			P.first('@', r.mention),
 			// "#"
-			r.hashtag,
+			P.first('#', r.hashtag),
 			// ":"
-			r.emojiCode,
+			P.first(':', r.emojiCode),
 			// "?[" or "["
-			r.link,
+			P.first('?[', r.link),
 			// http
-			r.url,
+			P.first('h', r.url),
 			// block
 			r.search,
 			r.text,
@@ -180,8 +185,8 @@ export const language = P.createLanguage<TypeTable>({
 	simple: r => {
 		return P.alt([
 			r.unicodeEmoji, // Regexp
-			r.emojiCode, // ":"
-			r.plainTag, // "<plain>" // to NOT parse emojiCode inside `<plain>`
+			P.first(':', r.emojiCode), // ":"
+			P.first('<', r.plainTag), // "<plain>" // to NOT parse emojiCode inside `<plain>`
 			r.text,
 		]);
 	},
@@ -191,45 +196,45 @@ export const language = P.createLanguage<TypeTable>({
 			// Regexp
 			r.unicodeEmoji,
 			// "<small>"
-			r.smallTag,
+			P.first('<', r.smallTag),
 			// "<plain>"
-			r.plainTag,
+			P.first('<', r.plainTag),
 			// "<b>"
-			r.boldTag,
+			P.first('<', r.boldTag),
 			// "<i>"
-			r.italicTag,
+			P.first('<', r.italicTag),
 			// "<s>"
-			r.strikeTag,
+			P.first('<', r.strikeTag),
 			// <http
-			r.urlAlt,
+			P.first('<', r.urlAlt),
 			// "***"
-			r.big,
+			P.first('*', r.big),
 			// "**"
-			r.boldAsta,
+			P.first('*', r.boldAsta),
 			// "*"
-			r.italicAsta,
+			P.first('*', r.italicAsta),
 			// "__"
-			r.boldUnder,
+			P.first('_', r.boldUnder),
 			// "_"
-			r.italicUnder,
+			P.first('_', r.italicUnder),
 			// "`"
-			r.inlineCode,
+			P.first('`', r.inlineCode),
 			// "\\("
-			r.mathInline,
+			P.first('\\', r.mathInline),
 			// "~~"
-			r.strikeWave,
+			P.first('~', r.strikeWave),
 			// "$[""
-			r.fn,
+			P.first('$', r.fn),
 			// "@"
-			r.mention,
+			P.first('@', r.mention),
 			// "#"
-			r.hashtag,
+			P.first('#', r.hashtag),
 			// ":"
-			r.emojiCode,
+			P.first(':', r.emojiCode),
 			// "?[" or "["
-			r.link,
+			P.first('?[', r.link),
 			// http
-			r.url,
+			P.first('h', r.url),
 			r.text,
 		]);
 	},
@@ -279,14 +284,14 @@ export const language = P.createLanguage<TypeTable>({
 			mark,
 			P.seq(P.notMatch(newLine), P.char).select(1).many(0),
 			newLine,
-			P.seq(P.notMatch(P.seq(newLine, mark, P.lineEnd)), P.char).select(1).many(1),
+			P.until(P.seq(newLine, mark, P.lineEnd), 1),
 			newLine,
 			mark,
 			P.lineEnd,
 			newLine.option(),
 		).map(result => {
 			const lang = result[3].join('').trim();
-			const code = result[5].join('');
+			const code = result[5];
 			return M.CODE_BLOCK(code, (lang.length > 0 ? lang : null));
 		});
 	},
@@ -299,13 +304,13 @@ export const language = P.createLanguage<TypeTable>({
 			P.lineBegin,
 			open,
 			newLine.option(),
-			P.seq(P.notMatch(P.seq(newLine.option(), close)), P.char).select(1).many(1),
+			P.until(P.seq(newLine.option(), close), 1),
 			newLine.option(),
 			close,
 			P.lineEnd,
 			newLine.option(),
 		).map(result => {
-			const formula = result[4].join('');
+			const formula = result[4];
 			return M.MATH_BLOCK(formula);
 		});
 	},
@@ -318,13 +323,19 @@ export const language = P.createLanguage<TypeTable>({
 			P.lineBegin,
 			open,
 			newLine.option(),
-			P.seq(P.notMatch(P.seq(newLine.option(), close)), nest(r.inline)).select(1).many(1),
-			newLine.option(),
-			close,
-			P.lineEnd,
-			newLine.option(),
+			P.manyThen(
+				nest(r.inline),
+				P.seq(newLine.option(), close),
+				P.seq(
+					newLine.option(),
+					close,
+					P.lineEnd,
+					newLine.option(),
+				),
+				1,
+			),
 		).map(result => {
-			return M.CENTER(mergeText(result[4]));
+			return M.CENTER(mergeText(result[4][0]));
 		});
 	},
 
@@ -413,8 +424,7 @@ export const language = P.createLanguage<TypeTable>({
 				return P.failure();
 			}
 			// check before
-			const beforeStr = input.slice(0, index);
-			if (/[a-z0-9]$/i.test(beforeStr)) {
+			if (alphaAndNumBefore(input, index)) {
 				return P.failure();
 			}
 			return P.success(result.index, M.ITALIC(mergeText(result.value[1])));
@@ -434,8 +444,7 @@ export const language = P.createLanguage<TypeTable>({
 				return P.failure();
 			}
 			// check before
-			const beforeStr = input.slice(0, index);
-			if (/[a-z0-9]$/i.test(beforeStr)) {
+			if (alphaAndNumBefore(input, index)) {
 				return P.failure();
 			}
 			return P.success(result.index, M.ITALIC(mergeText(result.value[1])));
@@ -481,10 +490,7 @@ export const language = P.createLanguage<TypeTable>({
 		return P.seq( 
 			open,
 			newLine.option(),
-			P.seq(
-				P.notMatch(P.seq(newLine.option(), close)),
-				P.char,
-			).select(1).many(1).text(),
+			P.until(P.seq(newLine.option(), close), 1),
 			newLine.option(),
 			close,
 		).select(2).map(result => M.PLAIN(result));
@@ -541,12 +547,9 @@ export const language = P.createLanguage<TypeTable>({
 		const mark = P.str('`');
 		return P.seq(
 			mark,
-			P.seq(
-				P.notMatch(P.alt([mark, P.str('´'), newLine])),
-				P.char,
-			).select(1).many(1),
+			P.until(P.alt([mark, P.str('´'), newLine]), 1),
 			mark,
-		).map(result => M.INLINE_CODE(result[1].join('')));
+		).map(result => M.INLINE_CODE(result[1]));
 	},
 
 	mathInline: () => {
@@ -554,12 +557,9 @@ export const language = P.createLanguage<TypeTable>({
 		const close = P.str('\\)');
 		return P.seq(
 			open,
-			P.seq(
-				P.notMatch(P.alt([close, newLine])),
-				P.char,
-			).select(1).many(1),
+			P.until(P.alt([close, newLine]), 1),
 			close,
-		).map(result => M.MATH_INLINE(result[1].join('')));
+		).map(result => M.MATH_INLINE(result[1]));
 	},
 
 	mention: () => {
@@ -579,8 +579,7 @@ export const language = P.createLanguage<TypeTable>({
 				return P.failure();
 			}
 			// check before (not mention)
-			const beforeStr = input.slice(0, index);
-			if (/[a-z0-9]$/i.test(beforeStr)) {
+			if (alphaAndNumBefore(input, index)) {
 				return P.failure();
 			}
 			let invalidMention = false;
@@ -590,9 +589,9 @@ export const language = P.createLanguage<TypeTable>({
 			// remove [.-] of tail of hostname
 			let modifiedHost = hostname;
 			if (hostname != null) {
-				result = /[.-]+$/.exec(hostname);
-				if (result != null) {
-					modifiedHost = hostname.slice(0, (-1 * result[0].length));
+				const trailing = trailingLength(hostname, '.-');
+				if (trailing > 0) {
+					modifiedHost = hostname.slice(0, (-1 * trailing));
 					if (modifiedHost.length === 0) {
 						// disallow invalid char only hostname
 						invalidMention = true;
@@ -602,10 +601,10 @@ export const language = P.createLanguage<TypeTable>({
 			}
 			// remove [.-] of tail of username
 			let modifiedName = username;
-			result = /[.-]+$/.exec(username);
-			if (result != null) {
+			const trailing = trailingLength(username, '.-');
+			if (trailing > 0) {
 				if (modifiedHost == null) {
-					modifiedName = username.slice(0, (-1 * result[0].length));
+					modifiedName = username.slice(0, (-1 * trailing));
 				} else {
 					// cannnot to remove tail of username if exist hostname
 					invalidMention = true;
@@ -660,8 +659,7 @@ export const language = P.createLanguage<TypeTable>({
 				return P.failure();
 			}
 			// check before
-			const beforeStr = input.slice(0, index);
-			if (/[a-z0-9]$/i.test(beforeStr)) {
+			if (alphaAndNumBefore(input, index)) {
 				return P.failure();
 			}
 			const resultIndex = result.index;
@@ -694,57 +692,33 @@ export const language = P.createLanguage<TypeTable>({
 			return result;
 		});
 		const closeLabel = P.str(']');
-		const openLabel = P.seq(
-			notLinkLabel,
-			P.alt([P.str('?['), P.str('[')]),
-		).select(1);
-		const labelItem = P.seq(
-			P.notMatch(P.alt([closeLabel, newLine])),
-			nest(labelInline),
-		).select(1);
 		const afterLabel = P.seq(
 			closeLabel,
 			P.str('('),
 			P.alt([r.urlAlt, r.url]),
 			P.str(')'),
 		).select(2);
-		return new P.Parser<M.MfmLink>((input, index, state) => {
-			const openResult = openLabel.handler(input, index, state);
-			if (!openResult.success) {
+		// fail on an invalid url (a string) so that `manyThen` caches the failure
+		const afterLabelUrl = new P.Parser<M.MfmUrl>((input, index, state) => {
+			const result = afterLabel.handler(input, index, state);
+			if (!result.success || typeof result.value === 'string') {
 				return P.failure();
 			}
-
-			const failedBoundaries = getLinkLabelFailures(input, state);
-			const boundaries: number[] = [];
-			const label: (M.MfmInline | string)[] = [];
-			let latestIndex = openResult.index;
-			while (!failedBoundaries.has(latestIndex)) {
-				boundaries.push(latestIndex);
-				if (latestIndex >= input.length) {
-					break;
-				}
-				const itemResult = labelItem.handler(input, latestIndex, state);
-				if (!itemResult.success) {
-					break;
-				}
-				label.push(itemResult.value);
-				latestIndex = itemResult.index;
-			}
-			if (label.length === 0) {
-				return P.failure();
-			}
-
-			const knownFailure = failedBoundaries.has(latestIndex);
-			const afterResult = knownFailure ? P.failure() : afterLabel.handler(input, latestIndex, state);
-			if (!afterResult.success || typeof afterResult.value === 'string') {
-				for (const boundary of boundaries) {
-					failedBoundaries.add(boundary);
-				}
-				return P.failure();
-			}
-
-			const silent = (openResult.value === '?[');
-			return P.success(afterResult.index, M.LINK(silent, afterResult.value.props.url, mergeText(label)));
+			return P.success(result.index, result.value);
+		});
+		return P.seq(
+			notLinkLabel,
+			P.alt([P.str('?['), P.str('[')]),
+			P.manyThen(
+				nest(labelInline),
+				P.alt([closeLabel, newLine]),
+				afterLabelUrl,
+				1,
+			),
+		).map(result => {
+			const silent = (result[1] === '?[');
+			const [label, url] = result[2];
+			return M.LINK(silent, url.props.url, mergeText(label));
 		});
 	},
 
@@ -775,10 +749,10 @@ export const language = P.createLanguage<TypeTable>({
 			const schema: string = result.value[1];
 			let content: string = result.value[2];
 			// remove the ".," at the right end
-			result = /[.,]+$/.exec(content);
-			if (result != null) {
-				modifiedIndex -= result[0].length;
-				content = content.slice(0, (-1 * result[0].length));
+			const trailing = trailingLength(content, '.,');
+			if (trailing > 0) {
+				modifiedIndex -= trailing;
+				content = content.slice(0, (-1 * trailing));
 				if (content.length === 0) {
 					return P.success(resultIndex, input.slice(index, resultIndex));
 				}
@@ -794,7 +768,7 @@ export const language = P.createLanguage<TypeTable>({
 			notLinkLabel,
 			open,
 			P.regexp(/https?:\/\//),
-			P.seq(P.notMatch(P.alt([close, space])), P.char).select(1).many(1),
+			P.until(P.alt([close, space]), 1),
 			close,
 		).text();
 		return new P.Parser((input, index, state) => {
@@ -815,19 +789,16 @@ export const language = P.createLanguage<TypeTable>({
 		return P.seq(
 			newLine.option(),
 			P.lineBegin,
-			P.seq(
-				P.notMatch(P.alt([
-					newLine,
-					P.seq(space, button, P.lineEnd),
-				])),
-				P.char,
-			).select(1).many(1),
+			P.until(P.alt([
+				newLine,
+				P.seq(space, button, P.lineEnd),
+			]), 1),
 			space,
 			button,
 			P.lineEnd,
 			newLine.option(),
 		).map(result => {
-			const query = result[2].join('');
+			const query = result[2];
 			return M.SEARCH(query, `${query}${result[3]}${result[4]}`);
 		});
 	},

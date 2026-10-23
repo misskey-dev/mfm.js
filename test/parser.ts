@@ -281,6 +281,12 @@ hoge`;
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		test('ignore internal markers not at line end', () => {
+			const input = '```a\nb\n```c\n```d\ne\n```';
+			const output = [CODE_BLOCK('b\n```c\n```d\ne', 'a')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('mathBlock', () => {
@@ -314,6 +320,14 @@ hoge`;
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+		test('with unclosed tag before', () => {
+			const input = '\\[a\\]b\n\\[c\\]';
+			const output = [
+				TEXT('\\[a\\]b'),
+				MATH_BLOCK('c')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('center', () => {
@@ -334,6 +348,25 @@ hoge`;
 					TEXT('abc\n123\n\npiyo')
 				]),
 				TEXT('after')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+		test('with unclosed tag before', () => {
+			const input = '<center>a</center>b\n<center>c</center>';
+			const output = [
+				TEXT('<center>a</center>b'),
+				CENTER([
+					TEXT('c')
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+		test('with close tag in plain', () => {
+			const input = '<center><plain></center></plain></center>';
+			const output = [
+				CENTER([
+					PLAIN('</center>')
+				]),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
@@ -677,6 +710,12 @@ hoge`;
 			const output = [MATH_INLINE('x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		test('with unclosed tag in previous line', () => {
+			const input = '\\(a\n\\(b\\)';
+			const output = [TEXT('\\(a\n'), MATH_INLINE('b')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('mention', () => {
@@ -731,6 +770,18 @@ hoge`;
 		test('invalid char only hostname', () => {
 			const input = '@abc@.';
 			const output = [TEXT('@abc@.')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('remove trailing periods only', () => {
+			const input = '@abc..def..';
+			const output = [MENTION('abc..def', null, '@abc..def'), TEXT('..')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('remove trailing periods of hostname only', () => {
+			const input = '@abc..def@misskey..io..';
+			const output = [MENTION('abc..def', 'misskey..io', '@abc..def@misskey..io'), TEXT('..')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
@@ -973,6 +1024,15 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 
+		test('ignore trailing periods only', () => {
+			const input = 'https://misskey.io/@ai...foo...';
+			const output = [
+				N_URL('https://misskey.io/@ai...foo'),
+				TEXT('...')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
 		test('with comma', () => {
 			const input = 'https://example.com/foo?bar=a,b';
 			const output = [
@@ -1050,6 +1110,38 @@ hoge`;
 			const input = '<https://大石泉すき.example.com>';
 			const output = [
 				N_URL('https://大石泉すき.example.com', true),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with unclosed angle brackets before', () => {
+			const input = '<https://a <https://b>';
+			const output = [
+				TEXT('<'),
+				N_URL('https://a'),
+				TEXT(' '),
+				N_URL('https://b', true),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with unclosed angle brackets in previous line', () => {
+			const input = '<https://a\n<https://b>';
+			const output = [
+				N_URL('https://a\n<https://b', true),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with unclosed angle brackets in bold', () => {
+			const input = '**<https://a <https://b>**';
+			const output = [
+				BOLD([
+					TEXT('<'),
+					N_URL('https://a'),
+					TEXT(' '),
+					N_URL('https://b', true),
+				]),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
@@ -1226,6 +1318,28 @@ hoge`;
 			assert.deepStrictEqual(mfm.parse(input), output);
 		})
 
+		test('with unclosed angle brackets in label', () => {
+			const input = '[<https://a <https://b>](https://c)';
+			const output = [
+				LINK(false, 'https://c', [
+					TEXT('<https://a <https://b>')
+				]),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with unclosed angle brackets in url part', () => {
+			const input = '[x](<https://a <https://b>)';
+			const output = [
+				TEXT('[x](<'),
+				N_URL('https://a'),
+				TEXT(' '),
+				N_URL('https://b', true),
+				TEXT(')'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
 		test('with unclosed brackets before', () => {
 			const input = '[[[foo] [bar](https://example.com)';
 			const output = [
@@ -1347,6 +1461,14 @@ hoge`;
 				TEXT('a\n'),
 				PLAIN('**Hello** world'),
 				TEXT('\nb')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with unclosed tag before', () => {
+			const input = '<plain>a\n<plain>b</plain>';
+			const output = [
+				PLAIN('a\n<plain>b'),
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
