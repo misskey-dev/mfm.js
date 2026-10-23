@@ -10,6 +10,15 @@
 ### Bugfixes
 
 -->
+## 0.28.0
+### Changes
+- We have added new restrictions during the parsing process to enhance security. While it is extremely rare, this may result in some highly complex MFM patterns failing to render.\
+  We have tested several common examples of "MFM art" under these new constraints and confirmed that they can still be parsed successfully.
+
+### Bugfixes
+- Update dependencies
+- Security fixes
+
 ## 0.27.0
 ### Bugfixes
 - Restore CLI commands that are accidentally removed in 0.26.0

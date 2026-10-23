@@ -1,6 +1,6 @@
 {
   "name": "mfm-js",
-  "version": "0.27.0",
+  "version": "0.28.0",
   "description": "An MFM parser implementation with TypeScript",
   "type": "module",
   "packageManager": "pnpm@12.14.0",
