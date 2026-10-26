@@ -287,6 +287,26 @@ hoge`;
 			const output = [CODE_BLOCK('b\n```c\n```d\ne', 'a')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		test('with CRLF line breaks', () => {
+			const input = 'abc\r\n```js\r\nconst abc = 1;\r\n```\r\n123';
+			const output = [
+				TEXT('abc'),
+				CODE_BLOCK('const abc = 1;', 'js'),
+				TEXT('123'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with CR line breaks', () => {
+			const input = 'abc\r```js\rconst abc = 1;\r```\r123';
+			const output = [
+				TEXT('abc'),
+				CODE_BLOCK('const abc = 1;', 'js'),
+				TEXT('123'),
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('mathBlock', () => {
@@ -430,6 +450,12 @@ hoge`;
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		test('ignore unclosed syntax', () => {
+			const input = '***abc';
+			const output = [TEXT('***abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('bold tag', () => {
@@ -466,6 +492,12 @@ hoge`;
 					TEXT('\n123')
 				])
 			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('ignore unclosed syntax', () => {
+			const input = '<b>abc';
+			const output = [TEXT('<b>abc')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
@@ -506,6 +538,32 @@ hoge`;
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		test('with underscores', () => {
+			const input = '__abc__';
+			const output = [
+				BOLD([
+					TEXT('abc')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with underscores (space allowed)', () => {
+			const input = '__a b__';
+			const output = [
+				BOLD([
+					TEXT('a b')
+				])
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('with underscores (only alphanumeric and space allowed)', () => {
+			const input = '__a*b__';
+			const output = [TEXT('__a*b__')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('small', () => {
@@ -544,6 +602,12 @@ hoge`;
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		test('ignore unclosed syntax', () => {
+			const input = '<small>abc';
+			const output = [TEXT('<small>abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('italic tag', () => {
@@ -580,6 +644,12 @@ hoge`;
 					TEXT('\nabc')
 				])
 			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('ignore unclosed syntax', () => {
+			const input = '<i>abc';
+			const output = [TEXT('<i>abc')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
@@ -672,6 +742,12 @@ hoge`;
 			])];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
+
+		test('ignore unclosed syntax', () => {
+			const input = '<s>abc';
+			const output = [TEXT('<s>abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
 	});
 
 	describe('strike', () => {
@@ -680,6 +756,18 @@ hoge`;
 			const output = [STRIKE([
 				TEXT('foo')
 			])];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('ignore unclosed syntax', () => {
+			const input = '~~abc';
+			const output = [TEXT('~~abc')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('disallow line break', () => {
+			const input = '~~abc\ndef~~';
+			const output = [TEXT('~~abc\ndef~~')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
@@ -842,6 +930,18 @@ hoge`;
 		test('disallow "-" in tail of hostname', () => {
 			const input = '@abc@aaa-';
 			const output = [MENTION('abc', 'aaa', '@abc@aaa'), TEXT('-')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('disallow "-" in tail of username with hostname', () => {
+			const input = '@abc-@misskey.io';
+			const output = [TEXT('@abc-@misskey.io')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+
+		test('disallow "." in tail of username with hostname', () => {
+			const input = '@abc.@misskey.io';
+			const output = [TEXT('@abc.@misskey.io')];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
 	});
