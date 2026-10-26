@@ -165,6 +165,11 @@ after`;
 			const input2 = '<https://github.com/syuilo/ai>';
 			assert.strictEqual(mfm.toString(mfm.parse(input2)), input2);
 		});
+
+		test('throw on unknown node', () => {
+			// @ts-expect-error passing an invalid node
+			assert.throws(() => mfm.toString({ type: 'unknown' }), /unknown mfm node/);
+		});
 	});
 
 	describe('inspect', () => {
