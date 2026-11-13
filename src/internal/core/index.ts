@@ -128,10 +128,11 @@ export function str<T extends string>(value: T): Parser<T> {
 }
 
 export function regexp<T extends RegExp>(pattern: T): Parser<string> {
-	const re = RegExp(`^(?:${pattern.source})`, pattern.flags);
+	// Use the sticky flag to match at `index` without slicing the input.
+	const re = RegExp(`(?:${pattern.source})`, pattern.flags.replace('g', '') + 'y');
 	return new Parser((input, index, _state) => {
-		const text = input.slice(index);
-		const result = re.exec(text);
+		re.lastIndex = index;
+		const result = re.exec(input);
 		if (result == null) {
 			return failure();
 		}
