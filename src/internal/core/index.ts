@@ -119,11 +119,18 @@ export class Parser<T> {
 }
 
 export function str<T extends string>(value: T): Parser<T> {
+	// most attempts fail at the first code unit, so it is checked before comparing the whole value
+	const firstCode = value.charCodeAt(0);
+	if (value.length === 1) {
+		return new Parser((input, index, _state) => {
+			if (input.charCodeAt(index) !== firstCode) {
+				return failure();
+			}
+			return success(index + 1, value);
+		});
+	}
 	return new Parser((input, index, _state) => {
-		if ((input.length - index) < value.length) {
-			return failure();
-		}
-		if (input.substr(index, value.length) !== value) {
+		if (input.charCodeAt(index) !== firstCode || !input.startsWith(value, index)) {
 			return failure();
 		}
 		return success(index + value.length, value);
