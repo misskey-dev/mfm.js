@@ -46,6 +46,8 @@ export class Parser<T> {
 	public handler: ParserHandler<T>;
 	// the characters the parser can start with (see `first`)
 	public firstChars?: string;
+	// the parser guarded by `first`
+	public guarded?: Parser<T>;
 
 	constructor(handler: ParserHandler<T>, name?: string) {
 		this.handler = handler;
@@ -183,23 +185,37 @@ export function seq<Parsers extends Parser<unknown>[]>(...parsers: Parsers): Par
 }
 
 export function alt<Parsers extends Parser<unknown>[]>(parsers: Parsers): Parser<ParsedType<Parsers[number]>> {
-	// parsers made by `first` are tried only at the characters they can start with
-	const candidatesByChar = parsers.some(parser => parser.firstChars != null) ? new Map<number, Parsers[number][]>() : null;
-	return new Parser<ParsedType<Parsers[number]>>((input, index, state): Result<ParsedType<Parsers[number]>> => {
-		let candidates: Parsers[number][] = parsers;
-		if (candidatesByChar != null) {
-			// non-ascii characters share an entry
-			const code = index < input.length ? Math.min(input.charCodeAt(index), 0x80) : -1;
-			let cached = candidatesByChar.get(code);
-			if (cached === undefined) {
-				cached = parsers.filter(parser => parser.firstChars == null || (code >= 0 && parser.firstChars.includes(String.fromCharCode(code))));
-				candidatesByChar.set(code, cached);
+	if (!parsers.some(parser => parser.firstChars != null)) {
+		return new Parser<ParsedType<Parsers[number]>>((input, index, state) => {
+			for (let i = 0; i < parsers.length; i++) {
+				const result = parsers[i].handler(input, index, state);
+				if (result.success) {
+					return result as Result<ParsedType<Parsers[number]>>;
+				}
 			}
-			candidates = cached;
+			return failure();
+		});
+	}
+	// parsers made by `first` are tried only at the characters they can start with
+	// the entries are the ascii characters, the non-ascii characters (which share an entry) and the end of the input
+	const NON_ASCII = 0x80;
+	const END = 0x81;
+	const candidatesByChar: (Parser<unknown>[] | undefined)[] = [];
+	for (let code = 0; code <= END; code++) {
+		candidatesByChar.push(undefined);
+	}
+	return new Parser<ParsedType<Parsers[number]>>((input, index, state) => {
+		const code = index < input.length ? Math.min(input.charCodeAt(index), NON_ASCII) : END;
+		let candidates = candidatesByChar[code];
+		if (candidates === undefined) {
+			candidates = parsers
+				.filter(parser => parser.firstChars == null || (code < NON_ASCII && parser.firstChars.includes(String.fromCharCode(code))))
+				// the guard of `first` is not needed here
+				.map(parser => parser.guarded ?? parser);
+			candidatesByChar[code] = candidates;
 		}
 		for (let i = 0; i < candidates.length; i++) {
-			const parser: Parsers[number] = candidates[i];
-			const result = parser.handler(input, index, state);
+			const result = candidates[i].handler(input, index, state);
 			if (result.success) {
 				return result as Result<ParsedType<Parsers[number]>>;
 			}
@@ -220,6 +236,7 @@ export function first<T>(chars: string, parser: Parser<T>): Parser<T> {
 		return parser.handler(input, index, state);
 	});
 	guarded.firstChars = chars;
+	guarded.guarded = parser;
 	return guarded;
 }
 
