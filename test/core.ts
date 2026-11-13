@@ -167,3 +167,21 @@ describe('mergeText', () => {
 		assert.deepStrictEqual(mergeText([BOLD([TEXT('a')]), [ITALIC([TEXT('b')])]]), [BOLD([TEXT('a')]), ITALIC([TEXT('b')])]);
 	});
 });
+
+describe('first chars', () => {
+	test('str, seq and alt declare the ascii chars they can start with', () => {
+		assert.strictEqual(P.str('ab').firstChars, 'a');
+		assert.strictEqual(P.str('あ').firstChars, undefined);
+		assert.strictEqual(P.seq(P.str('a'), P.char).firstChars, 'a');
+		assert.strictEqual(P.seq(P.char, P.str('a')).firstChars, undefined);
+		assert.strictEqual(P.alt([P.str('a'), P.newline]).firstChars, 'a\r\n');
+		assert.strictEqual(P.alt([P.str('a'), P.char]).firstChars, undefined);
+		assert.strictEqual(P.str('a').option().firstChars, undefined);
+	});
+
+	test('until stops only where the terminator matches', () => {
+		const state = createState();
+		assert.deepStrictEqual(P.until(P.seq(P.str('b'), P.str('c')), 1).handler('abあbc', 0, state), P.success(3, 'abあ'));
+		assert.deepStrictEqual(P.until(P.alt([P.str('あ'), P.str('c')]), 1).handler('abあbc', 0, state), P.success(2, 'ab'));
+	});
+});
