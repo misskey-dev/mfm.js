@@ -134,12 +134,12 @@ export function regexp<T extends RegExp>(pattern: T): Parser<string> {
 	// Use the sticky flag to match at `index` without slicing the input.
 	const re = RegExp(`(?:${pattern.source})`, pattern.flags.replace('g', '') + 'y');
 	return new Parser((input, index, _state) => {
+		// `test` does not allocate a match array; a sticky match starts at `index` and ends at `lastIndex`.
 		re.lastIndex = index;
-		const result = re.exec(input);
-		if (result == null) {
+		if (!re.test(input)) {
 			return failure();
 		}
-		return success(index + result[0].length, result[0]);
+		return success(re.lastIndex, input.slice(index, re.lastIndex));
 	});
 }
 
