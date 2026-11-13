@@ -34,8 +34,11 @@ export function success<T>(index: number, value: T): Success<T> {
 	};
 }
 
+// Failures carry no data, so a single frozen instance is shared.
+const FAILURE: Failure = Object.freeze({ success: false });
+
 export function failure(): Failure {
-	return { success: false };
+	return FAILURE;
 }
 
 export class Parser<T> {
