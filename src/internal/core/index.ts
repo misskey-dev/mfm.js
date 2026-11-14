@@ -46,6 +46,8 @@ export class Parser<T> {
 	public handler: ParserHandler<T>;
 	// the characters the parser can start with (see `first`)
 	public firstChars?: string;
+	// the parser guarded by `first`
+	public guarded?: Parser<T>;
 
 	constructor(handler: ParserHandler<T>, name?: string) {
 		this.handler = handler;
@@ -111,23 +113,34 @@ export class Parser<T> {
 	}
 
 	option(): Parser<T | null> {
-		return alt([
-			this,
-			succeeded(null),
-		]);
+		// same as `alt([this, succeeded(null)])`
+		return new Parser<T | null>((input, index, state) => {
+			const result = this.handler(input, index, state);
+			return result.success ? result : success(index, null);
+		});
 	}
 }
 
 export function str<T extends string>(value: T): Parser<T> {
-	return new Parser((input, index, _state) => {
-		if ((input.length - index) < value.length) {
-			return failure();
-		}
-		if (input.substr(index, value.length) !== value) {
-			return failure();
-		}
-		return success(index + value.length, value);
-	});
+	// most attempts fail at the first code unit, so it is checked before comparing the whole value
+	const firstCode = value.charCodeAt(0);
+	const parser = (value.length === 1)
+		? new Parser<T>((input, index, _state) => {
+			if (input.charCodeAt(index) !== firstCode) {
+				return failure();
+			}
+			return success(index + 1, value);
+		})
+		: new Parser<T>((input, index, _state) => {
+			if (input.charCodeAt(index) !== firstCode || !input.startsWith(value, index)) {
+				return failure();
+			}
+			return success(index + value.length, value);
+		});
+	if (firstCode < 0x80) {
+		parser.firstChars = value.charAt(0);
+	}
+	return parser;
 }
 
 export function regexp<T extends RegExp>(pattern: T): Parser<string> {
@@ -154,11 +167,15 @@ export type SeqParseResult<T extends unknown[]> =
 		: unknown[];
 
 export function seq<Parsers extends Parser<unknown>[]>(...parsers: Parsers): Parser<SeqParseResult<Parsers>> {
-	return new Parser((input, index, state) => {
-		let result;
-		let latestIndex = index;
-		const accum = [];
-		for (let i = 0; i < parsers.length; i++) {
+	const parser = new Parser<SeqParseResult<Parsers>>((input, index, state) => {
+		// most attempts fail at the first parser, so the array is made after it
+		let result = parsers[0].handler(input, index, state);
+		if (!result.success) {
+			return result;
+		}
+		let latestIndex = result.index;
+		const accum = [result.value];
+		for (let i = 1; i < parsers.length; i++) {
 			result = parsers[i].handler(input, latestIndex, state);
 			if (!result.success) {
 				return result;
@@ -168,32 +185,54 @@ export function seq<Parsers extends Parser<unknown>[]>(...parsers: Parsers): Par
 		}
 		return success(latestIndex, accum as SeqParseResult<Parsers>);
 	});
+	// a sequence can only start where its first parser can
+	parser.firstChars = parsers[0].firstChars;
+	return parser;
 }
 
 export function alt<Parsers extends Parser<unknown>[]>(parsers: Parsers): Parser<ParsedType<Parsers[number]>> {
-	// parsers made by `first` are tried only at the characters they can start with
-	const candidatesByChar = parsers.some(parser => parser.firstChars != null) ? new Map<number, Parsers[number][]>() : null;
-	return new Parser<ParsedType<Parsers[number]>>((input, index, state): Result<ParsedType<Parsers[number]>> => {
-		let candidates: Parsers[number][] = parsers;
-		if (candidatesByChar != null) {
-			// non-ascii characters share an entry
-			const code = index < input.length ? Math.min(input.charCodeAt(index), 0x80) : -1;
-			let cached = candidatesByChar.get(code);
-			if (cached === undefined) {
-				cached = parsers.filter(parser => parser.firstChars == null || (code >= 0 && parser.firstChars.includes(String.fromCharCode(code))));
-				candidatesByChar.set(code, cached);
+	if (!parsers.some(parser => parser.firstChars != null)) {
+		return new Parser<ParsedType<Parsers[number]>>((input, index, state) => {
+			for (let i = 0; i < parsers.length; i++) {
+				const result = parsers[i].handler(input, index, state);
+				if (result.success) {
+					return result as Result<ParsedType<Parsers[number]>>;
+				}
 			}
-			candidates = cached;
+			return failure();
+		});
+	}
+	// parsers made by `first` are tried only at the characters they can start with
+	// the entries are the ascii characters, the non-ascii characters (which share an entry) and the end of the input
+	const NON_ASCII = 0x80;
+	const END = 0x81;
+	const candidatesByChar: (Parser<unknown>[] | undefined)[] = [];
+	for (let code = 0; code <= END; code++) {
+		candidatesByChar.push(undefined);
+	}
+	const parser = new Parser<ParsedType<Parsers[number]>>((input, index, state) => {
+		const code = index < input.length ? Math.min(input.charCodeAt(index), NON_ASCII) : END;
+		let candidates = candidatesByChar[code];
+		if (candidates === undefined) {
+			candidates = parsers
+				.filter(parser => parser.firstChars == null || (code < NON_ASCII && parser.firstChars.includes(String.fromCharCode(code))))
+				// the guard of `first` is not needed here
+				.map(parser => parser.guarded ?? parser);
+			candidatesByChar[code] = candidates;
 		}
 		for (let i = 0; i < candidates.length; i++) {
-			const parser: Parsers[number] = candidates[i];
-			const result = parser.handler(input, index, state);
+			const result = candidates[i].handler(input, index, state);
 			if (result.success) {
 				return result as Result<ParsedType<Parsers[number]>>;
 			}
 		}
 		return failure();
 	});
+	// alternatives can only start where one of them can
+	if (parsers.every(parser => parser.firstChars != null)) {
+		parser.firstChars = parsers.map(parser => parser.firstChars).join('');
+	}
+	return parser;
 }
 
 /**
@@ -208,13 +247,8 @@ export function first<T>(chars: string, parser: Parser<T>): Parser<T> {
 		return parser.handler(input, index, state);
 	});
 	guarded.firstChars = chars;
+	guarded.guarded = parser;
 	return guarded;
-}
-
-function succeeded<T>(value: T): Parser<T> {
-	return new Parser((_input, index, _state) => {
-		return success(index, value);
-	});
 }
 
 export function notMatch(parser: Parser<unknown>): Parser<null> {
@@ -245,6 +279,12 @@ function stateKey(state: State): StateKey {
  * `terminator` must not depend on the state.
 */
 export function until(terminator: Parser<unknown>, min: number): Parser<string> {
+	// the terminator is tried only at the characters it can start with
+	const canStart = new Uint8Array(0x80).fill(terminator.firstChars == null ? 1 : 0);
+	for (const c of terminator.firstChars ?? '') {
+		canStart[c.charCodeAt(0)] = 1;
+	}
+	const skipNonAscii = terminator.firstChars != null;
 	const parser: Parser<string> = new Parser((input, index, state) => {
 		state.untilSpans ??= new Map();
 		const spans = getOrCreate(state.untilSpans, parser, () => new Map());
@@ -254,8 +294,14 @@ export function until(terminator: Parser<unknown>, min: number): Parser<string> 
 			end = span.end;
 		} else {
 			end = index;
-			while (end < input.length && !terminator.handler(input, end, state).success) {
-				end++;
+			for (; end < input.length; end++) {
+				const code = input.charCodeAt(end);
+				if (code < 0x80 ? canStart[code] === 0 : skipNonAscii) {
+					continue;
+				}
+				if (terminator.handler(input, end, state).success) {
+					break;
+				}
 			}
 			spans.set(input, { start: index, end });
 		}
@@ -324,6 +370,8 @@ export const newline = new Parser<'\r\n' | '\r' | '\n'>((input, index, _state) =
 	}
 	return failure();
 });
+
+newline.firstChars = '\r\n';
 
 export const char = new Parser((input, index, _state) => {
 	if ((input.length - index) < 1) {
