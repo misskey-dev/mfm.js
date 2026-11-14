@@ -4,31 +4,38 @@ type ArrayRecursive<T> = T | Array<ArrayRecursive<T>>;
 
 export function mergeText<T extends MfmNode>(nodes: ArrayRecursive<((T extends MfmInline ? MfmInline : MfmNode) | string)>[]): (T | MfmText)[] {
 	const dest: (T | MfmText)[] = [];
-	const storedChars: string[] = [];
+	// the text of the adjacent strings and text nodes that are not pushed yet
+	let stored = '';
 
-	/**
-	 * Generate a text node from the stored chars, And push it.
-	*/
-	function generateText(): void {
-		if (storedChars.length > 0) {
-			dest.push(TEXT(storedChars.join('')));
-			storedChars.length = 0;
-		}
-	}
-
-	const flatten = nodes.flat(1) as (string | T)[];
-	for (const node of flatten) {
+	function add(node: string | T): void {
 		if (typeof node === 'string') {
 			// Store the char.
-			storedChars.push(node);
+			stored += node;
 		} else if (!Array.isArray(node) && node.type === 'text') {
-			storedChars.push((node as MfmText).props.text);
+			stored += (node as MfmText).props.text;
 		} else {
-			generateText();
+			// Generate a text node from the stored chars, And push it.
+			if (stored.length > 0) {
+				dest.push(TEXT(stored));
+				stored = '';
+			}
 			dest.push(node);
 		}
 	}
-	generateText();
+
+	// same as iterating `nodes.flat(1)`, which is slow
+	for (const node of nodes) {
+		if (Array.isArray(node)) {
+			for (const child of node) {
+				add(child as string | T);
+			}
+		} else {
+			add(node as string | T);
+		}
+	}
+	if (stored.length > 0) {
+		dest.push(TEXT(stored));
+	}
 
 	return dest;
 }

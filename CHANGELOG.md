@@ -10,6 +10,10 @@
 ### Bugfixes
 
 -->
+## 0.x.x (unreleased)
+### Improvements
+- Improve parsing performance
+
 ## 0.28.0
 ### Improvements
 - Improve memory usage

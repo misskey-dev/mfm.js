@@ -34,8 +34,11 @@ export function success<T>(index: number, value: T): Success<T> {
 	};
 }
 
+// Failures carry no data, so a single frozen instance is shared.
+const FAILURE: Failure = Object.freeze({ success: false });
+
 export function failure(): Failure {
-	return { success: false };
+	return FAILURE;
 }
 
 export class Parser<T> {
@@ -128,14 +131,15 @@ export function str<T extends string>(value: T): Parser<T> {
 }
 
 export function regexp<T extends RegExp>(pattern: T): Parser<string> {
-	const re = RegExp(`^(?:${pattern.source})`, pattern.flags);
+	// Use the sticky flag to match at `index` without slicing the input.
+	const re = RegExp(`(?:${pattern.source})`, pattern.flags.replace('g', '') + 'y');
 	return new Parser((input, index, _state) => {
-		const text = input.slice(index);
-		const result = re.exec(text);
-		if (result == null) {
+		// `test` does not allocate a match array; a sticky match starts at `index` and ends at `lastIndex`.
+		re.lastIndex = index;
+		if (!re.test(input)) {
 			return failure();
 		}
-		return success(index + result[0].length, result[0]);
+		return success(re.lastIndex, input.slice(index, re.lastIndex));
 	});
 }
 
@@ -307,7 +311,19 @@ export function manyThen<T, U>(item: Parser<T>, stop: Parser<unknown>, after: Pa
 export const cr = str('\r');
 export const lf = str('\n');
 export const crlf = str('\r\n');
-export const newline = alt([crlf, cr, lf]);
+// Same as `alt([crlf, cr, lf])`, checked by char codes since newlines are tested at almost every position.
+export const newline = new Parser<'\r\n' | '\r' | '\n'>((input, index, _state) => {
+	const code = input.charCodeAt(index);
+	if (code === 0x0d) {
+		return (input.charCodeAt(index + 1) === 0x0a)
+			? success(index + 2, '\r\n')
+			: success(index + 1, '\r');
+	}
+	if (code === 0x0a) {
+		return success(index + 1, '\n');
+	}
+	return failure();
+});
 
 export const char = new Parser((input, index, _state) => {
 	if ((input.length - index) < 1) {
@@ -317,27 +333,19 @@ export const char = new Parser((input, index, _state) => {
 	return success(index + 1, value);
 });
 
-export const lineBegin = new Parser((input, index, state) => {
-	if (index === 0) {
-		return success(index, null);
-	}
-	if (cr.handler(input, index - 1, state).success) {
-		return success(index, null);
-	}
-	if (lf.handler(input, index - 1, state).success) {
+export function isNewLineCode(code: number): boolean {
+	return code === 0x0d || code === 0x0a;
+}
+
+export const lineBegin = new Parser((input, index, _state) => {
+	if (index === 0 || isNewLineCode(input.charCodeAt(index - 1))) {
 		return success(index, null);
 	}
 	return failure();
 });
 
-export const lineEnd = new Parser((input, index, state) => {
-	if (index === input.length) {
-		return success(index, null);
-	}
-	if (cr.handler(input, index, state).success) {
-		return success(index, null);
-	}
-	if (lf.handler(input, index, state).success) {
+export const lineEnd = new Parser((input, index, _state) => {
+	if (index === input.length || isNewLineCode(input.charCodeAt(index))) {
 		return success(index, null);
 	}
 	return failure();
