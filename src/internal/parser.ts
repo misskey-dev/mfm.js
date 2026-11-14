@@ -537,7 +537,7 @@ export const language = P.createLanguage<TypeTable>({
 		).map(result => {
 			if (typeof result === 'string') return result;
 			const name = result[1];
-			const args: Args = result[2] || {};
+			const args: Args = result[2] ?? {};
 			const content = result[4];
 			return M.FN(name, args, mergeText(content));
 		});

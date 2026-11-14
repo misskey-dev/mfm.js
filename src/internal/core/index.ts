@@ -384,6 +384,7 @@ export function createLanguage<T>(syntaxes: { [K in keyof T]: (r: ParserTable<T>
 	for (const key of Object.keys(syntaxes) as (keyof T & string)[]) {
 		rules[key] = lazy(() => {
 			const parser = syntaxes[key](rules);
+			// oxlint-disable-next-line typescript/no-unnecessary-condition -- the types rule out null, but a caller without types can still return nothing
 			if (parser == null) {
 				throw new Error('syntax must return a parser.');
 			}

@@ -5,6 +5,7 @@ import inputLine, { InputCanceledError } from './misc/inputLine';
 async function entryPoint(): Promise<void> {
 	console.log('intaractive simple parser');
 
+	// oxlint-disable-next-line typescript/no-unnecessary-condition -- the interactive loop runs until the input is canceled
 	while (true) {
 		let input: string;
 		try {
