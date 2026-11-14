@@ -155,3 +155,15 @@ describe('nest budget', () => {
 		assert.deepStrictEqual(mergeText(result.value), [BOLD([ITALIC([TEXT('a')])])]);
 	});
 });
+
+describe('mergeText', () => {
+	test('merges adjacent strings and text nodes into one text node', () => {
+		const nodes = ['a', TEXT('b'), ['c', TEXT('d')], BOLD([TEXT('e')]), TEXT('f'), 'g'];
+		assert.deepStrictEqual(mergeText(nodes), [TEXT('abcd'), BOLD([TEXT('e')]), TEXT('fg')]);
+	});
+
+	test('makes no text node when there is no text', () => {
+		assert.deepStrictEqual(mergeText([]), []);
+		assert.deepStrictEqual(mergeText([BOLD([TEXT('a')]), [ITALIC([TEXT('b')])]]), [BOLD([TEXT('a')]), ITALIC([TEXT('b')])]);
+	});
+});
